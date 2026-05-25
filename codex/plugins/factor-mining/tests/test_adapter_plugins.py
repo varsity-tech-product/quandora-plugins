@@ -114,7 +114,10 @@ class AdapterPluginTests(unittest.TestCase):
             "codex plugin marketplace add",
             "codex plugin add",
             "factor-mining@factor-mining-marketplace",
-            "secure setup prompt",
+            "factor_setup.py",
+            "--api-key-stdin",
+            "/dev/tty",
+            "input hidden",
         ):
             self.assertIn(expected, installer_text + readme_text)
         self.assertNotIn("FACTOR_MINING_AGENT_API_KEY=", installer_text)

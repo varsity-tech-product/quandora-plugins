@@ -45,9 +45,11 @@ a `403` response means the key is not an external-agent credential.
 ## Codex CLI Install
 
 For Codex, the shortest product flow is to install the marketplace, install the
-plugin, and start a Codex session with the Factor Mining workflow prompt. The
-Agent API Key is not passed to the installer. Codex runs the plugin setup helper,
-which asks for the key through a secure prompt.
+plugin, configure the Factor Mining Agent API Key in the terminal, and start a
+Codex session with the Factor Mining workflow prompt. The key is entered at a
+hidden terminal prompt before Codex starts; it is not pasted into chat, not passed
+as a command argument, and not written to shell history. The setup helper stores
+configuration under `~/.factor-mining-agent` with user-only file permissions.
 
 From a clone of this repository:
 
@@ -55,7 +57,14 @@ From a clone of this repository:
 ./install-codex.sh
 ```
 
-For direct distribution from GitHub:
+While this repository is private, raw GitHub URLs return `404` unless the caller
+uses authenticated GitHub access. Use a local clone or a Git-authenticated clone:
+
+```bash
+tmpdir="$(mktemp -d)" && git clone --depth 1 git@github.com:varsity-tech-product/factor-mining-agent-plugins.git "$tmpdir/factor-mining-agent-plugins" && "$tmpdir/factor-mining-agent-plugins/install-codex.sh"
+```
+
+After the repository or release asset is public, direct distribution can use:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/factor-mining-agent-plugins/main/install-codex.sh | bash
@@ -67,8 +76,9 @@ Set `FACTOR_MINING_PLUGIN_REF` to pin a release or branch:
 FACTOR_MINING_PLUGIN_REF=v0.1.0 ./install-codex.sh
 ```
 
-Set `FACTOR_MINING_START_CODEX=0` to install only, without starting a Codex
-session.
+Set `FACTOR_MINING_START_CODEX=0` to install and configure without starting a
+Codex session. Set `FACTOR_MINING_SKIP_SETUP=1` to install only and configure the
+Agent API Key later.
 
 ### Manual Codex CLI Commands
 
@@ -77,7 +87,7 @@ These are the three commands run by the installer:
 ```bash
 codex plugin marketplace add varsity-tech-product/factor-mining-agent-plugins --ref main
 codex plugin add factor-mining@factor-mining-marketplace
-codex "Use the Factor Mining plugin. Set up Factor Mining with my Agent API Key through the secure setup prompt. Do not ask me to paste the key into chat. Then choose an open task, write a valid plugin.py, upload it, wait for the backtest, fetch the default factor card if available, and summarize the result."
+PLUGIN_ROOT="$(codex plugin list --marketplace factor-mining-marketplace | awk '$1 == "factor-mining@factor-mining-marketplace" { print $NF; exit }')" && python3 "$PLUGIN_ROOT/scripts/factor_setup.py" && codex "Use the Factor Mining plugin. Verify Factor Mining status, then choose an open task, write a valid plugin.py, upload it, wait for the backtest, fetch the default factor card if available, and summarize the result."
 ```
 
 For local product validation, replace the first command with the repository path:

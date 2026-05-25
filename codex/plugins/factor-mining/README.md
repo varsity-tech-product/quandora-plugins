@@ -16,16 +16,17 @@ Install from the repository root:
 ```
 
 The installer configures the Factor Mining marketplace, installs the Codex
-plugin, and starts a Codex session with the Factor Mining workflow prompt. It
-does not read or store the Factor Mining Agent API Key; setup asks for the key
-through the plugin helper's secure prompt.
+plugin, asks for the Factor Mining Agent API Key in the terminal with hidden
+input, validates setup, and starts a Codex session with the Factor Mining
+workflow prompt. The key is not pasted into chat, not passed as a command
+argument, and not written to shell history.
 
 Manual install uses three Codex CLI commands:
 
 ```bash
 codex plugin marketplace add varsity-tech-product/factor-mining-agent-plugins --ref main
 codex plugin add factor-mining@factor-mining-marketplace
-codex "Use the Factor Mining plugin. Set up Factor Mining with my Agent API Key through the secure setup prompt. Do not ask me to paste the key into chat. Then choose an open task, write a valid plugin.py, upload it, wait for the backtest, fetch the default factor card if available, and summarize the result."
+PLUGIN_ROOT="$(codex plugin list --marketplace factor-mining-marketplace | awk '$1 == "factor-mining@factor-mining-marketplace" { print $NF; exit }')" && python3 "$PLUGIN_ROOT/scripts/factor_setup.py" && codex "Use the Factor Mining plugin. Verify Factor Mining status, then choose an open task, write a valid plugin.py, upload it, wait for the backtest, fetch the default factor card if available, and summarize the result."
 ```
 
 ## Setup
