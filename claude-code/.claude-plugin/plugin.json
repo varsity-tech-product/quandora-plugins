@@ -1,7 +1,7 @@
 {
   "name": "factor-mining",
   "version": "0.1.0",
-  "description": "Claude Code external-agent workflow for Factor Mining plugin.py upload, backtest, polling, and summaries.",
+  "description": "Generate, upload, backtest, poll, and summarize Factor Mining plugin.py factors from Claude Code.",
   "author": {
     "name": "Varsity Tech Product",
     "url": "https://github.com/varsity-tech-product"
@@ -15,23 +15,5 @@
     "claude-code",
     "quant"
   ],
-  "skills": "./skills/",
-  "interface": {
-    "displayName": "Factor Mining",
-    "shortDescription": "Generate, upload, backtest, and summarize Factor Mining plugin.py factors.",
-    "longDescription": "A Claude Code external-agent helper for writing Factor Mining plugin.py files, validating metadata statically, uploading factors, submitting backtests, polling workflow state, retrieving artifacts, and summarizing results.",
-    "developerName": "Varsity Tech Product",
-    "category": "Productivity",
-    "capabilities": [
-      "Interactive",
-      "Write"
-    ],
-    "websiteURL": "https://github.com/varsity-tech-product/factor-mining-agent-plugins",
-    "defaultPrompt": [
-      "Set up Factor Mining local-agent access.",
-      "Write plugin.py, upload it, and run a backtest.",
-      "Resume my Factor Mining run and summarize results."
-    ],
-    "brandColor": "#0F766E"
-  }
+  "skills": "./skills/"
 }

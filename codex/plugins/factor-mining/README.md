@@ -38,8 +38,8 @@ https://d25q1jf66e8y4g.cloudfront.net
 
 Use `--base-url` only for a staging or private Factor Mining API environment.
 The configured environment must expose `/agent/status`; the plugin deliberately
-rejects environments that cannot prove the key is a delegated external-agent
-key.
+rejects credentials that the endpoint does not accept as delegated Agent API
+Keys.
 
 Local configuration is stored at:
 
@@ -84,7 +84,11 @@ availability, and summary fields suitable for Codex to report.
 - Do not use frontend user keys, OpenAI API keys, Codex auth files, or BYOK
   credentials with this plugin.
 - Setup always calls `/health` and `/agent/status`.
-- Setup fails unless `/agent/status` returns `key_purpose: external_agent`.
+- Setup succeeds only when `/health` is healthy and `/agent/status` accepts the
+  delegated Agent API Key. The current success response is `status: ok` and
+  `agent_key: valid`.
+- A `403` response from `/agent/status` means the key is not an external-agent
+  credential.
 - API keys are redacted from output and errors.
 - Upload requests omit optional `submitter_label` and `agent_id` fields so the
   backend applies external-agent provenance from the API key.

@@ -1,41 +1,14 @@
 {
-  "schema_version": "1.0",
-  "name": "factor-mining",
+  "id": "factor-mining",
+  "name": "Factor Mining",
   "version": "0.1.0",
-  "display_name": "Factor Mining",
   "description": "OpenClaw external-agent workflow for Factor Mining plugin.py upload, backtest, polling, and summaries.",
-  "author": {
-    "name": "Varsity Tech Product",
-    "url": "https://github.com/varsity-tech-product"
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
   },
-  "homepage": "https://github.com/varsity-tech-product/factor-mining-agent-plugins",
-  "repository": "https://github.com/varsity-tech-product/factor-mining-agent-plugins",
-  "license": "Proprietary",
-  "keywords": [
-    "factor-mining",
-    "backtesting",
-    "openclaw",
-    "quant"
-  ],
   "skills": [
-    {
-      "name": "factor-mining",
-      "path": "skills/factor-mining/SKILL.md",
-      "description": "Create, upload, backtest, poll, summarize, and resume Factor Mining plugin.py runs through the packaged helper scripts."
-    }
-  ],
-  "commands": [
-    {
-      "name": "factor-setup",
-      "path": "scripts/factor_setup.py"
-    },
-    {
-      "name": "factor-api",
-      "path": "scripts/factor_api.py"
-    },
-    {
-      "name": "factor-upload-backtest",
-      "path": "scripts/factor_upload_backtest.py"
-    }
+    "skills/factor-mining"
   ]
 }

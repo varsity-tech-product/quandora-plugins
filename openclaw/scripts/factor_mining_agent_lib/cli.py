@@ -49,7 +49,7 @@ def _require_saved_external_agent_status(config: AgentConfig) -> None:
         validate_agent_status(config.agent_status)
     except Exception as exc:
         raise RuntimeError(
-            "Stored Factor Mining config is not verified as an external_agent delegated key. "
+            "Stored Factor Mining config is not verified as a delegated Factor Mining Agent API Key. "
             "Run setup again with a Factor Mining Agent API Key, not a frontend user key."
         ) from exc
 

@@ -63,6 +63,14 @@ jobs:
       - name: Run mock backend acceptance
         run: python3 codex/plugins/factor-mining/tests/acceptance/run_mock_acceptance.py
 
+      - name: Validate Claude Code plugin when available
+        run: |
+          if command -v claude >/dev/null 2>&1; then
+            claude plugin validate claude-code
+          else
+            echo "Claude CLI is not available in this environment; skipping Claude Code plugin validation."
+          fi
+
       - name: Optional Codex plugin validation
         run: |
           python3 -m pip install -r requirements-dev.txt

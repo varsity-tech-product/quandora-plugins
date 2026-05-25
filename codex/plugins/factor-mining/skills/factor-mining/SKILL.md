@@ -43,10 +43,10 @@ Factor Mining API environment:
 python3 scripts/factor_setup.py --base-url <staging-or-private-api-url>
 ```
 
-Setup and status must call `/agent/status`. Continue only when the response
-reports `key_purpose: external_agent`. If the configured API does not expose
-`/agent/status`, tell the user that the Factor Mining API environment must
-include the external-agent status endpoint before this plugin can be configured.
+Setup and status must call `/agent/status`. Continue only when `/health` is
+healthy and `/agent/status` accepts the delegated Agent API Key. The current
+success response is `status: ok` and `agent_key: valid`. If `/agent/status`
+returns `403`, tell the user the key is not an external-agent credential.
 
 Configuration is stored outside project repositories at:
 
@@ -62,8 +62,7 @@ Run state is stored at:
 
 ## Hard Security Rules
 
-- Use only a delegated Factor Mining Agent API Key whose `/agent/status`
-  response has `key_purpose: external_agent`.
+- Use only a delegated Factor Mining Agent API Key accepted by `/agent/status`.
 - Never ask for OpenAI API keys, Codex auth files, BYOK secrets, or frontend
   user credentials.
 - Never print, persist in logs, or summarize full API keys.

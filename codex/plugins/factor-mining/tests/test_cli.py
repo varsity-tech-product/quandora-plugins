@@ -26,9 +26,8 @@ class CliTests(unittest.TestCase):
                 base_url="https://factor.example",
                 api_key=secret,
                 agent_status=agent_status if agent_status is not None else {
-                    "ok": True,
-                    "mode": "local_agent",
-                    "key_purpose": "external_agent",
+                    "status": "ok",
+                    "agent_key": "valid",
                 },
             ),
             home=Path(home),
@@ -63,7 +62,7 @@ class CliTests(unittest.TestCase):
         opener = FakeOpener(
             [
                 FakeResponse(body={"db": "ok"}),
-                FakeResponse(body={"ok": True, "mode": "local_agent", "key_purpose": "external_agent"}),
+                FakeResponse(body={"status": "ok", "agent_key": "valid"}),
             ]
         )
         stdout = io.StringIO()
@@ -84,7 +83,8 @@ class CliTests(unittest.TestCase):
         self.assertEqual(config.api_key, secret)
         self.assertNotIn(secret, output)
         self.assertIn("vt_...cdef", output)
-        self.assertEqual(config.agent_status["key_purpose"], "external_agent")
+        self.assertEqual(config.agent_status["status"], "ok")
+        self.assertEqual(config.agent_status["agent_key"], "valid")
 
     def test_setup_uses_production_base_url_by_default(self):
         secret = "vt_test_secret_1234567890abcdef"
@@ -158,7 +158,6 @@ class CliTests(unittest.TestCase):
 
             self.assertEqual(code, 1)
             self.assertFalse((Path(tmp) / "config.json").exists())
-            self.assertIn("external_agent", stderr.getvalue())
             self.assertIn("Agent API Key", stderr.getvalue())
             self.assertNotIn(secret, stderr.getvalue())
 
@@ -243,7 +242,6 @@ class CliTests(unittest.TestCase):
             )
 
         self.assertEqual(code, 1)
-        self.assertIn("external_agent", stderr.getvalue())
         self.assertIn("Agent API Key", stderr.getvalue())
 
     def test_setup_reports_missing_agent_status_endpoint_clearly(self):

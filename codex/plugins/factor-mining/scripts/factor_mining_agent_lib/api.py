@@ -47,15 +47,26 @@ class AgentStatusError(ApiError):
     pass
 
 
+AGENT_KEY_GUIDANCE = (
+    "Factor Mining setup requires a delegated Factor Mining Agent API Key. "
+    "Run setup again with a Factor Mining Agent API Key, not a frontend user key."
+)
+
+
 def validate_agent_status(status: Mapping[str, Any]) -> Mapping[str, Any]:
     if status.get("ok") is False:
-        raise AgentStatusError("Factor Mining agent status returned ok=false", body=dict(status))
-    if status.get("key_purpose") != "external_agent":
-        raise AgentStatusError(
-            "Factor Mining setup requires an external_agent delegated Agent API Key. "
-            "Run setup again with a Factor Mining Agent API Key, not a frontend user key.",
-            body=dict(status),
-        )
+        raise AgentStatusError(AGENT_KEY_GUIDANCE, body=dict(status))
+    if "status" in status and status.get("status") != "ok":
+        raise AgentStatusError(AGENT_KEY_GUIDANCE, body=dict(status))
+    if "agent_key" in status and status.get("agent_key") != "valid":
+        raise AgentStatusError(AGENT_KEY_GUIDANCE, body=dict(status))
+    if "key_purpose" in status and status.get("key_purpose") != "external_agent":
+        raise AgentStatusError(AGENT_KEY_GUIDANCE, body=dict(status))
+
+    backend_main_proof = status.get("status") == "ok" and status.get("agent_key") == "valid"
+    richer_external_agent_proof = status.get("key_purpose") == "external_agent"
+    if not (backend_main_proof or richer_external_agent_proof):
+        raise AgentStatusError(AGENT_KEY_GUIDANCE, body=dict(status))
     return status
 
 
@@ -188,6 +199,15 @@ class ApiClient:
         try:
             status = self.request("GET", "/agent/status")
         except ApiError as exc:
+            if exc.status in (401, 403):
+                raise AgentStatusError(
+                    AGENT_KEY_GUIDANCE,
+                    status=exc.status,
+                    method=exc.method,
+                    url=exc.url,
+                    body=exc.body,
+                    api_key=self.api_key,
+                ) from exc
             if exc.status == 404:
                 raise AgentStatusError(
                     "Factor Mining API environment must include the external-agent status endpoint at /agent/status.",

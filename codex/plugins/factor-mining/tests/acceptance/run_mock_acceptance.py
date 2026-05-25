@@ -222,7 +222,8 @@ def _run_scenario(name: str, backend_scenario: str) -> ScenarioResult:
 
 
 def _assert_success(result: ScenarioResult) -> None:
-    if result.setup.get("agent_status", {}).get("key_purpose") != "external_agent":
+    agent_status = result.setup.get("agent_status", {})
+    if agent_status.get("status") != "ok" or agent_status.get("agent_key") != "valid":
         raise AcceptanceFailure("setup did not verify an external-agent key")
     if result.session.get("session_id") != "session_mock_1":
         raise AcceptanceFailure("session creation did not return the mock session")

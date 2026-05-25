@@ -23,10 +23,30 @@ class MockAcceptanceTests(unittest.TestCase):
 
         self.assertEqual(raised.exception.code, 401)
 
+    def test_mock_backend_agent_status_contract(self):
+        with start_mock_backend() as backend:
+            unauthenticated = request.Request(f"{backend.base_url}/agent/status", method="GET")
+            external_agent = request.Request(f"{backend.base_url}/agent/status", method="GET")
+            external_agent.add_header("Authorization", "Bearer vt_mock_valid")
+            rejected = request.Request(f"{backend.base_url}/agent/status", method="GET")
+            rejected.add_header("Authorization", "Bearer user_mock_invalid")
+
+            with self.assertRaises(HTTPError) as raised_unauthenticated:
+                request.urlopen(unauthenticated, timeout=5)
+            with request.urlopen(external_agent, timeout=5) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+            with self.assertRaises(HTTPError) as raised_rejected:
+                request.urlopen(rejected, timeout=5)
+
+        self.assertEqual(raised_unauthenticated.exception.code, 401)
+        self.assertEqual(payload, {"agent_key": "valid", "status": "ok"})
+        self.assertEqual(raised_rejected.exception.code, 403)
+
     def test_success_scenario_runs_full_helper_flow(self):
         result = run_success_scenario()
 
-        self.assertEqual(result.setup["agent_status"]["key_purpose"], "external_agent")
+        self.assertEqual(result.setup["agent_status"]["status"], "ok")
+        self.assertEqual(result.setup["agent_status"]["agent_key"], "valid")
         self.assertEqual(result.session["session_id"], "session_mock_1")
         self.assertEqual(result.metadata["factor_name"], "Mock Liquidity Stress")
         self.assertTrue(result.upload_summary["ok"])

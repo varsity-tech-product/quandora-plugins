@@ -37,10 +37,10 @@ summarize the outcome for the user.
 5. Let the agent run the waitable upload and backtest command.
 6. Review the summarized result, including job status, failures, metrics, and artifacts.
 
-Setup always verifies `/health` and `/agent/status`. The configured Factor
-Mining API environment must expose the external-agent status endpoint and return
-`key_purpose: external_agent`; otherwise setup fails before storing
-configuration.
+Setup always verifies `/health` and `/agent/status`. Setup succeeds only when
+the API is healthy and `/agent/status` accepts the delegated Factor Mining Agent
+API Key. The current success response is `status: ok` and `agent_key: valid`;
+a `403` response means the key is not an external-agent credential.
 
 ## Validation
 

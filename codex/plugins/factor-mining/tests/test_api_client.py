@@ -56,6 +56,19 @@ class FakeOpener:
 
 class ApiClientTests(unittest.TestCase):
     def test_agent_status_request_and_external_agent_validation(self):
+        opener = FakeOpener([FakeResponse(body={"status": "ok", "agent_key": "valid"})])
+        client = ApiClient("https://factor.example/api/", "vt_secret", opener=opener)
+
+        status = client.agent_status()
+
+        self.assertEqual(status["status"], "ok")
+        self.assertEqual(status["agent_key"], "valid")
+        request = opener.requests[0]
+        self.assertEqual(request.get_method(), "GET")
+        self.assertEqual(request.full_url, "https://factor.example/api/agent/status")
+        self.assertEqual(request.get_header("Authorization"), "Bearer vt_secret")
+
+    def test_agent_status_accepts_richer_external_agent_response(self):
         opener = FakeOpener(
             [
                 FakeResponse(
@@ -73,14 +86,31 @@ class ApiClientTests(unittest.TestCase):
         status = client.agent_status()
 
         self.assertEqual(status["key_purpose"], "external_agent")
-        request = opener.requests[0]
-        self.assertEqual(request.get_method(), "GET")
-        self.assertEqual(request.full_url, "https://factor.example/api/agent/status")
-        self.assertEqual(request.get_header("Authorization"), "Bearer vt_secret")
 
     def test_non_external_agent_status_is_rejected(self):
-        with self.assertRaisesRegex(AgentStatusError, "external_agent"):
-            validate_agent_status({"ok": True, "key_purpose": "frontend_user", "mode": "web"})
+        cases = [
+            {"ok": False},
+            {"status": "error", "agent_key": "valid"},
+            {"status": "ok", "agent_key": "invalid"},
+            {"status": "ok", "agent_key": "valid", "key_purpose": "frontend_user"},
+            {"status": "ok"},
+            {"agent_key": "valid"},
+            {"ok": True},
+        ]
+        for payload in cases:
+            with self.subTest(payload=payload):
+                with self.assertRaisesRegex(AgentStatusError, "Agent API Key"):
+                    validate_agent_status(payload)
+
+    def test_agent_status_403_has_agent_key_guidance(self):
+        client = ApiClient(
+            "https://factor.example",
+            "vt_secret",
+            opener=FakeOpener([FakeResponse(status=403, body={"detail": "forbidden"})]),
+        )
+
+        with self.assertRaisesRegex(AgentStatusError, "Agent API Key"):
+            client.agent_status()
 
     def test_missing_agent_status_endpoint_has_actionable_error(self):
         client = ApiClient(

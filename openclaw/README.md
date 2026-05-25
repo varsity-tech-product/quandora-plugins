@@ -34,9 +34,10 @@ Environment variable input is supported for automation-only contexts:
 FACTOR_MINING_AGENT_API_KEY=<agent-key> python3 scripts/factor_setup.py
 ```
 
-Setup calls `/health` and `/agent/status`. The configured Factor Mining API
-environment must return `key_purpose: external_agent`; otherwise setup fails
-before storing configuration.
+Setup calls `/health` and `/agent/status`. Setup succeeds only when the API is
+healthy and `/agent/status` accepts the delegated Factor Mining Agent API Key.
+The current success response is `status: ok` and `agent_key: valid`; a `403`
+response means the key is not an external-agent credential.
 
 ## Agent Workflow
 

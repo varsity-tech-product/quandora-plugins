@@ -27,10 +27,11 @@ python3 scripts/factor_setup.py --api-key-stdin
 FACTOR_MINING_AGENT_API_KEY=<agent-key> python3 scripts/factor_setup.py
 ```
 
-Setup calls `/health` and `/agent/status`. Continue only when the response
-reports `key_purpose: external_agent`. Do not bypass this check. If the
-configured Factor Mining API does not expose `/agent/status`, tell the user the
-external agent status endpoint is required before setup can complete.
+Setup calls `/health` and `/agent/status`. Continue only when `/health` is
+healthy and `/agent/status` accepts the delegated Agent API Key. The current
+success response is `status: ok` and `agent_key: valid`. If `/agent/status`
+returns `403`, tell the user the key is not an external-agent credential. Do
+not bypass this check.
 
 ## Workflow
 

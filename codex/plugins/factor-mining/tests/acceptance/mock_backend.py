@@ -92,6 +92,16 @@ def _handler_for(state: MockBackendState) -> type[BaseHTTPRequestHandler]:
                 return False
             return True
 
+        def _require_agent_status_auth(self) -> bool:
+            auth = self.headers.get("Authorization") or ""
+            if not auth.startswith("Bearer "):
+                self._send_json(401, {"detail": "A delegated Agent API Key is required."})
+                return False
+            if not auth.removeprefix("Bearer ").startswith("vt_") or state.scenario == "non_external_agent":
+                self._send_json(403, {"detail": "The provided key is not an external-agent credential."})
+                return False
+            return True
+
         def do_GET(self) -> None:
             parsed = urlparse(self.path)
             path = parsed.path
@@ -102,23 +112,13 @@ def _handler_for(state: MockBackendState) -> type[BaseHTTPRequestHandler]:
                 self._send_json(200, {"ok": True, "service": "factor-mining-mock"})
                 return
 
-            if not self._require_auth():
+            if path == "/agent/status":
+                if not self._require_agent_status_auth():
+                    return
+                self._send_json(200, {"status": "ok", "agent_key": "valid"})
                 return
 
-            if path == "/agent/status":
-                if state.scenario == "missing_agent_status":
-                    self._send_json(404, {"detail": "not found"})
-                    return
-                key_purpose = "frontend_user" if state.scenario == "non_external_agent" else "external_agent"
-                self._send_json(
-                    200,
-                    {
-                        "ok": True,
-                        "mode": "local_agent",
-                        "key_purpose": key_purpose,
-                        "capabilities": ["tasks:read", "plugins:upload", "backtests:create"],
-                    },
-                )
+            if not self._require_auth():
                 return
 
             if path == "/tasks":
