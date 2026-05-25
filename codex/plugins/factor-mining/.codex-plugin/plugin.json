@@ -1,0 +1,37 @@
+{
+  "name": "factor-mining",
+  "version": "0.1.0",
+  "description": "Codex local-agent workflow for Factor Mining plugin.py upload, backtest, polling, and summaries.",
+  "author": {
+    "name": "Varsity Tech Product",
+    "url": "https://github.com/varsity-tech-product"
+  },
+  "homepage": "https://github.com/varsity-tech-product/factor-mining-agent-plugins",
+  "repository": "https://github.com/varsity-tech-product/factor-mining-agent-plugins",
+  "license": "Proprietary",
+  "keywords": [
+    "factor-mining",
+    "backtesting",
+    "codex",
+    "quant"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Factor Mining",
+    "shortDescription": "Generate, upload, backtest, and summarize Factor Mining plugin.py factors.",
+    "longDescription": "A Codex-first local-agent helper for writing Factor Mining plugin.py files, validating metadata statically, uploading factors, submitting backtests, polling workflow state, retrieving artifacts, and summarizing results.",
+    "developerName": "Varsity Tech Product",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/varsity-tech-product/factor-mining-agent-plugins",
+    "defaultPrompt": [
+      "Set up Factor Mining local-agent access.",
+      "Write plugin.py, upload it, and run a backtest.",
+      "Resume my Factor Mining run and summarize results."
+    ],
+    "brandColor": "#0F766E"
+  }
+}

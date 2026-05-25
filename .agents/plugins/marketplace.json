@@ -1,0 +1,20 @@
+{
+  "name": "factor-mining-marketplace",
+  "interface": {
+    "displayName": "Factor Mining"
+  },
+  "plugins": [
+    {
+      "name": "factor-mining",
+      "source": {
+        "source": "local",
+        "path": "./codex/plugins/factor-mining"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
