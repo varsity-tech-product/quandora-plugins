@@ -49,29 +49,29 @@ hidden terminal prompt before Codex starts; it is not pasted into chat, not pass
 as a command argument, and not written to shell history. The setup helper stores
 configuration under `~/.factor-mining-agent` with user-only file permissions.
 
-From a clone of this repository:
-
-```bash
-./install-codex.sh
-```
-
-If distribution requires GitHub authentication, use a local clone or a
-Git-authenticated clone:
-
-```bash
-tmpdir="$(mktemp -d)" && git clone --depth 1 git@github.com:varsity-tech-product/factor-mining-agent-plugins.git "$tmpdir/factor-mining-agent-plugins" && "$tmpdir/factor-mining-agent-plugins/install-codex.sh"
-```
-
-After the repository or release asset is public, direct distribution can use:
+Install directly from the public GitHub repository:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/factor-mining-agent-plugins/main/install-codex.sh | bash
+```
+
+From a local clone of this repository:
+
+```bash
+./install-codex.sh
 ```
 
 Set `FACTOR_MINING_PLUGIN_REF` to pin a release or branch:
 
 ```bash
 FACTOR_MINING_PLUGIN_REF=v0.1.0 ./install-codex.sh
+```
+
+For the direct installer, pass the same variable to the shell that runs the
+installer:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/factor-mining-agent-plugins/main/install-codex.sh | FACTOR_MINING_PLUGIN_REF=v0.1.0 bash
 ```
 
 Set `FACTOR_MINING_START_CODEX=0` or pass `--no-start` to install and configure
