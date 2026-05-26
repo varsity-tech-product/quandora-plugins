@@ -156,3 +156,7 @@ python3 codex/plugins/factor-mining/tests/acceptance/run_mock_acceptance.py
 
 When a Codex plugin validator is available in the environment, run it against
 `codex/plugins/factor-mining`.
+
+## License
+
+This repository is licensed under the Apache License 2.0. See [LICENSE](LICENSE).

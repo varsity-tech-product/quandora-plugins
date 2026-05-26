@@ -8,7 +8,7 @@
   },
   "homepage": "https://github.com/varsity-tech-product/factor-mining-agent-plugins",
   "repository": "https://github.com/varsity-tech-product/factor-mining-agent-plugins",
-  "license": "Proprietary",
+  "license": "Apache-2.0",
   "keywords": [
     "factor-mining",
     "backtesting",
