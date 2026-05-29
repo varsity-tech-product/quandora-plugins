@@ -11,6 +11,20 @@ exchanges it for a delegated local-agent credential, stores that credential
 locally, and uses it through the bundled Quandora MCP tools. Users do not need
 to paste full credential values into chat.
 
+Current public `main` is temporarily configured for localhost Local Agent
+Connect testing. Start the local connect web service before starting Codex so
+`quandora_connect` can open:
+
+```text
+http://127.0.0.1:3037/local-agent/connect
+```
+
+Production releases will switch this default back to:
+
+```text
+https://app.quandora.ai/local-agent/connect
+```
+
 Quandora Buddy is optional. It provides desktop fishing animation and sanitized
 local event display, but it is not required for plugin authorization or
 backtesting. Plugin installation never downloads, installs, starts, or updates
@@ -27,6 +41,15 @@ Install from the public marketplace source:
 ```bash
 codex plugin marketplace add varsity-tech-product/factor-mining-agent-plugins --ref main
 codex plugin add factor-mining@factor-mining-marketplace
+```
+
+## Update Or Reinstall
+
+```bash
+codex plugin marketplace upgrade factor-mining-marketplace
+codex plugin remove factor-mining@factor-mining-marketplace
+codex plugin add factor-mining@factor-mining-marketplace
+codex plugin list --marketplace factor-mining-marketplace
 ```
 
 Or run the installer:
@@ -62,6 +85,25 @@ Resume my Factor Mining run and summarize results.
 If no local-agent credential is connected, Codex will use `quandora_connect`
 to open Quandora Local Agent Connect. Complete authorization in the browser,
 then let Codex continue the workflow.
+
+## Localhost Connect Test
+
+Use this prompt after updating or reinstalling:
+
+```text
+Use Quandora Factor Mining. Check my connection status. If I am not connected, run Quandora Local Agent Connect, open the authorization page, wait for me to approve it in the browser, then list available public tasks. Stop after showing the task list.
+```
+
+Expected behavior:
+
+- Codex calls `quandora_connect_status` or `quandora_status`.
+- If disconnected, Codex calls `quandora_connect`.
+- Browser opens `http://127.0.0.1:3037/local-agent/connect?...`.
+- User approves in the local web page.
+- Browser redirects to the plugin loopback callback.
+- Codex calls `quandora_connect_wait` if needed.
+- Plugin stores a `vt_agent_...` credential locally.
+- Codex calls `/agent/status` and then lists public tasks.
 
 ## Product Workflow
 
@@ -101,6 +143,7 @@ plugin, then fully restart Codex:
 codex plugin marketplace upgrade factor-mining-marketplace
 codex plugin remove factor-mining@factor-mining-marketplace
 codex plugin add factor-mining@factor-mining-marketplace
+codex plugin list --marketplace factor-mining-marketplace
 ```
 
 If authorization is not connected, ask Codex to run Quandora connect again. If

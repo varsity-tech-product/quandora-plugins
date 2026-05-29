@@ -12,6 +12,10 @@ backtests, and returns workflow, job, artifact, and factor result data.
 The plugin owns local-agent authorization through Quandora Local Agent Connect.
 Use `quandora_connect` when no plugin-local credential is connected. Raw
 credentials must never be pasted into chat, terminal logs, UI text, or docs.
+Current public `main` is temporarily configured for localhost Local Agent
+Connect testing, so `quandora_connect` opens
+`http://127.0.0.1:3037/local-agent/connect`. Production releases should switch
+this default back to `https://app.quandora.ai/local-agent/connect`.
 
 Buddy is optional. It provides desktop fishing animation and a sanitized local
 event receiver, but it is not required for authorization or backtesting. Plugin

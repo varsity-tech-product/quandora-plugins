@@ -23,7 +23,7 @@ from .config import DEFAULT_BASE_URL, agent_home, ensure_agent_home, _write_priv
 from .redaction import redact_obj, redact_text
 
 
-DEFAULT_WEB_CONNECT_URL = "https://app.quandora.ai/local-agent/connect"
+DEFAULT_WEB_CONNECT_URL = "http://127.0.0.1:3037/local-agent/connect"
 DEFAULT_TIMEOUT_SECONDS = 300
 PENDING_CONNECT_TTL_SECONDS = 600
 CALLBACK_HOST = "127.0.0.1"
