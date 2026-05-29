@@ -32,7 +32,7 @@ from factor_mining_agent_lib.workflow import is_workflow_terminal, summarize_fac
 
 PROTOCOL_VERSION = "2024-11-05"
 SERVER_NAME = "quandora-factor-mining"
-SERVER_VERSION = "0.2.2"
+SERVER_VERSION = "0.2.3"
 BUDDY_REQUIRED_MESSAGE = (
     "Quandora Buddy is a separate required local desktop app for Factor Mining "
     "account connection and backtesting. Install Buddy from "
@@ -803,7 +803,7 @@ def read_message(stream: BinaryIO) -> dict[str, Any] | None:
 
 def write_message(stream: BinaryIO, message: Mapping[str, Any]) -> None:
     body = json.dumps(message, separators=(",", ":"), sort_keys=True).encode("utf-8")
-    stream.write(f"Content-Length: {len(body)}\r\n\r\n".encode("ascii") + body)
+    stream.write(body + b"\n")
     stream.flush()
 
 

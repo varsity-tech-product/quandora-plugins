@@ -1,6 +1,6 @@
 {
   "name": "factor-mining",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Quandora local-agent workflow for writing, uploading, backtesting, and summarizing Factor Mining plugin.py factors.",
   "author": {
     "name": "Varsity Tech Product",
