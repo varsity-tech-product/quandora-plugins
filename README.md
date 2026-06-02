@@ -1,77 +1,35 @@
 # Quandora Factor Mining
 
-Quandora Factor Mining is a Codex plugin for turning public factor tasks or
-custom factor ideas into local `plugin.py` factors, then submitting them to
-Quandora for validation, upload, backtesting, artifact retrieval, and result
-summaries.
+Quandora Factor Mining is a local-agent plugin distribution for turning public
+factor tasks or custom factor ideas into local `plugin.py` factors, then
+submitting them to Quandora for validation, backtesting, artifact retrieval,
+and result summaries.
 
-The plugin owns local-agent authorization through Quandora Local Agent Connect.
-Codex opens the Quandora authorization page, receives the local callback,
-exchanges it for a delegated local-agent credential, stores that credential
-locally, and uses it through the bundled Quandora MCP tools. Users do not need
-to paste full credential values into chat.
+Codex is available now. Claude Code and OpenClaw adapter slots are reserved for
+future releases and are not installable from this repository yet.
 
-Current public `main` is temporarily configured for localhost Local Agent
-Connect testing. Start the local connect web service and local orchestrator
-before starting Codex so `quandora_connect` can open:
+## Codex CLI
 
-```text
-http://127.0.0.1:3037/local-agent/connect
-```
-
-and the plugin can validate and run Factor Mining calls through:
-
-```text
-http://127.0.0.1:18080
-```
-
-Production releases will switch these defaults back to:
-
-```text
-https://app.quandora.ai/local-agent/connect
-https://d25q1jf66e8y4g.cloudfront.net
-```
-
-Quandora Buddy is optional. It provides desktop fishing animation and sanitized
-local event display, but it is not required for plugin authorization or
-backtesting. Plugin installation never downloads, installs, starts, or updates
-Buddy in the background.
-
-```text
-https://app.quandora.ai/download/buddy
-```
-
-## Codex CLI Install
-
-Install from the public marketplace source:
+Install the marketplace and plugin:
 
 ```bash
 codex plugin marketplace add varsity-tech-product/factor-mining-agent-plugins --ref main
 codex plugin add factor-mining@factor-mining-marketplace
 ```
 
-## Update Or Reinstall
-
-```bash
-codex plugin marketplace upgrade factor-mining-marketplace
-codex plugin remove factor-mining@factor-mining-marketplace
-codex plugin add factor-mining@factor-mining-marketplace
-codex plugin list --marketplace factor-mining-marketplace
-```
-
-Or run the installer:
+Or run:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/factor-mining-agent-plugins/main/install-codex.sh | bash
 ```
 
-## Codex Desktop Install
+## Codex Desktop
 
-In Codex Desktop, add this marketplace:
+Use these fields in Codex Desktop:
 
 ```text
-Marketplace source: varsity-tech-product/factor-mining-agent-plugins
-Marketplace ref: main
+Source: varsity-tech-product/factor-mining-agent-plugins
+Git ref: main
 Plugin: factor-mining@factor-mining-marketplace
 ```
 
@@ -89,71 +47,52 @@ Use Factor Mining with my custom factor idea.
 Resume my Factor Mining run and summarize results.
 ```
 
-If no local-agent credential is connected, Codex will use `quandora_connect`
-to open Quandora Local Agent Connect. Complete authorization in the browser,
-then let Codex continue the workflow.
+## Local Agent Connect
 
-## Localhost Connect Test
-
-Use this prompt after updating or reinstalling:
+The Codex plugin owns Local Agent Connect. When authorization is needed, Codex
+calls `quandora_connect`, the plugin opens:
 
 ```text
-Use Quandora Factor Mining. Check my connection status. If I am not connected, run Quandora Local Agent Connect, open the authorization page, wait for me to approve it in the browser, then list available public tasks. Stop after showing the task list.
+https://www.quandora.ai/local-agent/connect
 ```
 
-Expected behavior:
+The user signs in and authorizes in the browser. The web app redirects to the
+plugin's local loopback callback, the plugin exchanges the code with PKCE, and
+the returned delegated `vt_agent_...` credential is stored locally with
+owner-only permissions. The plugin then uses that credential for task listing,
+session creation, plugin upload, backtesting, job polling, and factor-card
+artifact retrieval.
 
-- Codex calls `quandora_connect_status` or `quandora_status`.
-- If disconnected, Codex calls `quandora_connect`.
-- Browser opens `http://127.0.0.1:3037/local-agent/connect?...`.
-- User approves in the local web page.
-- Browser redirects to the plugin loopback callback.
-- Codex calls `quandora_connect_wait` if needed.
-- Plugin stores a `vt_agent_...` credential locally.
-- Codex calls local `/agent/status` on `http://127.0.0.1:18080` and then
-  lists public tasks.
+There is no manual key-paste flow.
 
-## Product Workflow
+## Buddy
 
-Codex uses the bundled `quandora-factor-mining` MCP server for formal Factor
-Mining actions:
+Buddy is an optional desktop animation companion. It is not required for
+authorization, credential storage, upload, backtesting, polling, or artifact
+retrieval. Plugin installation never installs or starts Buddy.
 
-- connect, pending-connect wait/cancel/status, and disconnect
-- public task listing and task-backed session creation
-- custom idea session creation with explicit task payload
-- static `plugin.py` metadata parsing without executing generated code
-- deduplication context requests
-- upload, backtest, workflow/job polling, artifact retrieval, and summaries
-- optional sanitized Buddy events
+## Localhost Testing
 
-The plugin does not expose generic API-call, URL-fetch, or raw-credential
-tools. Generated `plugin.py` source stays local until the user asks Codex to
-submit it through the bundled Factor Mining workflow.
-
-## Security And Privacy
-
-- Use only plugin-owned Local Agent Connect credentials through the bundled
-  Quandora MCP tools.
-- Never paste full Factor Mining credentials into chat.
-- Never print, persist in logs, or summarize full credential values.
-- Do not import, exec, eval, or otherwise execute generated `plugin.py`.
-- Do not print generated `plugin.py` source in final summaries.
-- Treat downstream job IDs, presigned URLs, and service metadata as internal.
-- Buddy events are best-effort and must never include credentials, generated
-  source, full workspace paths, presigned URLs, or backend internals.
-
-## Troubleshooting
-
-If Codex says the Quandora MCP tools are unavailable, upgrade and reinstall the
-plugin, then fully restart Codex:
+Local connect web testing is available only through an explicit override:
 
 ```bash
-codex plugin marketplace upgrade factor-mining-marketplace
-codex plugin remove factor-mining@factor-mining-marketplace
-codex plugin add factor-mining@factor-mining-marketplace
-codex plugin list --marketplace factor-mining-marketplace
+QUANDORA_CONNECT_WEB_URL=http://127.0.0.1:3037/local-agent/connect
 ```
 
-If authorization is not connected, ask Codex to run Quandora connect again. If
-the browser cannot be opened automatically, Codex will show a safe
-authorization URL and wait for the connect callback in the same session.
+The production default remains `https://www.quandora.ai/local-agent/connect`.
+
+## Repository Layout
+
+```text
+.agents/plugins/marketplace.json
+plugins/factor-mining/
+adapters/claude-code/
+adapters/openclaw/
+```
+
+`plugins/factor-mining/` contains the Codex package. The adapter directories
+are reserved empty slots for future releases.
+
+## License
+
+This repository is licensed under the Apache License 2.0. See [LICENSE](LICENSE).

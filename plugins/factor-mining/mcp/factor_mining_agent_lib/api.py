@@ -49,7 +49,7 @@ class AgentStatusError(ApiError):
 
 AGENT_KEY_GUIDANCE = (
     "Run quandora_connect to authorize this plugin with Quandora Local Agent Connect. "
-    "Buddy is optional and only provides the desktop fishing animation companion."
+    "If the saved credential expired or was revoked, run quandora_connect again."
 )
 
 

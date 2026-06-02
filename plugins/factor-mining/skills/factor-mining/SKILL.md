@@ -12,21 +12,16 @@ backtests, and returns workflow, job, artifact, and factor result data.
 The plugin owns local-agent authorization through Quandora Local Agent Connect.
 Use `quandora_connect` when no plugin-local credential is connected. Raw
 credentials must never be pasted into chat, terminal logs, UI text, or docs.
-Current public `main` is temporarily configured for localhost Local Agent
-Connect testing, so `quandora_connect` opens
-`http://127.0.0.1:3037/local-agent/connect` and Factor Mining API calls use
-`http://127.0.0.1:18080`. Production releases should switch these defaults
-back to `https://app.quandora.ai/local-agent/connect` and
-`https://d25q1jf66e8y4g.cloudfront.net`.
+By default, `quandora_connect` opens
+`https://www.quandora.ai/local-agent/connect`. For local connect web testing,
+set `QUANDORA_CONNECT_WEB_URL=http://127.0.0.1:3037/local-agent/connect`
+before starting the MCP server. After exchange, Factor Mining API calls use the
+`base_url` returned by Quandora, expected to be `https://www.quandora.ai/api`
+in production.
 
-Buddy is optional. It provides desktop fishing animation and a sanitized local
-event receiver, but it is not required for authorization or backtesting. Plugin
-installation never downloads or installs Buddy in the background. Optional
-Buddy download:
-
-```text
-https://app.quandora.ai/download/buddy
-```
+Buddy is optional. It provides desktop animation from Quandora backend activity
+events, but it is not required for authorization or backtesting. Plugin
+installation never downloads or installs Buddy in the background.
 
 Use the bundled Quandora MCP tools for the product workflow. If the MCP tools
 are not available, stop and explain that the Quandora plugin tools are not
@@ -41,7 +36,6 @@ Use these tools for the formal workflow:
 - `quandora_connect_pending`
 - `quandora_connect_cancel`
 - `quandora_connect_wait`
-- `quandora_connect_status`
 - `quandora_disconnect`
 - `quandora_list_public_tasks`
 - `quandora_create_task_session`
@@ -50,13 +44,14 @@ Use these tools for the formal workflow:
 - `quandora_request_dedup_context`
 - `quandora_upload_backtest_wait`
 - `quandora_resume_run`
-- `quandora_emit_buddy_event`
+- `quandora_get_workflow`
+- `quandora_get_job`
+- `quandora_get_artifact`
 
-Start with `quandora_connect_status` or `quandora_status`. Continue only when
-the plugin-local delegated credential validates. If no credential is connected,
-run `quandora_connect` and wait for the user to complete web authorization. Do
-not call upload, backtest, polling, artifact, or session tools before connect
-is complete.
+Start with `quandora_status`. Continue only when the plugin-local delegated
+credential validates. If no credential is connected, run `quandora_connect` and
+wait for the user to complete web authorization. Do not call upload, backtest,
+polling, artifact, or session tools before connect is complete.
 
 If `quandora_connect` returns `pending=true`, open the returned
 `authorization_url` for the user if possible, then call `quandora_connect_wait`
@@ -83,8 +78,7 @@ and target behavior when they are available.
 
 When you have a draft description and formula, call
 `quandora_request_dedup_context` and use the returned similar-factor guidance to
-avoid near-duplicates. This context informs local revision only; do not imply
-Buddy can observe local drafting or editing.
+avoid near-duplicates. This context informs local revision only.
 
 Write or locate one `plugin.py`, then call `quandora_parse_plugin_metadata`.
 The parser is static and must not import or execute generated code. When the
@@ -98,12 +92,6 @@ Summarize the JSON returned by `quandora_upload_backtest_wait` or
 metrics. If `ok` is false or failures are present, report the failed or
 cancelled terminal status clearly instead of presenting the run as successful.
 
-Buddy event emission is best-effort. Before upload or backtest submission, do
-not emit deterministic business-progress states for brainstorming, drafting,
-editing, or plugin-defined progress. After upload or submission, Buddy events
-may reflect only backend-visible workflow, job, artifact, result, and
-fish-grade data. Never include credentials, generated source, full workspace
-paths, presigned URLs, or backend internals in event payloads.
 Never show backend job IDs, presigned URLs, local absolute paths, raw
 credentials, bearer tokens, or `plugin.py` source in user-facing summaries.
 

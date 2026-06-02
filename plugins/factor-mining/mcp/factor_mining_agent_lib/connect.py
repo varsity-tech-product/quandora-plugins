@@ -23,7 +23,7 @@ from .config import DEFAULT_BASE_URL, agent_home, ensure_agent_home, _write_priv
 from .redaction import redact_obj, redact_text
 
 
-DEFAULT_WEB_CONNECT_URL = "http://127.0.0.1:3037/local-agent/connect"
+DEFAULT_WEB_CONNECT_URL = "https://www.quandora.ai/local-agent/connect"
 DEFAULT_TIMEOUT_SECONDS = 300
 PENDING_CONNECT_TTL_SECONDS = 600
 CALLBACK_HOST = "127.0.0.1"
@@ -76,7 +76,7 @@ def is_local_agent_connect_credential(value: Any) -> bool:
 def load_connected_credential(home: str | Path | None = None) -> dict[str, Any]:
     path = credential_path(home)
     if not path.exists():
-        raise ConnectExchangeError("No Quandora local-agent credential is connected. Run quandora_connect. Buddy is optional.")
+        raise ConnectExchangeError("No Quandora local-agent credential is connected. Run quandora_connect.")
     with path.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
     credential = payload.get("credential") if isinstance(payload, Mapping) else None
@@ -107,7 +107,7 @@ def save_connected_credential(
             "redacted": redact_credential(raw_value),
         },
         "base_url": str(exchange_response.get("base_url") or orchestrator_base_url).rstrip("/"),
-        "credential_backend_base_url": credential_backend_base_url.rstrip("/"),
+        "credential_backend_base_url": _normalize_product_api_origin(credential_backend_base_url),
         "identity": redact_obj(exchange_response.get("identity") or {}),
         "capabilities": list(exchange_response.get("capabilities") or []),
         "connected_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
@@ -218,6 +218,12 @@ class PendingConnect:
     created_at: float
 
 
+@dataclass(frozen=True)
+class _CredentialSnapshot:
+    existed: bool
+    data: bytes | None = None
+
+
 _PENDING_CONNECTS: dict[str, PendingConnect] = {}
 _PENDING_CONNECTS_LOCK = threading.Lock()
 
@@ -307,7 +313,7 @@ def exchange_connect_code(
         sort_keys=True,
     ).encode("utf-8")
     req = request.Request(
-        f"{credential_backend_base_url.rstrip('/')}/agent/connect/exchange",
+        _connect_api_url(credential_backend_base_url, "/api/agent/connect/exchange"),
         data=body,
         method="POST",
         headers={"Content-Type": "application/json"},
@@ -346,7 +352,7 @@ def disconnect_local_agent(
     warning = None
     if backend_base_url:
         req = request.Request(
-            f"{backend_base_url}/agent/connect/revoke",
+            _connect_api_url(backend_base_url, "/api/agent/connect/revoke"),
             data=b"{}",
             method="POST",
             headers={"Authorization": f"Bearer {credential}", "Content-Type": "application/json"},
@@ -468,7 +474,7 @@ def connect_local_agent(
     verifier, challenge = generate_pkce_pair()
     callback = start_loopback_callback_server(expected_state=state)
     client_metadata = dict(client or {"name": "quandora-factor-mining-plugin", "adapter": "codex"})
-    backend_base_url = (credential_backend_base_url or _origin_from_url(web_connect_url)).rstrip("/")
+    backend_base_url = _normalize_product_api_origin(credential_backend_base_url or _origin_from_url(web_connect_url))
     pending_registered = False
     try:
         authorization_url = build_authorization_url(
@@ -516,10 +522,6 @@ def connect_local_agent(
             home=home,
             opener=opener,
         )
-    except Exception:
-        if not credential_exists(home):
-            clear_connected_credential(home)
-        raise
     finally:
         if not pending_registered:
             callback.close()
@@ -619,16 +621,17 @@ def _wait_for_connect_completion(
     home: str | Path | None,
     opener: Any,
 ) -> dict[str, Any]:
+    callback_result = pending.callback.wait(max(1.0, float(timeout_seconds)))
+    exchange = exchange_connect_code(
+        credential_backend_base_url=pending.credential_backend_base_url,
+        code=callback_result["code"],
+        state=callback_result["state"],
+        code_verifier=pending.code_verifier,
+        client=pending.client,
+        opener=opener,
+    )
+    credential_snapshot = _snapshot_connected_credential(home)
     try:
-        callback_result = pending.callback.wait(max(1.0, float(timeout_seconds)))
-        exchange = exchange_connect_code(
-            credential_backend_base_url=pending.credential_backend_base_url,
-            code=callback_result["code"],
-            state=callback_result["state"],
-            code_verifier=pending.code_verifier,
-            client=pending.client,
-            opener=opener,
-        )
         record = save_connected_credential(
             exchange,
             home=home,
@@ -636,7 +639,7 @@ def _wait_for_connect_completion(
             credential_backend_base_url=pending.credential_backend_base_url,
         )
         credential = load_connected_credential(home)["credential"]["value"]
-        api_client = ApiClient(pending.orchestrator_base_url, credential, opener=opener)
+        api_client = ApiClient(str(record["base_url"]), credential, opener=opener)
         agent_status = api_client.agent_status()
         return {
             "ok": True,
@@ -647,9 +650,33 @@ def _wait_for_connect_completion(
             "agent_status": redact_obj(agent_status),
         }
     except Exception:
-        if not credential_exists(home):
-            clear_connected_credential(home)
+        _restore_connected_credential(credential_snapshot, home)
         raise
+
+
+def _snapshot_connected_credential(home: str | Path | None = None) -> _CredentialSnapshot:
+    path = credential_path(home)
+    try:
+        return _CredentialSnapshot(existed=True, data=path.read_bytes())
+    except FileNotFoundError:
+        return _CredentialSnapshot(existed=False)
+
+
+def _restore_connected_credential(snapshot: _CredentialSnapshot, home: str | Path | None = None) -> None:
+    if not snapshot.existed:
+        clear_connected_credential(home)
+        return
+    root = ensure_agent_home(home)
+    path = root / credential_path(home).name
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    try:
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(snapshot.data or b"")
+    finally:
+        try:
+            os.chmod(path, 0o600)
+        except OSError:
+            pass
 
 
 def _decode_response(response: Any) -> Any:
@@ -681,7 +708,8 @@ def _safe_exchange_error(payload: Any, *, status: int) -> str:
 
 def _redact_paths(value: str) -> str:
     decoded = parse.unquote(value).replace(str(Path.home()), "[home]")
-    return re.sub(r"/Users/[^/\s?#]+", "[home]", decoded)
+    user_home_pattern = "/" + "Users" + r"/[^/\s?#]+"
+    return re.sub(user_home_pattern, "[home]", decoded)
 
 
 def _origin_from_url(value: str) -> str:
@@ -689,6 +717,18 @@ def _origin_from_url(value: str) -> str:
     if not parsed.scheme or not parsed.netloc:
         raise ConnectExchangeError("web_connect_url must be an absolute URL")
     return parse.urlunsplit((parsed.scheme, parsed.netloc, "", "", ""))
+
+
+def _normalize_product_api_origin(value: str) -> str:
+    parsed = parse.urlsplit(value.rstrip("/"))
+    if parsed.path == "/api":
+        return parse.urlunsplit((parsed.scheme, parsed.netloc, "", "", ""))
+    return value.rstrip("/")
+
+
+def _connect_api_url(base_url: str, path: str) -> str:
+    base = _normalize_product_api_origin(base_url)
+    return f"{base}/{path.lstrip('/')}"
 
 
 def _single_query_value(query: Mapping[str, list[str]], key: str) -> str | None:

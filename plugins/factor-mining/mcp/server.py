@@ -16,13 +16,6 @@ if str(MCP_ROOT) not in sys.path:
 
 from factor_mining_agent_lib import connect
 from factor_mining_agent_lib.api import ApiClient, ApiError
-from factor_mining_agent_lib.buddy import (
-    BUDDY_DOWNLOAD_URL,
-    emit_buddy_event,
-    failure_payload,
-    result_payload_from_wait_result,
-    validate_buddy_event_type,
-)
 from factor_mining_agent_lib.config import HOME_ENV
 from factor_mining_agent_lib.metadata import parse_plugin_metadata
 from factor_mining_agent_lib.redaction import redact_text
@@ -35,8 +28,7 @@ SERVER_NAME = "quandora-factor-mining"
 SERVER_VERSION = "0.3.0"
 MISSING_CREDENTIAL_MESSAGE = (
     "No Quandora local-agent credential is connected. Run quandora_connect to authorize this plugin through "
-    "Quandora Local Agent Connect. Buddy is optional and only provides the desktop fishing animation companion. "
-    f"You can download Buddy separately from {BUDDY_DOWNLOAD_URL}."
+    "Quandora Local Agent Connect."
 )
 TASK_PAYLOAD_REQUIRED_FIELDS = {
     "task_id",
@@ -108,18 +100,6 @@ TOOL_DEFINITIONS: tuple[dict[str, Any], ...] = (
             "type": "object",
             "properties": {
                 "connect_handle": {"type": "string"},
-            },
-            "additionalProperties": False,
-        },
-    },
-    {
-        "name": "quandora_connect_status",
-        "description": "Report plugin-local Local Agent Connect status and optional Buddy animation companion availability.",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "live_check": {"type": "boolean"},
-                "home": {"type": "string"},
             },
             "additionalProperties": False,
         },
@@ -253,17 +233,41 @@ TOOL_DEFINITIONS: tuple[dict[str, Any], ...] = (
         },
     },
     {
-        "name": "quandora_emit_buddy_event",
-        "description": "Emit a sanitized, best-effort local Buddy event without credentials or generated source.",
+        "name": "quandora_get_workflow",
+        "description": "Fetch Factor Mining workflow state for a connected session.",
         "inputSchema": {
             "type": "object",
-            "required": ["event_type"],
+            "required": ["session_id"],
             "properties": {
-                "event_type": {"type": "string"},
-                "payload": {"type": "object"},
-                "run": {"type": "object"},
-                "source_agent": {"type": "string"},
-                "workspace": {"type": "string"},
+                "session_id": {"type": "string"},
+                "home": {"type": "string"},
+            },
+            "additionalProperties": False,
+        },
+    },
+    {
+        "name": "quandora_get_job",
+        "description": "Fetch Factor Mining job state for a connected job.",
+        "inputSchema": {
+            "type": "object",
+            "required": ["job_id"],
+            "properties": {
+                "job_id": {"type": "string"},
+                "home": {"type": "string"},
+            },
+            "additionalProperties": False,
+        },
+    },
+    {
+        "name": "quandora_get_artifact",
+        "description": "Fetch a Factor Mining job artifact such as the default factor card.",
+        "inputSchema": {
+            "type": "object",
+            "required": ["job_id"],
+            "properties": {
+                "job_id": {"type": "string"},
+                "name": {"type": "string"},
+                "output_dir": {"type": "string"},
                 "home": {"type": "string"},
             },
             "additionalProperties": False,
@@ -286,8 +290,6 @@ def call_tool(name: str, arguments: Mapping[str, Any] | None = None, *, opener: 
         return _connect_pending()
     if name == "quandora_connect_cancel":
         return _connect_cancel(args)
-    if name == "quandora_connect_status":
-        return _connect_status(args, opener=opener, env=env)
     if name == "quandora_disconnect":
         return _disconnect(args, opener=opener, env=env)
     if name == "quandora_status":
@@ -306,8 +308,12 @@ def call_tool(name: str, arguments: Mapping[str, Any] | None = None, *, opener: 
         return _upload_backtest_wait(args, opener=opener, env=env)
     if name == "quandora_resume_run":
         return _resume_run(args, opener=opener, env=env)
-    if name == "quandora_emit_buddy_event":
-        return _emit_buddy_event(args, env=env)
+    if name == "quandora_get_workflow":
+        return _get_workflow(args, opener=opener, env=env)
+    if name == "quandora_get_job":
+        return _get_job(args, opener=opener, env=env)
+    if name == "quandora_get_artifact":
+        return _get_artifact(args, opener=opener, env=env)
     raise ToolInputError(f"Unknown Quandora MCP tool: {name}")
 
 
@@ -359,7 +365,6 @@ def _connect_cancel(args: Mapping[str, Any]) -> dict[str, Any]:
 
 def _connect_status(args: Mapping[str, Any], *, opener: Any, env: Mapping[str, str] | None) -> dict[str, Any]:
     home = _configured_home(args, env)
-    buddy = _buddy_runtime_status(home)
     try:
         record = connect.load_connected_credential(home)
     except Exception as exc:
@@ -367,7 +372,6 @@ def _connect_status(args: Mapping[str, Any], *, opener: Any, env: Mapping[str, s
             "ok": True,
             "connected": False,
             "credential": None,
-            "buddy": buddy,
             "message": str(exc),
         }
 
@@ -380,7 +384,6 @@ def _connect_status(args: Mapping[str, Any], *, opener: Any, env: Mapping[str, s
         "identity": safe_record.get("identity", {}),
         "base_url": safe_record.get("base_url"),
         "connected_at": safe_record.get("connected_at"),
-        "buddy": buddy,
     }
     if bool(args.get("live_check", False)):
         client = ApiClient(str(record["base_url"]), str(record["credential"]["value"]), opener=opener)
@@ -460,13 +463,6 @@ def _upload_backtest_wait(args: Mapping[str, Any], *, opener: Any, env: Mapping[
     if output_dir:
         _validate_artifact_name(artifact_name)
 
-    emit_buddy_event(
-        "factor.validating",
-        {"file": "plugin.py"},
-        run={"client_run_id": client_run_id, "session_id": session_id},
-        workspace=plugin_path.parent,
-        home=home,
-    )
     metadata = parse_plugin_metadata(plugin_path)
     try:
         upload_response = client.upload_plugin(
@@ -481,13 +477,6 @@ def _upload_backtest_wait(args: Mapping[str, Any], *, opener: Any, env: Mapping[
         plugin_id = _plugin_id(upload_response)
         if not plugin_id:
             raise McpServerError("Upload response did not include plugin_id")
-        emit_buddy_event(
-            "factor.casting",
-            {"stage": "plugin_uploaded"},
-            run={"client_run_id": client_run_id, "session_id": session_id},
-            workspace=plugin_path.parent,
-            home=home,
-        )
         backtest_response = client.submit_backtest(
             session_id,
             plugin_id,
@@ -504,20 +493,6 @@ def _upload_backtest_wait(args: Mapping[str, Any], *, opener: Any, env: Mapping[
             artifact_paths={},
         )
         save_run_state(state, home=home)
-        emit_buddy_event(
-            "factor.submitted",
-            {"status": "submitted"},
-            run={"client_run_id": client_run_id, "session_id": session_id},
-            workspace=plugin_path.parent,
-            home=home,
-        )
-        emit_buddy_event(
-            "factor.waiting",
-            {"submitted_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())},
-            run={"client_run_id": client_run_id, "session_id": session_id},
-            workspace=plugin_path.parent,
-            home=home,
-        )
         if args.get("wait", True) is False:
             return _redact_payload(
                 {
@@ -538,14 +513,7 @@ def _upload_backtest_wait(args: Mapping[str, Any], *, opener: Any, env: Mapping[
                 home=home,
             )
         )
-    except Exception as exc:
-        emit_buddy_event(
-            "factor.failed",
-            failure_payload("upload-backtest", str(exc), recoverable=True),
-            run={"client_run_id": client_run_id, "session_id": session_id},
-            workspace=plugin_path.parent,
-            home=home,
-        )
+    except Exception:
         raise
 
 
@@ -591,33 +559,31 @@ def _resume_run(args: Mapping[str, Any], *, opener: Any, env: Mapping[str, str] 
         "artifact": artifact,
         "summary": summary,
     }
-    if outcome.get("terminal_status"):
-        run = {"client_run_id": state.client_run_id, "session_id": state.session_id}
-        if outcome.get("ok"):
-            emit_buddy_event("factor.result", result_payload_from_wait_result(result), run=run, home=home)
-        else:
-            emit_buddy_event(
-                "factor.failed",
-                failure_payload("resume", f"Backtest finished with terminal status {outcome.get('status')}", recoverable=True),
-                run=run,
-                home=home,
-            )
     return _redact_payload(result)
 
 
-def _emit_buddy_event(args: Mapping[str, Any], *, env: Mapping[str, str] | None) -> dict[str, bool]:
-    event_type = _required_string(args, "event_type")
-    validate_buddy_event_type(event_type)
-    payload = args.get("payload") if isinstance(args.get("payload"), Mapping) else {}
-    run = args.get("run") if isinstance(args.get("run"), Mapping) else {}
-    return emit_buddy_event(
-        event_type,
-        _redact_payload(payload),
-        run=_redact_payload(run),
-        source_agent=str(args.get("source_agent") or "codex"),
-        workspace=args.get("workspace"),
-        home=_configured_home(args, env),
-    )
+def _get_workflow(args: Mapping[str, Any], *, opener: Any, env: Mapping[str, str] | None) -> Any:
+    _credential, client = _client_from_local_auth(args, opener=opener, env=env)
+    return _redact_payload(client.workflow(_required_string(args, "session_id")))
+
+
+def _get_job(args: Mapping[str, Any], *, opener: Any, env: Mapping[str, str] | None) -> Any:
+    _credential, client = _client_from_local_auth(args, opener=opener, env=env)
+    return _redact_payload(client.job(_required_string(args, "job_id")))
+
+
+def _get_artifact(args: Mapping[str, Any], *, opener: Any, env: Mapping[str, str] | None) -> Any:
+    _credential, client = _client_from_local_auth(args, opener=opener, env=env)
+    name = _optional_string(args, "name") or "default_factor_card.json"
+    output_dir = _optional_string(args, "output_dir")
+    if output_dir:
+        _validate_artifact_name(name)
+    artifact = client.artifact(_required_string(args, "job_id"), name)
+    saved_path = _save_json_artifact(output_dir, name, artifact)
+    result: dict[str, Any] = {"name": name, "status": "available", "artifact": artifact}
+    if saved_path:
+        result["path"] = saved_path
+    return _redact_payload(result)
 
 
 def _client_from_local_auth(
@@ -635,20 +601,6 @@ def _client_from_local_auth(
     if verify_live:
         client.agent_status()
     return credential, client
-
-
-def _buddy_runtime_status(home: str | None) -> dict[str, Any]:
-    root = Path(home).expanduser() if home is not None else Path.home()
-    port_file = root / ".quandora-buddy" / "port.json"
-    try:
-        payload = json.loads(port_file.read_text(encoding="utf-8"))
-    except Exception:
-        return {"available": False, "role": "optional_animation_companion"}
-    return {
-        "available": isinstance(payload, Mapping) and isinstance(payload.get("port"), int),
-        "role": "optional_animation_companion",
-        "credential_provider": "compatibility_only",
-    }
 
 
 def _configured_home(args: Mapping[str, Any], env: Mapping[str, str] | None) -> str | None:
@@ -745,16 +697,6 @@ def _run_wait_flow(
         "artifact": artifact,
         "summary": summary,
     }
-    run = {"client_run_id": state.client_run_id, "session_id": state.session_id}
-    if result["ok"]:
-        emit_buddy_event("factor.result", result_payload_from_wait_result(result), run=run, home=home)
-    else:
-        emit_buddy_event(
-            "factor.failed",
-            failure_payload("backtest", f"Backtest finished with terminal status {result['status']}", recoverable=True),
-            run=run,
-            home=home,
-        )
     return result
 
 

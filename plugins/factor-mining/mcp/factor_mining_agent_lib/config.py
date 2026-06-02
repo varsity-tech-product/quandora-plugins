@@ -6,7 +6,8 @@ from typing import Any, Mapping
 
 
 DEFAULT_HOME = Path.home() / ".factor-mining-agent"
-DEFAULT_BASE_URL = "http://127.0.0.1:18080"
+DEFAULT_BASE_URL = "https://www.quandora.ai/api"
+ORCHESTRATOR_DIAGNOSTIC_URL = "https://d25q1jf66e8y4g.cloudfront.net"
 HOME_ENV = "FACTOR_MINING_AGENT_HOME"
 
 
