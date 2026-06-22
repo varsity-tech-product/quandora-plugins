@@ -50,18 +50,22 @@ claude plugin install quandora@quandora
 
 ## OpenClaw
 
-OpenClaw installs the same plugin bundle and stores the Factor Mining Remote
-MCP server in its MCP registry.
+Use the installer so OpenClaw installs the plugin bundle and registers the
+Factor Mining Remote MCP server:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.0/install-openclaw.sh | bash
+```
+
+Manual install requires both steps:
 
 ```bash
 openclaw plugins install quandora --marketplace https://github.com/varsity-tech-product/quandora-plugins.git#v0.4.0 --force
+openclaw mcp add quandora-factor-mining --transport streamable-http --url https://mcp.quandora.ai/factor-mining --auth oauth --no-probe
 ```
 
-Or run:
-
-```bash
-./install-openclaw.sh
-```
+If `openclaw mcp add` does not support `--no-probe` or fails, use
+`install-openclaw.sh`; the script includes a Remote MCP registration fallback.
 
 ## First Prompts
 
