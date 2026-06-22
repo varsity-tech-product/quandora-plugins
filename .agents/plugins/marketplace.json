@@ -1,7 +1,7 @@
 {
-  "name": "factor-mining-marketplace",
+  "name": "quandora",
   "interface": {
-    "displayName": "Quandora Factor Mining"
+    "displayName": "Quandora Plugins"
   },
   "plugins": [
     {

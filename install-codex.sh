@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-MARKETPLACE_SOURCE="${FACTOR_MINING_PLUGIN_SOURCE:-varsity-tech-product/factor-mining-agent-plugins}"
+MARKETPLACE_SOURCE="${FACTOR_MINING_PLUGIN_SOURCE:-varsity-tech-product/quandora-plugins}"
 MARKETPLACE_REF="${FACTOR_MINING_PLUGIN_REF:-main}"
-MARKETPLACE_NAME="${FACTOR_MINING_PLUGIN_MARKETPLACE:-factor-mining-marketplace}"
+MARKETPLACE_NAME="${FACTOR_MINING_PLUGIN_MARKETPLACE:-quandora}"
 PLUGIN_NAME="${FACTOR_MINING_PLUGIN_NAME:-factor-mining}"
 START_MODE="${FACTOR_MINING_START_MODE:-cli}"
 INSTALL_ONLY="0"
@@ -26,8 +26,8 @@ Options:
   -h, --help            Show this help.
 
 Default flow:
-  codex plugin marketplace add varsity-tech-product/factor-mining-agent-plugins --ref main
-  codex plugin add factor-mining@factor-mining-marketplace
+  codex plugin marketplace add varsity-tech-product/quandora-plugins --ref main
+  codex plugin add factor-mining@quandora
   codex "Show me the Factor Mining public task list."
 
 Plugin installation never downloads or installs Buddy in the background. Buddy

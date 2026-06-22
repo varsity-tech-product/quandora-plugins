@@ -1,9 +1,12 @@
-# Quandora Factor Mining
+# Quandora Plugins
 
-Quandora Factor Mining is a local-agent plugin distribution for turning public
-factor tasks or custom factor ideas into local `plugin.py` factors, then
-submitting them to Quandora for validation, backtesting, artifact retrieval,
-and result summaries.
+This repository is the public Quandora plugin marketplace for local-agent
+platforms. It can host multiple Quandora plugins over time. Factor Mining is the
+first supported plugin and service.
+
+Quandora Factor Mining turns public factor tasks or custom factor ideas into
+local `plugin.py` factors, then submits them to Quandora for validation,
+backtesting, artifact retrieval, and result summaries.
 
 Codex is available now. Claude Code and OpenClaw adapter slots are reserved for
 future releases and are not installable from this repository yet.
@@ -13,14 +16,14 @@ future releases and are not installable from this repository yet.
 Install the marketplace and plugin:
 
 ```bash
-codex plugin marketplace add varsity-tech-product/factor-mining-agent-plugins --ref main
-codex plugin add factor-mining@factor-mining-marketplace
+codex plugin marketplace add varsity-tech-product/quandora-plugins --ref main
+codex plugin add factor-mining@quandora
 ```
 
 Or run:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/factor-mining-agent-plugins/main/install-codex.sh | bash
+curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/install-codex.sh | bash
 ```
 
 ## Codex Desktop
@@ -28,9 +31,9 @@ curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/factor-mining-
 Use these fields in Codex Desktop:
 
 ```text
-Source: varsity-tech-product/factor-mining-agent-plugins
+Source: varsity-tech-product/quandora-plugins
 Git ref: main
-Plugin: factor-mining@factor-mining-marketplace
+Plugin: factor-mining@quandora
 ```
 
 You can also run:
