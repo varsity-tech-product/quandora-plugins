@@ -1,14 +1,14 @@
 {
   "name": "quandora",
   "interface": {
-    "displayName": "Quandora Plugins"
+    "displayName": "Quandora"
   },
   "plugins": [
     {
-      "name": "factor-mining",
+      "name": "quandora",
       "source": {
         "source": "local",
-        "path": "./plugins/factor-mining"
+        "path": "./plugins/quandora"
       },
       "policy": {
         "installation": "AVAILABLE",

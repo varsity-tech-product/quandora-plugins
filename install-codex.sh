@@ -1,38 +1,27 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-MARKETPLACE_SOURCE="${FACTOR_MINING_PLUGIN_SOURCE:-varsity-tech-product/quandora-plugins}"
-MARKETPLACE_REF="${FACTOR_MINING_PLUGIN_REF:-main}"
-MARKETPLACE_NAME="${FACTOR_MINING_PLUGIN_MARKETPLACE:-quandora}"
-PLUGIN_NAME="${FACTOR_MINING_PLUGIN_NAME:-factor-mining}"
-START_MODE="${FACTOR_MINING_START_MODE:-cli}"
-INSTALL_ONLY="0"
-WORKSPACE_PATH="${FACTOR_MINING_WORKSPACE:-.}"
-CODEX_PROMPT="${FACTOR_MINING_CODEX_PROMPT:-Use Quandora Factor Mining. First use the bundled Quandora MCP tools to run quandora_status. If no local-agent credential is connected, run quandora_connect and let me complete web authorization. Buddy is optional for desktop animation. Show me the Factor Mining public task list. Do not create a session until I choose a public task or provide a custom idea. Then write a valid plugin.py locally, upload it, wait for the backtest, fetch the default factor card if available, and summarize the result.}"
-BUDDY_DOWNLOAD_URL="https://www.quandora.ai/download/buddy"
-
-if [[ "${FACTOR_MINING_START_CODEX:-1}" == "0" ]]; then
-  START_MODE="none"
-fi
+MARKETPLACE_SOURCE="${QUANDORA_PLUGIN_SOURCE:-varsity-tech-product/quandora-plugins}"
+MARKETPLACE_REF="${QUANDORA_PLUGIN_REF:-v0.4.0}"
+MARKETPLACE_NAME="${QUANDORA_PLUGIN_MARKETPLACE:-quandora}"
+PLUGIN_NAME="${QUANDORA_PLUGIN_NAME:-quandora}"
+START_MODE="${QUANDORA_START_MODE:-none}"
+WORKSPACE_PATH="${QUANDORA_WORKSPACE:-.}"
+CODEX_PROMPT="${QUANDORA_CODEX_PROMPT:-Use Quandora Factor Mining to show public tasks.}"
 
 usage() {
   cat <<'USAGE'
 Usage: install-codex.sh [options]
 
 Options:
-  --desktop             Install, print connect next steps, then open Codex Desktop.
-  --no-start            Install and print connect next steps without starting Codex.
-  --install-only        Install the Codex plugin and print connect next steps.
-  -h, --help            Show this help.
+  --desktop      Install, print next steps, then open Codex Desktop.
+  --start        Install, print next steps, then start Codex CLI.
+  --no-start     Install and print next steps. This is the default.
+  -h, --help     Show this help.
 
-Default flow:
-  codex plugin marketplace add varsity-tech-product/quandora-plugins --ref main
-  codex plugin add factor-mining@quandora
-  codex "Show me the Factor Mining public task list."
-
-Plugin installation never downloads or installs Buddy in the background. Buddy
-is an optional desktop animation companion installed through an explicit user
-action.
+Default install:
+  codex plugin marketplace add varsity-tech-product/quandora-plugins --ref v0.4.0
+  codex plugin add quandora@quandora
 USAGE
 }
 
@@ -41,12 +30,11 @@ while [[ $# -gt 0 ]]; do
     --desktop)
       START_MODE="desktop"
       ;;
+    --start)
+      START_MODE="cli"
+      ;;
     --no-start)
       START_MODE="none"
-      ;;
-    --install-only)
-      START_MODE="none"
-      INSTALL_ONLY="1"
       ;;
     -h|--help)
       usage
@@ -71,47 +59,15 @@ marketplace_configured() {
 }
 
 plugin_installed() {
-  codex plugin list --marketplace "${MARKETPLACE_NAME}" 2>/dev/null \
-    | grep -E "^${PLUGIN_NAME}@${MARKETPLACE_NAME}[[:space:]]+installed, enabled" >/dev/null
+  codex plugin list --marketplace "${MARKETPLACE_NAME}" 2>/dev/null |
+    grep -E "^${PLUGIN_NAME}@${MARKETPLACE_NAME}[[:space:]]+installed, enabled" >/dev/null
 }
 
-plugin_root() {
-  codex plugin list --marketplace "${MARKETPLACE_NAME}" 2>/dev/null \
-    | awk -v plugin="${PLUGIN_NAME}@${MARKETPLACE_NAME}" '$1 == plugin { print $NF; exit }'
-}
-
-print_stale_marketplace_help() {
-  echo "The configured ${MARKETPLACE_NAME} marketplace may point to an older source." >&2
-  echo "To reset it to the public product marketplace, run:" >&2
-  echo "  codex plugin marketplace remove ${MARKETPLACE_NAME}" >&2
-  if [[ -d "${MARKETPLACE_SOURCE}" ]]; then
-    printf '  codex plugin marketplace add %q\n' "${MARKETPLACE_SOURCE}" >&2
-  else
-    printf '  codex plugin marketplace add %q --ref %q\n' "${MARKETPLACE_SOURCE}" "${MARKETPLACE_REF}" >&2
-  fi
-  echo "Then rerun this installer." >&2
-}
-
-validate_plugin_root() {
-  local root="$1"
-  if [[ -f "${root}/.codex-plugin/plugin.json" && -f "${root}/.mcp.json" && -f "${root}/mcp/server.py" ]]; then
-    return 0
-  fi
-  echo "Installed plugin root does not contain the current Codex package: ${root}" >&2
-  print_stale_marketplace_help
-  return 1
-}
-
-print_connect_next_steps() {
-  echo "Codex plugin is installed."
-  echo "Authorize the local agent with the bundled quandora_connect MCP tool."
-  echo "Buddy is optional and provides desktop animation."
-  echo "Plugin installation never downloads or installs Buddy in the background."
-  echo "Download Buddy for animation: ${BUDDY_DOWNLOAD_URL}"
-  echo "Next steps:"
-  echo "  1. Start Codex with:"
-  printf '     codex %q\n' "${CODEX_PROMPT}"
-  echo "  2. Let the plugin open Quandora Local Agent Connect when prompted."
+print_next_steps() {
+  echo "Quandora plugin is installed."
+  echo "Remote MCP authorization is handled by Codex during first use."
+  echo "Try:"
+  printf '  codex %q\n' "${CODEX_PROMPT}"
 }
 
 echo "Configuring Codex marketplace: ${MARKETPLACE_NAME}"
@@ -119,7 +75,6 @@ if marketplace_configured; then
   echo "Marketplace already configured; refreshing if it is Git-backed."
   if ! codex plugin marketplace upgrade "${MARKETPLACE_NAME}" >/dev/null 2>&1; then
     echo "Marketplace refresh did not complete. Continuing with the configured source." >&2
-    print_stale_marketplace_help
   fi
 else
   if [[ -d "${MARKETPLACE_SOURCE}" ]]; then
@@ -136,33 +91,20 @@ else
   codex plugin add "${PLUGIN_NAME}@${MARKETPLACE_NAME}"
 fi
 
-PLUGIN_ROOT="$(plugin_root)"
-if [[ -z "${PLUGIN_ROOT}" || ! -d "${PLUGIN_ROOT}" ]]; then
-  echo "Could not locate installed plugin root for ${PLUGIN_NAME}@${MARKETPLACE_NAME}." >&2
-  print_stale_marketplace_help
-  exit 1
-fi
-validate_plugin_root "${PLUGIN_ROOT}"
-
-if [[ "${INSTALL_ONLY}" == "1" ]]; then
-  print_connect_next_steps
-  echo "Codex startup was skipped because --install-only was used."
-  exit 0
-fi
-
-if [[ "${START_MODE}" == "none" ]]; then
-  print_connect_next_steps
-  echo "For Codex Desktop, run:"
-  printf 'codex app %q\n' "${WORKSPACE_PATH}"
-  exit 0
-fi
-
-if [[ "${START_MODE}" == "desktop" ]]; then
-  echo "Opening Codex Desktop."
-  print_connect_next_steps
-  exec codex app "${WORKSPACE_PATH}"
-fi
-
-echo "Starting Codex CLI."
-print_connect_next_steps
-exec codex "${CODEX_PROMPT}"
+case "${START_MODE}" in
+  none)
+    print_next_steps
+    ;;
+  desktop)
+    print_next_steps
+    exec codex app "${WORKSPACE_PATH}"
+    ;;
+  cli)
+    print_next_steps
+    exec codex "${CODEX_PROMPT}"
+    ;;
+  *)
+    echo "Unknown start mode: ${START_MODE}" >&2
+    exit 2
+    ;;
+esac

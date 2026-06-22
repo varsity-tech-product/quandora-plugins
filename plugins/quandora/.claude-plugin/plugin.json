@@ -1,0 +1,19 @@
+{
+  "name": "quandora",
+  "version": "0.4.0",
+  "description": "All-in-one Quandora plugin for Remote MCP workflows.",
+  "author": {
+    "name": "Varsity Tech Product",
+    "url": "https://github.com/varsity-tech-product"
+  },
+  "homepage": "https://github.com/varsity-tech-product/quandora-plugins",
+  "repository": "https://github.com/varsity-tech-product/quandora-plugins",
+  "license": "Apache-2.0",
+  "skills": "./skills/",
+  "mcpServers": {
+    "quandora-factor-mining": {
+      "type": "http",
+      "url": "https://mcp.quandora.ai/factor-mining"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "quandora",
+  "version": "0.4.0",
+  "description": "All-in-one Quandora plugin for Remote MCP workflows.",
+  "author": {
+    "name": "Varsity Tech Product",
+    "url": "https://github.com/varsity-tech-product"
+  },
+  "homepage": "https://github.com/varsity-tech-product/quandora-plugins",
+  "repository": "https://github.com/varsity-tech-product/quandora-plugins",
+  "license": "Apache-2.0",
+  "keywords": [
+    "quandora",
+    "factor-mining",
+    "remote-mcp",
+    "backtesting",
+    "quant"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Quandora",
+    "shortDescription": "Use Quandora services through Remote MCP.",
+    "longDescription": "Quandora packages service skills in one plugin. Factor Mining is the first skill and uses Quandora Remote MCP for task listing, session creation, factor submission, backtesting, artifact retrieval, and result summaries.",
+    "developerName": "Varsity Tech Product",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/varsity-tech-product/quandora-plugins",
+    "defaultPrompt": [
+      "Use Quandora Factor Mining to show public tasks.",
+      "Use Quandora Factor Mining with my custom factor idea.",
+      "Use Quandora Factor Mining to resume a run and summarize results."
+    ],
+    "brandColor": "#0F766E"
+  }
+}

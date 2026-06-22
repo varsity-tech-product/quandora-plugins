@@ -1,0 +1,8 @@
+{
+  "quandora-factor-mining": {
+    "url": "https://mcp.quandora.ai/factor-mining",
+    "oauth_resource": "https://mcp.quandora.ai/factor-mining",
+    "startup_timeout_sec": 20,
+    "tool_timeout_sec": 600
+  }
+}

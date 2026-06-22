@@ -1,29 +1,28 @@
 # Quandora Plugins
 
-This repository is the public Quandora plugin marketplace for local-agent
-platforms. It can host multiple Quandora plugins over time. Factor Mining is the
-first supported plugin and service.
+Quandora Plugins is the public marketplace for Quandora agent integrations.
+Version 0.4.0 ships one all-in-one plugin package:
 
-Quandora Factor Mining turns public factor tasks or custom factor ideas into
-local `plugin.py` factors, then submits them to Quandora for validation,
-backtesting, artifact retrieval, and result summaries.
+```text
+quandora@quandora
+```
 
-Codex is available now. Claude Code and OpenClaw adapter slots are reserved for
-future releases and are not installable from this repository yet.
+Factor Mining is the first bundled skill. It uses Quandora Remote MCP over
+HTTP/OAuth for public task listing, custom factor sessions, inline
+`plugin_source` submission, backtesting, artifact retrieval, and result
+summaries.
 
 ## Codex CLI
 
-Install the marketplace and plugin:
-
 ```bash
-codex plugin marketplace add varsity-tech-product/quandora-plugins --ref main
-codex plugin add factor-mining@quandora
+codex plugin marketplace add varsity-tech-product/quandora-plugins --ref v0.4.0
+codex plugin add quandora@quandora
 ```
 
-Or run:
+Or run the installer from a checkout:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/install-codex.sh | bash
+./install-codex.sh
 ```
 
 ## Codex Desktop
@@ -32,8 +31,8 @@ Use these fields in Codex Desktop:
 
 ```text
 Source: varsity-tech-product/quandora-plugins
-Git ref: main
-Plugin: factor-mining@quandora
+Git ref: v0.4.0
+Plugin: quandora@quandora
 ```
 
 You can also run:
@@ -42,59 +41,59 @@ You can also run:
 ./install-codex-desktop.sh
 ```
 
+## Claude Code
+
+```bash
+claude plugin marketplace add varsity-tech-product/quandora-plugins@v0.4.0
+claude plugin install quandora@quandora
+```
+
+## OpenClaw
+
+OpenClaw installs the same plugin bundle and stores the Factor Mining Remote
+MCP server in its MCP registry.
+
+```bash
+openclaw plugins install quandora --marketplace https://github.com/varsity-tech-product/quandora-plugins.git#v0.4.0 --force
+```
+
+Or run:
+
+```bash
+./install-openclaw.sh
+```
+
 ## First Prompts
 
 ```text
-Show me the Factor Mining public task list.
-Use Factor Mining with my custom factor idea.
-Resume my Factor Mining run and summarize results.
+Use Quandora Factor Mining to show public tasks.
+Use Quandora Factor Mining with my custom factor idea.
+Use Quandora Factor Mining to resume a run and summarize results.
 ```
 
-## Local Agent Connect
+## Authorization
 
-The Codex plugin owns Local Agent Connect. When authorization is needed, Codex
-calls `quandora_connect`, the plugin opens:
+The Factor Mining Remote MCP server is named `quandora-factor-mining` and uses:
 
 ```text
-https://www.quandora.ai/local-agent/connect
+https://mcp.quandora.ai/factor-mining
 ```
 
-The user signs in and authorizes in the browser. The web app redirects to the
-plugin's local loopback callback, the plugin exchanges the code with PKCE, and
-the returned delegated `vt_agent_...` credential is stored locally with
-owner-only permissions. The plugin then uses that credential for task listing,
-session creation, plugin upload, backtesting, job polling, and factor-card
-artifact retrieval.
-
-There is no manual key-paste flow.
-
-## Buddy
-
-Buddy is an optional desktop animation companion. It is not required for
-authorization, credential storage, upload, backtesting, polling, or artifact
-retrieval. Plugin installation never installs or starts Buddy.
-
-## Localhost Testing
-
-Local connect web testing is available only through an explicit override:
-
-```bash
-QUANDORA_CONNECT_WEB_URL=http://127.0.0.1:3037/local-agent/connect
-```
-
-The production default remains `https://www.quandora.ai/local-agent/connect`.
+Authorization is handled by the agent platform's Remote MCP OAuth flow during
+first use or from that platform's MCP UI. Plugin installation does not require
+a separate auth command.
 
 ## Repository Layout
 
 ```text
 .agents/plugins/marketplace.json
-plugins/factor-mining/
-adapters/claude-code/
-adapters/openclaw/
+.claude-plugin/marketplace.json
+plugins/quandora/
+tools/validate-quandora-product-package.py
 ```
 
-`plugins/factor-mining/` contains the Codex package. The adapter directories
-are reserved empty slots for future releases.
+Future Quandora services can be added as sibling skills under
+`plugins/quandora/skills/`.
 
 ## License
 

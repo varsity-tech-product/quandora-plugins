@@ -1,0 +1,25 @@
+{
+  "name": "quandora",
+  "owner": {
+    "name": "Varsity Tech Product",
+    "url": "https://github.com/varsity-tech-product"
+  },
+  "description": "Quandora plugin marketplace.",
+  "version": "0.4.0",
+  "plugins": [
+    {
+      "name": "quandora",
+      "description": "All-in-one Quandora plugin for Remote MCP workflows.",
+      "version": "0.4.0",
+      "source": "./plugins/quandora",
+      "category": "Productivity",
+      "tags": [
+        "quandora",
+        "factor-mining",
+        "remote-mcp",
+        "quant"
+      ],
+      "strict": true
+    }
+  ]
+}
