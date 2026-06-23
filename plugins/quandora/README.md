@@ -8,13 +8,13 @@ Factor Mining is the first bundled skill.
 The Factor Mining skill uses the `quandora-mcp` Remote MCP server:
 
 ```text
-https://mcp-staging.varsity.lol/factor-mining
+https://mcp.quandora.ai/factor-mining
 ```
 
 Internal validation may use:
 
 ```text
-https://mcp-staging.varsity.lol/factor-mining
+https://mcp.quandora.ai/factor-mining
 ```
 
 The plugin package includes a shared `.mcp.json` for Codex-compatible bundled
@@ -27,12 +27,12 @@ Remote MCP definitions in its own registry.
 ### Install
 
 Codex Desktop uses repository source `varsity-tech-product/quandora-plugins`,
-git ref `v0.4.6`, and plugin `quandora@quandora`.
+git ref `v0.4.7`, and plugin `quandora@quandora`.
 
 Codex CLI:
 
 ```bash
-codex plugin marketplace add varsity-tech-product/quandora-plugins --ref v0.4.6
+codex plugin marketplace add varsity-tech-product/quandora-plugins --ref v0.4.7
 codex plugin add quandora@quandora
 ```
 
@@ -56,7 +56,7 @@ Mining.
 ### Install
 
 ```bash
-claude plugin marketplace add varsity-tech-product/quandora-plugins@v0.4.6
+claude plugin marketplace add varsity-tech-product/quandora-plugins@v0.4.7
 claude plugin install quandora@quandora
 ```
 
@@ -74,13 +74,13 @@ Mining.
 ### Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.6/install-openclaw.sh | bash
+curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.7/install-openclaw.sh | bash
 ```
 
 If the installer reports `Excluded by agent allowlist`:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.6/install-openclaw.sh | bash -s -- --allow-skill
+curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.7/install-openclaw.sh | bash -s -- --allow-skill
 ```
 
 ### Authorize
