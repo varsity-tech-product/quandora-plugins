@@ -19,9 +19,13 @@ REMOTE_MCP_URL = "https://mcp.quandora.ai/factor-mining"
 REMOTE_MCP_NAME = "quandora-factor-mining"
 
 FORBIDDEN_PRODUCT_PATHS = [
+    ROOT / "docs",
+    ROOT / "install-codex.sh",
+    ROOT / "install-codex-desktop.sh",
     ROOT / "plugins" / "factor-mining",
     ROOT / "plugins" / "factor-mining-demo",
     ROOT / "plugins" / "factor-mining-batch-test",
+    PLUGIN_DIR / "assets",
     PLUGIN_DIR / "mcp" / "server.py",
     PLUGIN_DIR / "mcp" / "launch.py",
     PLUGIN_DIR / "mcp" / "factor_mining_agent_lib",
@@ -41,8 +45,6 @@ FORBIDDEN_TEXT_PATTERNS = [
 
 USER_FACING_DOCS = [
     ROOT / "README.md",
-    ROOT / "install-codex.sh",
-    ROOT / "install-codex-desktop.sh",
     ROOT / "install-openclaw.sh",
 ]
 

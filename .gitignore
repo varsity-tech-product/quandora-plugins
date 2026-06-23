@@ -1,3 +1,13 @@
 __pycache__/
 *.py[cod]
 .DS_Store
+
+# Local planning artifacts should not ship in the public plugin package.
+docs/
+
+# Platform-native install commands are the supported path for Codex.
+install-codex.sh
+install-codex-desktop.sh
+
+# No bundled visual assets are required for the v0.4.x plugin package.
+plugins/quandora/assets/

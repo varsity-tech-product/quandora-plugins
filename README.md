@@ -29,12 +29,6 @@ browser authorization finishes, return to Codex Desktop and start a new chat:
 Use Quandora Factor Mining to show public tasks.
 ```
 
-You can also run:
-
-```bash
-./install-codex-desktop.sh
-```
-
 ## Codex CLI and TUI
 
 Install the plugin, then authenticate the Remote MCP server from the shell:
@@ -50,12 +44,6 @@ Inside the Codex TUI, run:
 
 ```text
 Use Quandora Factor Mining to show public tasks.
-```
-
-The installer can handle the plugin install step from a checkout:
-
-```bash
-./install-codex.sh
 ```
 
 Run `codex mcp login quandora-factor-mining` before expecting the Remote MCP
