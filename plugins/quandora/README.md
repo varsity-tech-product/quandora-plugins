@@ -29,7 +29,8 @@ Authorization is handled by the host platform's Remote MCP OAuth flow:
 - Claude Desktop requires connecting and enabling the required Quandora
   connector in the chat.
 - Claude Code requires authenticating `quandora-mcp` from `/mcp`.
-- OpenClaw uses its MCP registry and auth UI.
+- OpenClaw requires `openclaw mcp login quandora-mcp`. Open the printed URL,
+  approve access, then finish with the `--code` command printed by OpenClaw.
 
 Claude Desktop chat can use the connected Remote MCP tools after the connector
 is enabled; it does not need a local coding workspace. Local coding agents such

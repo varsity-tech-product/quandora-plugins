@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the v0.4.3 Quandora Remote MCP product package."""
+"""Validate the v0.4.4 Quandora Remote MCP product package."""
 
 from __future__ import annotations
 
@@ -11,8 +11,8 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.4.3"
-TAG = "v0.4.3"
+VERSION = "0.4.4"
+TAG = "v0.4.4"
 PLUGIN = "quandora"
 PLUGIN_DIR = ROOT / "plugins" / PLUGIN
 REMOTE_MCP_URL = "https://mcp.quandora.ai/factor-mining"
@@ -174,7 +174,7 @@ def validate_skill() -> None:
     for tool in required_tools:
         expect(tool in text, f"skill must mention Remote MCP tool {tool}")
     for tool in forbidden_tools:
-        expect(tool not in text, f"skill must not expose v0.4.3 batch tool {tool}")
+        expect(tool not in text, f"skill must not expose v0.4.4 batch tool {tool}")
     expect("plugin_source" in text, "skill must require inline plugin_source")
     expect("plugin_path" not in text, "skill must not allow plugin_path upload")
 

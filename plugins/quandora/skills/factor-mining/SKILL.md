@@ -23,8 +23,9 @@ connection step when it is known:
   menu.
 - Claude Code: ask the user to open `/mcp`, authenticate
   `quandora-mcp`, then retry the skill.
-- OpenClaw: ask the user to authenticate the registered Remote MCP server from
-  OpenClaw's MCP UI or first-use auth flow.
+- OpenClaw: ask the user to run `openclaw mcp login quandora-mcp`, open the
+  printed URL, approve access, then finish with the `--code` command printed by
+  OpenClaw.
 
 Do not use raw HTTP calls, local helper scripts, direct Product Backend calls,
 direct Factor Mining calls, local execution keys, or credential paste flows as a
@@ -32,7 +33,7 @@ fallback.
 
 ## Remote MCP Tools
 
-Use only these v0.4.3 Factor Mining tools:
+Use only these v0.4.4 Factor Mining tools:
 
 - `factor_mining_status`
 - `factor_mining_list_public_tasks`
@@ -47,7 +48,7 @@ Use only these v0.4.3 Factor Mining tools:
 Some hosts may prefix tool names with the server name, such as
 `quandora-mcp__factor_mining_status`. Treat those as the same tools.
 
-Do not use or advertise batch mining in v0.4.3.
+Do not use or advertise batch mining in v0.4.4.
 
 ## Workflow
 

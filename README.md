@@ -1,7 +1,7 @@
 # Quandora Plugins
 
 Quandora Plugins is the public marketplace for Quandora agent integrations.
-Version 0.4.3 ships one all-in-one plugin package:
+Version 0.4.4 ships one all-in-one plugin package:
 
 ```text
 quandora@quandora
@@ -26,14 +26,14 @@ Use these fields in Codex Desktop:
 
 ```text
 Source: varsity-tech-product/quandora-plugins
-Git ref: v0.4.3
+Git ref: v0.4.4
 Plugin: quandora@quandora
 ```
 
 ### Codex CLI
 
 ```bash
-codex plugin marketplace add varsity-tech-product/quandora-plugins --ref v0.4.3
+codex plugin marketplace add varsity-tech-product/quandora-plugins --ref v0.4.4
 codex plugin add quandora@quandora
 ```
 
@@ -44,7 +44,7 @@ Install the Quandora plugin in Claude Desktop.
 ### Claude Code
 
 ```bash
-claude plugin marketplace add varsity-tech-product/quandora-plugins@v0.4.3
+claude plugin marketplace add varsity-tech-product/quandora-plugins@v0.4.4
 claude plugin install quandora@quandora
 ```
 
@@ -53,14 +53,14 @@ claude plugin install quandora@quandora
 Install and verify the plugin bundle and Remote MCP server:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.3/install-openclaw.sh | bash
+curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.4/install-openclaw.sh | bash
 ```
 
 If the installer reports `Excluded by agent allowlist`, allow the skill and
 verify again:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.3/install-openclaw.sh | bash -s -- --allow-skill
+curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.4/install-openclaw.sh | bash -s -- --allow-skill
 ```
 
 ## Authorization
@@ -77,8 +77,8 @@ Authorize `quandora-mcp` through the host platform:
 - Codex CLI uses `codex mcp login quandora-mcp`.
 - Claude Desktop connects the Quandora connector from Settings -> Connectors.
 - Claude Code authenticates `quandora-mcp` from `/mcp`.
-- OpenClaw authenticates the registered MCP server from its MCP UI or first-use
-  auth flow.
+- OpenClaw uses `openclaw mcp login quandora-mcp`. Open the printed URL,
+  approve access, then run `openclaw mcp login quandora-mcp --code <code>`.
 
 ## Use
 

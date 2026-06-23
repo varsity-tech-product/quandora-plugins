@@ -2,8 +2,8 @@
 set -euo pipefail
 
 PLUGIN_NAME="${QUANDORA_PLUGIN_NAME:-quandora}"
-MARKETPLACE_URL="${QUANDORA_PLUGIN_MARKETPLACE_URL:-https://github.com/varsity-tech-product/quandora-plugins.git#v0.4.3}"
-INSTALLER_URL="${QUANDORA_OPENCLAW_INSTALLER_URL:-https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.3/install-openclaw.sh}"
+MARKETPLACE_URL="${QUANDORA_PLUGIN_MARKETPLACE_URL:-https://github.com/varsity-tech-product/quandora-plugins.git#v0.4.4}"
+INSTALLER_URL="${QUANDORA_OPENCLAW_INSTALLER_URL:-https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.4/install-openclaw.sh}"
 MCP_NAME="${QUANDORA_MCP_NAME:-quandora-mcp}"
 MCP_URL="${QUANDORA_MCP_URL:-https://mcp.quandora.ai/factor-mining}"
 SKILL_NAME="${QUANDORA_FACTOR_MINING_SKILL_NAME:-factor-mining}"
@@ -22,9 +22,24 @@ Options:
   -h, --help          Show this help.
 
 Default install:
-  openclaw plugins install quandora --marketplace https://github.com/varsity-tech-product/quandora-plugins.git#v0.4.3 --force
+  openclaw plugins install quandora --marketplace https://github.com/varsity-tech-product/quandora-plugins.git#v0.4.4 --force
   openclaw mcp add quandora-mcp --transport streamable-http --url https://mcp.quandora.ai/factor-mining --auth oauth --no-probe
 USAGE
+}
+
+print_openclaw_auth_steps() {
+  echo "Authorize Quandora Remote MCP before use:"
+  echo "  openclaw mcp login ${MCP_NAME}"
+  echo "After approval, run the code command printed by OpenClaw:"
+  echo "  openclaw mcp login ${MCP_NAME} --code <code>"
+  echo "Then verify the authorized MCP connection:"
+  echo "  openclaw mcp doctor ${MCP_NAME} --probe"
+}
+
+mcp_has_oauth_tokens() {
+  local status
+  status="$(openclaw mcp status --verbose 2>/dev/null || true)"
+  printf '%s\n' "${status}" | grep -A8 -E "^- ${MCP_NAME}: " | grep -q "oauth: tokens=yes"
 }
 
 verify_openclaw_install() {
@@ -45,7 +60,14 @@ verify_openclaw_install() {
     return 0
   fi
 
-  echo "OpenClaw verification passed."
+  echo "OpenClaw plugin and skill verification passed."
+  if ! mcp_has_oauth_tokens; then
+    echo "Quandora Remote MCP is registered but not authorized yet."
+    print_openclaw_auth_steps
+    return 0
+  fi
+
+  echo "Quandora Remote MCP is authorized."
   echo "Start OpenClaw:"
   echo "  openclaw chat"
   echo "Then run:"
@@ -196,5 +218,4 @@ else
 fi
 
 echo "Quandora plugin is installed for OpenClaw."
-echo "Remote MCP authorization is handled by OpenClaw during first use or from the MCP UI."
 verify_openclaw_install
