@@ -1,7 +1,7 @@
 # Quandora Plugins
 
 Quandora Plugins is the public marketplace for Quandora agent integrations.
-Version 0.4.7 ships one all-in-one plugin package:
+Version 0.4.8 ships one all-in-one plugin package for staging Remote MCP testing:
 
 ```text
 quandora@quandora
@@ -21,7 +21,7 @@ quandora-mcp
 The current Quandora Remote MCP endpoint is:
 
 ```text
-https://mcp.quandora.ai/factor-mining
+https://mcp-staging.varsity.lol/factor-mining
 ```
 
 ## Codex
@@ -32,14 +32,14 @@ Use these fields in Codex Desktop:
 
 ```text
 Source: varsity-tech-product/quandora-plugins
-Git ref: v0.4.7
+Git ref: v0.4.8
 Plugin: quandora@quandora
 ```
 
 Codex CLI:
 
 ```bash
-codex plugin marketplace add varsity-tech-product/quandora-plugins --ref v0.4.7
+codex plugin marketplace add varsity-tech-product/quandora-plugins --ref v0.4.8
 codex plugin add quandora@quandora
 ```
 
@@ -74,7 +74,7 @@ Use Quandora Factor Mining to resume a run and summarize results.
 ### Install
 
 ```bash
-claude plugin marketplace add varsity-tech-product/quandora-plugins@v0.4.7
+claude plugin marketplace add varsity-tech-product/quandora-plugins@v0.4.8
 claude plugin install quandora@quandora
 ```
 
@@ -105,14 +105,14 @@ Use Quandora Factor Mining to resume a run and summarize results.
 Install and verify the plugin bundle and Remote MCP server:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.7/install-openclaw.sh | bash
+curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.8/install-openclaw.sh | bash
 ```
 
 If the installer reports `Excluded by agent allowlist`, allow the skill and
 verify again:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.7/install-openclaw.sh | bash -s -- --allow-skill
+curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.8/install-openclaw.sh | bash -s -- --allow-skill
 ```
 
 ### Authorize
