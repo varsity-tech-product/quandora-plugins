@@ -1,7 +1,7 @@
 # Quandora Plugins
 
 Quandora Plugins is the public marketplace for Quandora agent integrations.
-Version 0.4.1 ships one all-in-one plugin package:
+Version 0.4.2 ships one all-in-one plugin package:
 
 ```text
 quandora@quandora
@@ -18,7 +18,7 @@ Use these fields in Codex Desktop:
 
 ```text
 Source: varsity-tech-product/quandora-plugins
-Git ref: v0.4.1
+Git ref: v0.4.2
 Plugin: quandora@quandora
 ```
 
@@ -34,7 +34,7 @@ Use Quandora Factor Mining to show public tasks.
 Install the plugin, then authenticate the Remote MCP server from the shell:
 
 ```bash
-codex plugin marketplace add varsity-tech-product/quandora-plugins --ref v0.4.1
+codex plugin marketplace add varsity-tech-product/quandora-plugins --ref v0.4.2
 codex plugin add quandora@quandora
 codex mcp login quandora-factor-mining
 codex
@@ -81,7 +81,7 @@ draft the factor source in the conversation and submit it as inline
 Install the plugin:
 
 ```bash
-claude plugin marketplace add varsity-tech-product/quandora-plugins@v0.4.1
+claude plugin marketplace add varsity-tech-product/quandora-plugins@v0.4.2
 claude plugin install quandora@quandora
 ```
 
@@ -97,22 +97,26 @@ coding session.
 
 ## OpenClaw
 
-Use the installer so OpenClaw installs the plugin bundle and registers the
-Factor Mining Remote MCP server:
+Install and verify the plugin bundle and Remote MCP server:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.1/install-openclaw.sh | bash
+curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.2/install-openclaw.sh | bash
 ```
 
-Manual install requires both steps:
+If the installer reports `Excluded by agent allowlist`, allow the skill and
+verify again:
 
 ```bash
-openclaw plugins install quandora --marketplace https://github.com/varsity-tech-product/quandora-plugins.git#v0.4.1 --force
-openclaw mcp add quandora-factor-mining --transport streamable-http --url https://mcp.quandora.ai/factor-mining --auth oauth --no-probe
+curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.2/install-openclaw.sh | bash -s -- --allow-skill
 ```
 
-If `openclaw mcp add` does not support `--no-probe` or fails, use
-`install-openclaw.sh`; the script includes a Remote MCP registration fallback.
+```bash
+openclaw chat
+```
+
+```text
+/factor-mining show public tasks
+```
 
 ## First Prompts
 
