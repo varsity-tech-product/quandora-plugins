@@ -1,7 +1,7 @@
 # Quandora Plugins
 
 Quandora Plugins is the public marketplace for Quandora agent integrations.
-Version 0.4.2 ships one all-in-one plugin package:
+Version 0.4.3 ships one all-in-one plugin package:
 
 ```text
 quandora@quandora
@@ -12,150 +12,95 @@ HTTP/OAuth for public task listing, custom factor sessions, inline
 `plugin_source` submission, backtesting, artifact retrieval, and result
 summaries.
 
-## Codex Desktop
+The Remote MCP server is named:
+
+```text
+quandora-mcp
+```
+
+## Install
+
+### Codex Desktop
 
 Use these fields in Codex Desktop:
 
 ```text
 Source: varsity-tech-product/quandora-plugins
-Git ref: v0.4.2
+Git ref: v0.4.3
 Plugin: quandora@quandora
 ```
 
-Codex Desktop can launch the Quandora OAuth page during first use. After the
-browser authorization finishes, return to Codex Desktop and start a new chat:
-
-```text
-Use Quandora Factor Mining to show public tasks.
-```
-
-## Codex CLI and TUI
-
-Install the plugin, then authenticate the Remote MCP server from the shell:
+### Codex CLI
 
 ```bash
-codex plugin marketplace add varsity-tech-product/quandora-plugins --ref v0.4.2
+codex plugin marketplace add varsity-tech-product/quandora-plugins --ref v0.4.3
 codex plugin add quandora@quandora
-codex mcp login quandora-factor-mining
-codex
 ```
 
-Inside the Codex TUI, run:
+### Claude Desktop
 
-```text
-Use Quandora Factor Mining to show public tasks.
-```
+Install the Quandora plugin in Claude Desktop.
 
-Run `codex mcp login quandora-factor-mining` before expecting the Remote MCP
-tools to be available in a TUI session.
-
-## Claude Desktop
-
-Install the Quandora plugin in Claude Desktop, then connect the required
-Quandora connector:
-
-```text
-Settings -> Connectors -> Quandora -> Connect
-```
-
-The connector URL is:
-
-```text
-https://mcp.quandora.ai/factor-mining
-```
-
-Claude Desktop may route through a Claude sign-in page before opening the
-Quandora OAuth authorization page. After connecting, enable the Quandora
-connector for the current chat from the `+` menu, then use:
-
-```text
-Use Quandora Factor Mining to show public tasks.
-```
-
-The Claude Desktop chat flow does not require a local workspace. Claude can
-draft the factor source in the conversation and submit it as inline
-`plugin_source` through the connected Remote MCP tools.
-
-## Claude Code
-
-Install the plugin:
+### Claude Code
 
 ```bash
-claude plugin marketplace add varsity-tech-product/quandora-plugins@v0.4.2
+claude plugin marketplace add varsity-tech-product/quandora-plugins@v0.4.3
 claude plugin install quandora@quandora
 ```
 
-Then start Claude Code and authenticate the Remote MCP server from `/mcp`:
-
-```text
-/mcp
-```
-
-Select `quandora-factor-mining`, choose Authenticate/Login, complete the
-browser authorization, and then use the `factor-mining` skill in the local
-coding session.
-
-## OpenClaw
+### OpenClaw
 
 Install and verify the plugin bundle and Remote MCP server:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.2/install-openclaw.sh | bash
+curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.3/install-openclaw.sh | bash
 ```
 
 If the installer reports `Excluded by agent allowlist`, allow the skill and
 verify again:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.2/install-openclaw.sh | bash -s -- --allow-skill
+curl -fsSL https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.3/install-openclaw.sh | bash -s -- --allow-skill
 ```
+
+## Authorization
+
+The current Quandora Remote MCP endpoint is:
+
+```text
+https://mcp.quandora.ai/factor-mining
+```
+
+Authorize `quandora-mcp` through the host platform:
+
+- Codex Desktop can open the Quandora OAuth page during first use.
+- Codex CLI uses `codex mcp login quandora-mcp`.
+- Claude Desktop connects the Quandora connector from Settings -> Connectors.
+- Claude Code authenticates `quandora-mcp` from `/mcp`.
+- OpenClaw authenticates the registered MCP server from its MCP UI or first-use
+  auth flow.
+
+## Use
+
+In OpenClaw, start chat first:
 
 ```bash
 openclaw chat
 ```
 
+Use the slash command when the host supports skills:
+
 ```text
 /factor-mining show public tasks
 ```
 
-## First Prompts
+You can also ask directly:
 
 ```text
 Use Quandora Factor Mining to show public tasks.
 Use Quandora Factor Mining with my custom factor idea.
 Use Quandora Factor Mining to resume a run and summarize results.
 ```
-
-## Authorization
-
-The Factor Mining Remote MCP server is named `quandora-factor-mining` and uses:
-
-```text
-https://mcp.quandora.ai/factor-mining
-```
-
-Authorization is handled by the agent platform's Remote MCP OAuth flow:
-
-- Codex Desktop can open the Quandora OAuth page during first use.
-- Codex CLI/TUI requires `codex mcp login quandora-factor-mining`.
-- Claude Desktop requires connecting and enabling the Quandora connector.
-- Claude Code requires authenticating `quandora-factor-mining` from `/mcp`.
-- OpenClaw requires the registered Remote MCP server to be authenticated from
-  OpenClaw's MCP UI or first-use auth flow.
-
-The plugin never asks users to paste Quandora credentials into chat.
-
-## Repository Layout
-
-```text
-.agents/plugins/marketplace.json
-.claude-plugin/marketplace.json
-plugins/quandora/
-tools/validate-quandora-product-package.py
-```
-
-Future Quandora services can be added as sibling skills under
-`plugins/quandora/skills/`.
 
 ## License
 

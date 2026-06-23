@@ -5,12 +5,12 @@
     "url": "https://github.com/varsity-tech-product"
   },
   "description": "Quandora plugin marketplace.",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "plugins": [
     {
       "name": "quandora",
       "description": "All-in-one Quandora plugin for Remote MCP workflows.",
-      "version": "0.4.2",
+      "version": "0.4.3",
       "source": "./plugins/quandora",
       "category": "Productivity",
       "tags": [

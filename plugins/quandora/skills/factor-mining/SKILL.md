@@ -6,7 +6,7 @@ description: Use when an agent should create or submit a Quandora Factor Mining 
 # Quandora Factor Mining
 
 Use this skill for Factor Mining through the Quandora Remote MCP server
-`quandora-factor-mining`. The agent drafts a valid Factor Mining `plugin.py`
+`quandora-mcp`. The agent drafts a valid Factor Mining `plugin.py`
 source, submits that source inline through Remote MCP, waits for the backtest
 result, fetches safe artifacts, and summarizes the outcome.
 
@@ -16,13 +16,13 @@ connection step when it is known:
 
 - Codex Desktop: ask the user to complete the browser authorization that Codex
   opens, then start a new chat if the tools still are not visible.
-- Codex CLI/TUI: ask the user to run `codex mcp login quandora-factor-mining`
-  in the shell before starting or reloading the TUI session.
+- Codex CLI: ask the user to run `codex mcp login quandora-mcp`
+  in the shell before starting or reloading the CLI session.
 - Claude Desktop: ask the user to connect the required Quandora connector from
   Settings -> Connectors, then enable it for the current chat from the `+`
   menu.
 - Claude Code: ask the user to open `/mcp`, authenticate
-  `quandora-factor-mining`, then retry the skill.
+  `quandora-mcp`, then retry the skill.
 - OpenClaw: ask the user to authenticate the registered Remote MCP server from
   OpenClaw's MCP UI or first-use auth flow.
 
@@ -32,7 +32,7 @@ fallback.
 
 ## Remote MCP Tools
 
-Use only these v0.4.2 Factor Mining tools:
+Use only these v0.4.3 Factor Mining tools:
 
 - `factor_mining_status`
 - `factor_mining_list_public_tasks`
@@ -45,9 +45,9 @@ Use only these v0.4.2 Factor Mining tools:
 - `factor_mining_get_artifact`
 
 Some hosts may prefix tool names with the server name, such as
-`quandora-factor-mining__factor_mining_status`. Treat those as the same tools.
+`quandora-mcp__factor_mining_status`. Treat those as the same tools.
 
-Do not use or advertise batch mining in v0.4.2.
+Do not use or advertise batch mining in v0.4.3.
 
 ## Workflow
 

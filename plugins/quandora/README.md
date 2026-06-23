@@ -5,7 +5,7 @@ Factor Mining is the first bundled skill.
 
 ## Remote MCP
 
-The Factor Mining skill uses the `quandora-factor-mining` Remote MCP server:
+The Factor Mining skill uses the `quandora-mcp` Remote MCP server:
 
 ```text
 https://mcp.quandora.ai/factor-mining
@@ -25,10 +25,10 @@ Remote MCP definitions in its own registry.
 Authorization is handled by the host platform's Remote MCP OAuth flow:
 
 - Codex Desktop can open the Quandora OAuth page during first use.
-- Codex CLI/TUI requires `codex mcp login quandora-factor-mining`.
+- Codex CLI requires `codex mcp login quandora-mcp`.
 - Claude Desktop requires connecting and enabling the required Quandora
   connector in the chat.
-- Claude Code requires authenticating `quandora-factor-mining` from `/mcp`.
+- Claude Code requires authenticating `quandora-mcp` from `/mcp`.
 - OpenClaw uses its MCP registry and auth UI.
 
 Claude Desktop chat can use the connected Remote MCP tools after the connector
@@ -42,6 +42,3 @@ the factor as inline `plugin_source`.
 skills/
   factor-mining/
 ```
-
-Additional Quandora services can be added later as sibling skills under this
-same plugin package.
