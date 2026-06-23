@@ -33,7 +33,7 @@ fallback.
 
 ## Remote MCP Tools
 
-Use only these v0.4.4 Factor Mining tools:
+Use only these v0.4.5 Factor Mining tools:
 
 - `factor_mining_status`
 - `factor_mining_list_public_tasks`
@@ -48,7 +48,7 @@ Use only these v0.4.4 Factor Mining tools:
 Some hosts may prefix tool names with the server name, such as
 `quandora-mcp__factor_mining_status`. Treat those as the same tools.
 
-Do not use or advertise batch mining in v0.4.4.
+Do not use or advertise batch mining in v0.4.5.
 
 ## Workflow
 

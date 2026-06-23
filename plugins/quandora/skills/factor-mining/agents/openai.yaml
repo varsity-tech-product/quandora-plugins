@@ -9,4 +9,4 @@ dependencies:
       value: "quandora-mcp"
       description: "Quandora Factor Mining Remote MCP server"
       transport: "streamable_http"
-      url: "https://mcp.quandora.ai/factor-mining"
+      url: "https://mcp-staging.varsity.lol/factor-mining"

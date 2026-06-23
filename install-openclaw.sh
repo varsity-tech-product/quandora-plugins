@@ -2,10 +2,10 @@
 set -euo pipefail
 
 PLUGIN_NAME="${QUANDORA_PLUGIN_NAME:-quandora}"
-MARKETPLACE_URL="${QUANDORA_PLUGIN_MARKETPLACE_URL:-https://github.com/varsity-tech-product/quandora-plugins.git#v0.4.4}"
-INSTALLER_URL="${QUANDORA_OPENCLAW_INSTALLER_URL:-https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.4/install-openclaw.sh}"
+MARKETPLACE_URL="${QUANDORA_PLUGIN_MARKETPLACE_URL:-https://github.com/varsity-tech-product/quandora-plugins.git#v0.4.5}"
+INSTALLER_URL="${QUANDORA_OPENCLAW_INSTALLER_URL:-https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/v0.4.5/install-openclaw.sh}"
 MCP_NAME="${QUANDORA_MCP_NAME:-quandora-mcp}"
-MCP_URL="${QUANDORA_MCP_URL:-https://mcp.quandora.ai/factor-mining}"
+MCP_URL="${QUANDORA_MCP_URL:-https://mcp-staging.varsity.lol/factor-mining}"
 SKILL_NAME="${QUANDORA_FACTOR_MINING_SKILL_NAME:-factor-mining}"
 ALLOW_SKILL=0
 TARGET_AGENT="${QUANDORA_OPENCLAW_AGENT_ID:-}"
@@ -22,8 +22,8 @@ Options:
   -h, --help          Show this help.
 
 Default install:
-  openclaw plugins install quandora --marketplace https://github.com/varsity-tech-product/quandora-plugins.git#v0.4.4 --force
-  openclaw mcp add quandora-mcp --transport streamable-http --url https://mcp.quandora.ai/factor-mining --auth oauth --no-probe
+  openclaw plugins install quandora --marketplace https://github.com/varsity-tech-product/quandora-plugins.git#v0.4.5 --force
+  openclaw mcp add quandora-mcp --transport streamable-http --url https://mcp-staging.varsity.lol/factor-mining --auth oauth --no-probe
 USAGE
 }
 
