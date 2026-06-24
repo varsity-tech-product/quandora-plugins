@@ -6,7 +6,7 @@ Quandora Plugins is the public marketplace for Quandora agent integrations. The 
 quandora@quandora
 ```
 
-Quandora Factor Mining lets local agents create `plugin.py`, submit it through the authenticated Quandora connection, run a backtest, retrieve available artifacts, and save the run files in the local workspace.
+Quandora Factor Mining lets local agents create `plugin.py`, submit it through the authenticated Quandora connection, run a backtest, retrieve available factor cards and chart artifacts, and save the run files in the local workspace.
 
 ## Install
 
@@ -97,7 +97,7 @@ When the host supports local files, each run is saved under:
 results/factor-mining/<session_id>/attempt-<n>/
 ```
 
-The run folder contains the submitted `plugin.py`, a redacted `run_summary.json`, a `factor_card.json` when available, and safe artifacts returned by Quandora. The agent prints the result folder path at the end of each run.
+The run folder contains the submitted `plugin.py`, a redacted `run_summary.json`, a `factor_card.json` when available, safe artifacts returned by Quandora, and PNG charts under `artifacts/png/` when chart images are available. The agent prints the result and artifact folder paths at the end of each run.
 
 ## License
 
