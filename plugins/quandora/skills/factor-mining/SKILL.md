@@ -11,7 +11,8 @@ The agent drafts a valid Factor Mining `plugin.py`, submits the complete source 
 
 If the required Quandora tools are visible, continue automatically. If they are not visible, use the host's normal Quandora connection path before stopping:
 
-- Codex CLI or Codex Desktop: run `codex mcp login quandora-mcp`. Wait for the user to complete the browser authorization flow, then check again for `factor_mining_status`. If the tools still are not visible in the current host session, tell the user to fully quit/reopen Codex Desktop or start a new chat.
+- Codex CLI/TUI: run `codex mcp login quandora-mcp`. Wait for the user to complete the browser authorization flow, then check again for `factor_mining_status`.
+- Codex Desktop: the plugin alone is not enough if the Connector is not authenticated. Tell the user to open Settings -> Connectors, select Quandora, click Connect, authorize Quandora in the browser, then start a new chat. If the tools still are not visible, tell the user to fully quit and reopen Codex Desktop.
 - Claude Code: open `/mcp`, authenticate `quandora-mcp`, then start a new chat.
 - Claude Desktop: the plugin alone is not enough. Tell the user to open Settings -> Connectors, add a Connector named `quandora` with URL `https://mcp.quandora.ai/factor-mining`, click Connect, authorize Quandora in the browser, then start a new chat.
 - OpenClaw: run `openclaw mcp login quandora-mcp`, complete the printed authorization flow, then start a new chat.
@@ -49,7 +50,7 @@ For example, use `_takerBuyBuf.Enqueue(bar.TakerBuyVolume);`, not `_takerBuyBuf.
 
 ## Workflow
 
-Start with `factor_mining_status`. If authorization is missing or the tools are not exposed, use the host's Quandora connection path. In Codex, run `codex mcp login quandora-mcp` yourself before asking the user to take action. Do not ask the user for direct keys.
+Start with `factor_mining_status`. If authorization is missing or the tools are not exposed, use the host's Quandora connection path: desktop hosts use their Connector settings, while CLI/TUI hosts use their MCP login command. Do not ask the user for direct keys.
 
 Determine whether the user wants a public task or a custom idea:
 
