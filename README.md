@@ -44,7 +44,14 @@ claude plugin marketplace add varsity-tech-product/quandora-plugins
 claude plugin install quandora@quandora
 ```
 
-Claude Desktop requires both the Quandora plugin and the Quandora connector. Use the Connectors page to connect your Quandora account, then start a new chat.
+Claude Desktop requires both the Quandora plugin and the Quandora connector. After installing the plugin, manually add and connect the Connector in Claude Desktop:
+
+```text
+Name: quandora
+URL: https://mcp.quandora.ai/factor-mining
+```
+
+Use Settings -> Connectors, add the Connector above, click Connect, authorize Quandora in the browser, then start a new chat.
 
 In Claude Code, open `/mcp` and authenticate `quandora-mcp`, then start a new chat.
 

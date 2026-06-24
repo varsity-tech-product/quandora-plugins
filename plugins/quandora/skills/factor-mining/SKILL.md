@@ -13,7 +13,7 @@ If the required Quandora tools are visible, continue automatically. If they are 
 
 - Codex CLI or Codex Desktop: run `codex mcp login quandora-mcp`. Wait for the user to complete the browser authorization flow, then check again for `factor_mining_status`. If the tools still are not visible in the current host session, tell the user to fully quit/reopen Codex Desktop or start a new chat.
 - Claude Code: open `/mcp`, authenticate `quandora-mcp`, then start a new chat.
-- Claude Desktop: connect the Quandora connector in Settings, then start a new chat.
+- Claude Desktop: the plugin alone is not enough. Tell the user to open Settings -> Connectors, add a Connector named `quandora` with URL `https://mcp.quandora.ai/factor-mining`, click Connect, authorize Quandora in the browser, then start a new chat.
 - OpenClaw: run `openclaw mcp login quandora-mcp`, complete the printed authorization flow, then start a new chat.
 
 Do not ask for Quandora API keys, `vt_` keys, bearer tokens, service tokens, or credentials. Do not use raw HTTP calls, local helper scripts, direct internal service calls, local execution keys, or credential paste flows as a fallback.
