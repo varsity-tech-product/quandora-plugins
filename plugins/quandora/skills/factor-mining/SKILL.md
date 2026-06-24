@@ -84,35 +84,51 @@ If `upload_backtest_wait` returns `running`, call `factor_mining_resume_run` at 
 
 ### Artifact Handling
 
-Only call `factor_mining_get_artifact` with an `artifact_id` returned from `upload_backtest_wait` or `resume_run`. Do not call it without `artifact_id`. Save returned JSON/text artifacts under the run's `artifacts/` folder. If an artifact is listed but unavailable or omitted, write an artifact manifest entry and continue.
+Treat `factor_card.metrics` returned by `factor_mining_upload_backtest_wait` or `factor_mining_resume_run` as the authoritative backtest result. `factor_mining_get_artifact` is only for optional artifacts listed in the response `artifacts[]`.
+
+Only call `factor_mining_get_artifact` with an `artifact_id` returned from `upload_backtest_wait` or `resume_run`. Do not call it without `artifact_id`. Missing, null, unavailable, omitted, or non-inline artifact content is not a run failure. Treat artifact fetch failures as optional attachment failures unless the run itself failed. Never tell the user backend-oriented messages such as "the factor-card artifact has no inline body", "artifact body is missing", `structuredContent`, "MCP response shape", or "backend envelope".
 
 When the host supports file writes, save safe result files in the same run archive:
 
-- `run_summary.json` for the redacted structured run summary.
-- `factor_card.json` for factor-card metrics when available.
-- `artifacts/<artifact_name>` for safe artifacts fetched with `factor_mining_get_artifact`.
+- Always save `run_summary.json` from the redacted structured run response.
+- Always save `factor_card.json` from `run_response.factor_card`, not from artifact fetching.
+- Always save `artifact_manifest.json` with each returned artifact's `artifact_id`, `name`, `content_type`, and fetch status.
+- Save `artifacts/<artifact_name>` only when `factor_mining_get_artifact` returns safe inline JSON/text content or another supported safe content envelope.
+
+If artifact content is null, omitted, unavailable, or unsupported, record that status in `artifact_manifest.json` and continue.
 
 Do not save bearer tokens, presigned URLs, raw service metadata, hidden backend IDs, or credentials. If the host does not support file writes, continue the workflow and say local archiving is not available in that host.
 
 ## Final Response
 
-Summarize the result clearly. Inspect `ok`, `status`, `terminal_status`, `failures`, sanitized job statuses, artifact availability, and factor-card metrics. If the run failed or was cancelled, report the terminal status and safe error details.
+Summarize status, factor name, key metrics from `factor_card.metrics`, and safe diagnostics if the run failed. Inspect `ok`, `status`, `terminal_status`, `failures`, sanitized job statuses, artifact availability, and factor-card metrics. Do not mention backend internals, and do not treat optional artifact unavailability as failure.
 
 Never show backend job IDs, presigned URLs, bearer tokens, raw credentials, or full `plugin.py` source in user-facing summaries. It is safe to show local result and artifact folder paths created by the current host.
 
-At the end of every completed, failed, or interrupted run, print these explicit path lines when the host supports file writes. Use absolute local paths so GUI hosts can render them as clickable folders:
+At the end of every completed, failed, or interrupted run, always explicitly show where local result files were saved. If a specific file was not created, omit only that file line. Still print the result folder if available.
 
-```text
-Result folder: /absolute/path/to/results/factor-mining/<session_id>/attempt-<n>/
-Artifact folder: /absolute/path/to/results/factor-mining/<session_id>/attempt-<n>/artifacts/
-```
+For GUI/Desktop hosts, use Markdown links with absolute local paths and angle-bracket link targets so paths with spaces work:
+
+Result folder: [Open result folder](</absolute/path/to/results/factor-mining/<session_id>/attempt-1/>)
+Artifact folder: [Open artifact folder](</absolute/path/to/results/factor-mining/<session_id>/attempt-1/artifacts/>)
+Plugin source: [plugin.py](</absolute/path/to/results/factor-mining/<session_id>/attempt-1/plugin.py>)
+Run summary: [run_summary.json](</absolute/path/to/results/factor-mining/<session_id>/attempt-1/run_summary.json>)
+Factor card: [factor_card.json](</absolute/path/to/results/factor-mining/<session_id>/attempt-1/factor_card.json>)
+Artifact manifest: [artifact_manifest.json](</absolute/path/to/results/factor-mining/<session_id>/attempt-1/artifact_manifest.json>)
+
+For CLI/TUI hosts, use plain absolute paths, not Markdown links:
+
+Result folder: /absolute/path/to/results/factor-mining/<session_id>/attempt-1/
+Artifact folder: /absolute/path/to/results/factor-mining/<session_id>/attempt-1/artifacts/
+Plugin source: /absolute/path/to/results/factor-mining/<session_id>/attempt-1/plugin.py
+Run summary: /absolute/path/to/results/factor-mining/<session_id>/attempt-1/run_summary.json
+Factor card: /absolute/path/to/results/factor-mining/<session_id>/attempt-1/factor_card.json
+Artifact manifest: /absolute/path/to/results/factor-mining/<session_id>/attempt-1/artifact_manifest.json
 
 If the host could not write files, print:
 
-```text
 Result folder: not available in this host
 Artifact folder: not available in this host
-```
 
 ## plugin.py Contract
 
