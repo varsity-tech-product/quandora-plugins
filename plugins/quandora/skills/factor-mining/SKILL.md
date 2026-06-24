@@ -36,6 +36,17 @@ Some hosts may prefix action names with the server name, such as `quandora-mcp__
 
 Do not use or advertise batch mining.
 
+## Runtime Field Mapping
+
+When writing Factor Sections, use the runtime `bar` object in C# code. Do not reference Python column names directly inside C#.
+
+- `close` -> `bar.Close`
+- `volume` -> `bar.Volume`
+- `taker_buy_volume` -> `bar.TakerBuyVolume`
+- `taker_sell_volume` -> `bar.TakerSellVolume`
+
+For example, use `_takerBuyBuf.Enqueue(bar.TakerBuyVolume);`, not `_takerBuyBuf.Enqueue(takerBuyVolume);`.
+
 ## Workflow
 
 Start with `factor_mining_status`. If authorization is missing or the tools are not exposed, use the host's Quandora connection path. In Codex, run `codex mcp login quandora-mcp` yourself before asking the user to take action. Do not ask the user for direct keys.
@@ -64,7 +75,15 @@ Never submit a filesystem path or ask Quandora to read local files. Validate the
 
 When the source is valid and the user is ready to submit, call `factor_mining_upload_backtest_wait` with `session_id`, inline `plugin_source`, and the selected `fwd_period` when required. Use `fwd_period=7` only when neither the task nor the user specifies a horizon.
 
-If the run is still running, call `factor_mining_resume_run` until it reaches a terminal state or the host session must stop. Use `factor_mining_resume_run` when a prior run was interrupted. Use `factor_mining_get_artifact` only for artifact identifiers returned by Quandora.
+Use `factor_mining_resume_run` when a prior run was interrupted.
+
+### Waiting Policy
+
+If `upload_backtest_wait` returns `running`, call `factor_mining_resume_run` at most 6 times in the current request. If the run is still `running`, stop waiting, keep the saved files, and tell the user the run is still in progress. Always print the result folder path.
+
+### Artifact Handling
+
+Only call `factor_mining_get_artifact` with an `artifact_id` returned from `upload_backtest_wait` or `resume_run`. Do not call it without `artifact_id`. Save returned JSON/text artifacts under the run's `artifacts/` folder. If an artifact is listed but unavailable or omitted, write an artifact manifest entry and continue.
 
 When the host supports file writes, save safe result files in the same run archive:
 
