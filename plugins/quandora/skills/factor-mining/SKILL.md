@@ -78,18 +78,20 @@ Do not save bearer tokens, presigned URLs, raw service metadata, hidden backend 
 
 Summarize the result clearly. Inspect `ok`, `status`, `terminal_status`, `failures`, sanitized job statuses, artifact availability, and factor-card metrics. If the run failed or was cancelled, report the terminal status and safe error details.
 
-Never show backend job IDs, presigned URLs, bearer tokens, raw credentials, or full `plugin.py` source in user-facing summaries. Use concise filenames for saved artifacts instead of local absolute paths.
+Never show backend job IDs, presigned URLs, bearer tokens, raw credentials, or full `plugin.py` source in user-facing summaries. It is safe to show local result and artifact folder paths created by the current host.
 
-At the end of every completed, failed, or interrupted run, print one explicit result-path line:
+At the end of every completed, failed, or interrupted run, print these explicit path lines when the host supports file writes. Use absolute local paths so GUI hosts can render them as clickable folders:
 
 ```text
-Result folder: results/factor-mining/<session_id>/attempt-<n>/
+Result folder: /absolute/path/to/results/factor-mining/<session_id>/attempt-<n>/
+Artifact folder: /absolute/path/to/results/factor-mining/<session_id>/attempt-<n>/artifacts/
 ```
 
 If the host could not write files, print:
 
 ```text
 Result folder: not available in this host
+Artifact folder: not available in this host
 ```
 
 ## plugin.py Contract
