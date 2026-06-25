@@ -20,6 +20,14 @@ Git ref: leave blank
 Plugin: quandora@quandora
 ```
 
+You can also ask Codex Desktop to install and connect Quandora for you:
+
+```text
+Install Quandora from varsity-tech-product/quandora-plugins, then connect Quandora Factor Mining.
+```
+
+Codex may ask before running the Codex CLI setup commands. These commands install the Quandora plugin into Codex, write Codex plugin/MCP configuration, and open Quandora OAuth. They do not grant Quandora access to your local files.
+
 Codex CLI:
 
 ```bash
@@ -54,6 +62,8 @@ URL: https://mcp.quandora.ai/factor-mining
 Use Settings -> Connectors, add the Connector above, click Connect, authorize Quandora in the browser, then start a new chat.
 
 In Claude Code, open `/mcp` and authenticate `quandora`, then start a new chat.
+
+Claude Desktop can use the connected Quandora tools in chat, but local result-folder archiving is only guaranteed in local agent environments such as Claude Code, Codex, and OpenClaw. Claude Desktop's built-in file creation uses Claude's sandbox and may provide downloadable files rather than writing directly to a chosen local folder.
 
 ### OpenClaw
 
@@ -94,10 +104,10 @@ Use Quandora Factor Mining to resume a run and summarize results.
 When the host supports local files, each run is saved under:
 
 ```text
-results/factor-mining/<session_id>/attempt-<n>/
+results/factor-mining/<factor_name>/
 ```
 
-The run folder contains the submitted `plugin.py`, a redacted `run_summary.json`, a `factor_card.json` when available, safe artifacts returned by Quandora, and PNG charts under `artifacts/png/` when chart images are available. The agent prints the result and artifact folder paths at the end of each run.
+The run folder contains the submitted `plugin.py`, a redacted `run_summary.json`, a `factor_card.json` when available, and a `factor_mining_artifacts/` folder for safe artifacts returned by Quandora, including PNG charts when chart images are available. The agent prints the result folder path at the end of each run.
 
 ## License
 
