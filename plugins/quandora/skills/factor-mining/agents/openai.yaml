@@ -9,5 +9,5 @@ dependencies:
       value: "quandora"
       description: "Quandora Factor Mining connection"
       transport: "streamable_http"
-      url: "https://mcp.quandora.ai/factor-mining"
-      oauth_resource: "https://mcp.quandora.ai/factor-mining"
+      url: "https://mcp-staging.varsity.lol/factor-mining"
+      oauth_resource: "https://mcp-staging.varsity.lol/factor-mining"

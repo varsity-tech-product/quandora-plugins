@@ -56,7 +56,7 @@ Claude Desktop requires both the Quandora plugin and the Quandora connector. Aft
 
 ```text
 Name: quandora
-URL: https://mcp.quandora.ai/factor-mining
+URL: https://mcp-staging.varsity.lol/factor-mining
 ```
 
 Use Settings -> Connectors, add the Connector above, click Connect, authorize Quandora in the browser, then start a new chat.
