@@ -33,6 +33,7 @@ Use only the Factor Mining actions exposed by `quandora`:
 - `factor_mining_resume_run`
 - `factor_mining_get_artifact`
 - `factor_mining_get_backtest_png_artifacts`
+- `factor_mining_get_backtest_png_artifact_chunk`
 
 Some hosts may prefix action names with the server name, such as `quandora__factor_mining_status`. Treat those as the same actions.
 
@@ -90,7 +91,7 @@ Treat `factor_card.metrics` returned by `factor_mining_upload_backtest_wait` or 
 
 Only call `factor_mining_get_artifact` with an `artifact_id` returned from `upload_backtest_wait` or `resume_run`. Do not call it without `artifact_id`. Missing, null, unavailable, omitted, or non-inline artifact content is not a run failure. Treat artifact fetch failures as optional attachment failures unless the run itself failed. Never tell the user backend-oriented messages such as "the factor-card artifact has no inline body", "artifact body is missing", `structuredContent`, "MCP response shape", or "backend envelope".
 
-After a backtest reaches a terminal state, fetch chart PNGs with `factor_mining_get_backtest_png_artifacts` when the tool is available. Use the bare backtest `job_id` from `run.run_id` or each value in `run.job_ids[]`; do not pass an `artifact_id` to this tool. If multiple job IDs are present, fetch PNGs for each job ID.
+After a backtest reaches a terminal state, fetch chart PNGs with `factor_mining_get_backtest_png_artifacts` when the tool is available. Use the bare backtest `job_id` from `run.run_id` or each value in `run.job_ids[]`; do not pass an `artifact_id` to this tool. If multiple job IDs are present, fetch PNGs for each job ID. Treat PNG fetch issues as optional artifact failures, not run failures.
 
 When the host supports file writes, save `plugin.py` in the factor-name folder and save all generated or fetched result files inside `factor_mining_artifacts/`:
 
@@ -99,8 +100,9 @@ When the host supports file writes, save `plugin.py` in the factor-name folder a
 - Always save `factor_mining_artifacts/factor_card.json` from `run_response.factor_card`, not from artifact fetching.
 - Always save `factor_mining_artifacts/artifact_manifest.json` with each returned artifact's `artifact_id`, `name`, `content_type`, and fetch status.
 - Save `factor_mining_artifacts/<artifact_name>` only when `factor_mining_get_artifact` returns safe inline JSON/text content or another supported safe content envelope.
-- Save PNG chart images returned by `factor_mining_get_backtest_png_artifacts` directly under `factor_mining_artifacts/`. For each `png_artifacts[]` item with `content_type="image/png"` and non-empty `content_b64`, decode the base64 content and write `factor_mining_artifacts/<safe_name>.png`. Never print or expose the base64 payload to the user.
-- Include PNG chart metadata in `artifact_manifest.json`: `job_id`, `name`, `window`, `content_type`, `size_bytes`, `md5_hex`, `saved_path`, `omitted`, and `omitted_windows`.
+- Save PNG chart images under `factor_mining_artifacts/`. Prefer `factor_mining_get_backtest_png_artifact_chunk` when it is available. For each allowed PNG item from the manifest, loop with `offset=0`, `limit=262144`, decode each `content_b64` chunk, append bytes locally, and stop when `next_offset` is null. Verify the final byte length equals `size_bytes`; if possible, verify `md5_hex`.
+- If chunk fetching is unavailable and a PNG manifest item includes non-empty `content_b64` small enough for the host to handle, decode it and save `factor_mining_artifacts/<safe_name>.png`. Never print or expose base64 payloads to the user.
+- Include PNG chart metadata in `artifact_manifest.json`: `job_id`, `name`, `window`, `content_type`, `size_bytes`, `md5_hex`, `saved_path`, `omitted`, `omitted_windows`, and fetch status for every saved, omitted, withheld, or failed chart.
 
 If artifact content is null, omitted, unavailable, or unsupported, record that status in `artifact_manifest.json` and continue. If a PNG item has `content_b64=null`, record its `omitted` reason such as `oversize` or `total_cap` and do not treat it as a failed run. If `omitted_windows` reports withheld `oos` or `all` charts, mention only that additional chart windows were withheld from local display; do not imply the charts do not exist.
 
