@@ -21,7 +21,7 @@ When the host supports local files, Factor Mining archives each run under:
 results/factor-mining/<session_id>/attempt-<n>/
 ```
 
-The archive contains the submitted `plugin.py`, a redacted `run_summary.json`, a `factor_card.json` when available, safe artifacts returned by Quandora, and PNG charts under `artifacts/png/` when chart images are available. The agent prints the result and artifact folder paths after each run so the user can open the files directly.
+The archive contains the submitted `plugin.py`, a redacted `run_summary.json`, `factor_card_is.json` and `factor_card_all.json` when available, `artifact_manifest.json`, and PNG charts under `artifacts/is/` and `artifacts/all/`. The agent prints the result, artifact, and chart folder paths after each run so the user can open the files directly.
 
 ## Skills
 

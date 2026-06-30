@@ -198,10 +198,10 @@ Use Quandora Factor Mining to resume a run and summarize results.
 When the host supports local files, each run is saved under:
 
 ```text
-results/factor-mining/<factor_name>/
+results/factor-mining/<session_id>/<attempt_id>/
 ```
 
-The run folder contains the submitted `plugin.py`, a redacted `run_summary.json`, a `factor_card.json` when available, and a `factor_mining_artifacts/` folder for safe artifacts returned by Quandora, including PNG charts when chart images are available. The agent prints the result folder path at the end of each run.
+The run folder contains the submitted `plugin.py`, a redacted `run_summary.json`, `factor_card_is.json` and `factor_card_all.json` when available, `artifact_manifest.json`, and PNG charts under `artifacts/is/` and `artifacts/all/`. The agent prints the result, artifact, and chart folder paths at the end of each run.
 
 ## License
 
