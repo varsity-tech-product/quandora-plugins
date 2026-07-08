@@ -1,6 +1,9 @@
 ---
 name: factor-mining
-description: Use when an agent should create or submit a Quandora Factor Mining plugin.py, run a user-scoped backtest, fetch safe artifacts, save local result files, summarize outcomes, or resume a run through Quandora.
+description: >-
+  Use when an agent should create or submit a Quandora Factor Mining plugin.py,
+  run a user-scoped backtest, fetch safe artifacts, save local result files,
+  summarize outcomes, or resume a run through Qua
 ---
 
 # Quandora Factor Mining
@@ -11,11 +14,11 @@ The agent drafts a valid Factor Mining `plugin.py`, submits the complete source 
 
 If the required Quandora tools are visible, continue automatically. If they are not visible, use the host's normal Quandora connection path before stopping:
 
-- Codex CLI/TUI: run `codex mcp login quandora`. Wait for the user to complete the browser authorization flow, then check again for `factor_mining_status`.
-- Codex Desktop: the plugin provides the Quandora connector. If the first use opens the authorization flow, wait for the user to authorize Quandora in the browser, then continue in a new chat. If the tools still are not visible, tell the user to fully quit and reopen Codex Desktop.
-- Claude Code: open `/mcp`, authenticate `quandora`, then start a new chat.
-- Claude Desktop: the plugin alone is not enough. Tell the user to open Settings -> Connectors, add a Connector named `quandora` with URL `https://mcp.quandora.ai/factor-mining`, click Connect, authorize Quandora in the browser, then start a new chat.
-- OpenClaw: run `openclaw mcp login quandora`, complete the printed authorization flow, then start a new chat.
+* Codex CLI/TUI: run `codex mcp login quandora`. Wait for the user to complete the browser authorization flow, then check again for `factor_mining_status`.
+* Codex Desktop: the plugin provides the Quandora connector. If the first use opens the authorization flow, wait for the user to authorize Quandora in the browser, then continue in a new chat. If the tools still are not visible, tell the user to fully quit and reopen Codex Desktop.
+* Claude Code: open `/mcp`, authenticate `quandora`, then start a new chat.
+* Claude Desktop: the plugin alone is not enough. Tell the user to open Settings -> Connectors, add a Connector named `quandora` with URL `https://mcp.quandora.ai/factor-mining`, click Connect, authorize Quandora in the browser, then start a new chat.
+* OpenClaw: run `openclaw mcp login quandora`, complete the printed authorization flow, then start a new chat.
 
 Do not ask for Quandora API keys, `vt_` keys, bearer tokens, service tokens, or credentials. Do not use raw HTTP calls, local helper scripts, direct internal service calls, local execution keys, or credential paste flows as a fallback.
 
@@ -23,19 +26,19 @@ Do not ask for Quandora API keys, `vt_` keys, bearer tokens, service tokens, or 
 
 Use only the Factor Mining actions exposed by `quandora`:
 
-- `factor_mining_status`
-- `factor_mining_list_public_tasks`
-- `factor_mining_create_task_session`
-- `factor_mining_create_custom_session`
-- `factor_mining_validate_plugin_source`
-- `factor_mining_request_dedup_context`
-- `factor_mining_upload_backtest_wait`
-- `factor_mining_resume_run`
-- `factor_mining_get_artifact`
-- `factor_mining_get_backtest_window_cards`
-- `factor_mining_get_backtest_png_artifacts`
-- `factor_mining_create_backtest_png_download_ticket`
-- `factor_mining_get_backtest_png_artifact_chunk`
+* `factor_mining_status`
+* `factor_mining_list_public_tasks`
+* `factor_mining_create_task_session`
+* `factor_mining_create_custom_session`
+* `factor_mining_validate_plugin_source`
+* `factor_mining_request_dedup_context`
+* `factor_mining_upload_backtest_wait`
+* `factor_mining_resume_run`
+* `factor_mining_get_artifact`
+* `factor_mining_get_backtest_window_cards`
+* `factor_mining_get_backtest_png_artifacts`
+* `factor_mining_create_backtest_png_download_ticket`
+* `factor_mining_get_backtest_png_artifact_chunk`
 
 Some hosts may prefix action names with the server name, such as `quandora__factor_mining_status`. Treat those as the same actions.
 
@@ -45,10 +48,10 @@ Do not use or advertise batch mining.
 
 When writing Factor Sections, use the runtime `bar` object in C# code. Do not reference Python column names directly inside C#.
 
-- `close` -> `bar.Close`
-- `volume` -> `bar.Volume`
-- `taker_buy_volume` -> `bar.TakerBuyVolume`
-- `taker_sell_volume` -> `bar.TakerSellVolume`
+* `close` -> `bar.Close`
+* `volume` -> `bar.Volume`
+* `taker_buy_volume` -> `bar.TakerBuyVolume`
+* `taker_sell_volume` -> `bar.TakerSellVolume`
 
 For example, use `_takerBuyBuf.Enqueue(bar.TakerBuyVolume);`, not `_takerBuyBuf.Enqueue(takerBuyVolume);`.
 
@@ -58,12 +61,12 @@ Start with `factor_mining_status`. If authorization is missing or the tools are 
 
 Determine whether the user wants a public task or a custom idea:
 
-- For public tasks, call `factor_mining_list_public_tasks`, show concise choices, and ask the user to pick one unless they explicitly ask the agent to choose. The selected task's returned `allowed_data` is the authoritative list of data columns available for that task: use only fields included there and do not invent unavailable market fields. If a public task does not include `allowed_data`, stay conservative and use only `close` unless the user chooses a custom idea/session with explicit `allowed_data`. Then call `factor_mining_create_task_session`.
-- For a custom idea, call `factor_mining_create_custom_session` with a clear title, category, description, non-empty `allowed_data`, and `fwd_period`. Include every input column the generated factor needs, such as `close`, `volume`, `funding_rate_close`, or `open_interest_close`.
+* For public tasks, call `factor_mining_list_public_tasks`, show concise choices, and ask the user to pick one unless they explicitly ask the agent to choose. The selected task's returned `allowed_data` is the authoritative list of data columns available for that task: use only fields included there and do not invent unavailable market fields. If a public task does not include `allowed_data`, stay conservative and use only `close` unless the user chooses a custom idea/session with explicit `allowed_data`. Then call `factor_mining_create_task_session`.
+* For a custom idea, call `factor_mining_create_custom_session` with a clear title, category, description, non-empty `allowed_data`, and `fwd_period`. Include every input column the generated factor needs, such as `close`, `volume`, `funding_rate_close`, or `open_interest_close`.
 
-After a session exists, prepare one local result archive when the host supports file writes. Use a stable factor slug for the run folder. Prefer the generated top-level `FACTOR_TYPE`; if it is missing, convert `FACTOR_NAME` to lowercase snake_case. For example, `FACTOR_TYPE = "aggressive_flow_exhaustion_reversal"` uses:
+After a session exists, prepare one local result archive when the host supports file writes. Use a stable factor slug for the run folder. Prefer the generated top-level `FACTOR_TYPE`; if it is missing, convert `FACTOR_NAME` to lowercase snake\_case. For example, `FACTOR_TYPE = "aggressive_flow_exhaustion_reversal"` uses:
 
-```text
+```
 Quandora result/factor-mining/aggressive_flow_exhaustion_reversal/
 Quandora result/factor-mining/aggressive_flow_exhaustion_reversal/artifacts/
 ```
@@ -74,8 +77,8 @@ Before submission, call `factor_mining_request_dedup_context` with the session c
 
 Create or locate one `plugin.py` source:
 
-- In local coding hosts with a writable workspace, save the submitted source as `plugin.py` inside the run archive. Read the file back and submit the full contents as inline `plugin_source`.
-- In chat-only hosts without file writes, keep the generated source in the conversation/tool-call context and submit it directly as inline `plugin_source`.
+* In local coding hosts with a writable workspace, save the submitted source as `plugin.py` inside the run archive. Read the file back and submit the full contents as inline `plugin_source`.
+* In chat-only hosts without file writes, keep the generated source in the conversation/tool-call context and submit it directly as inline `plugin_source`.
 
 Never submit a filesystem path or ask Quandora to read local files. Validate the source with `factor_mining_validate_plugin_source`. The validation step is static; do not import, execute, eval, or shell-run generated factor code.
 
@@ -100,7 +103,7 @@ Treat the terminal `factor_mining_upload_backtest_wait` or `factor_mining_resume
 
 Use this standard local layout:
 
-```text
+```
 Quandora result/factor-mining/<factor_slug>/
   plugin.py
   run_summary.json
@@ -138,36 +141,21 @@ At the end of every completed, failed, or interrupted run, always explicitly sho
 
 For GUI/Desktop hosts, use Markdown links with absolute local paths and angle-bracket link targets so paths with spaces work:
 
-Result folder: [Open result folder](</absolute/path/to/Quandora result/factor-mining/<factor_slug>/>)
-Artifact folder: [Open artifact folder](</absolute/path/to/Quandora result/factor-mining/<factor_slug>/artifacts/>)
-PNG chart folder: [Open PNG chart folder](</absolute/path/to/Quandora result/factor-mining/<factor_slug>/artifacts/>)
-Plugin source: [plugin.py](</absolute/path/to/Quandora result/factor-mining/<factor_slug>/plugin.py>)
-Run summary: [run_summary.json](</absolute/path/to/Quandora result/factor-mining/<factor_slug>/run_summary.json>)
-IS factor card: [factor_card_is.json](</absolute/path/to/Quandora result/factor-mining/<factor_slug>/factor_card_is.json>)
-ALL factor card: [factor_card_all.json](</absolute/path/to/Quandora result/factor-mining/<factor_slug>/factor_card_all.json>)
-Artifact manifest: [artifact_manifest.json](</absolute/path/to/Quandora result/factor-mining/<factor_slug>/artifact_manifest.json>)
+Result folder: \[Open result folder]\(\</absolute/path/to/Quandora result/factor-mining/\<factor\_slug>/>) Artifact folder: \[Open artifact folder]\(\</absolute/path/to/Quandora result/factor-mining/\<factor\_slug>/artifacts/>) PNG chart folder: \[Open PNG chart folder]\(\</absolute/path/to/Quandora result/factor-mining/\<factor\_slug>/artifacts/>) Plugin source: \[plugin.py]\(\</absolute/path/to/Quandora result/factor-mining/\<factor\_slug>/plugin.py>) Run summary: \[run\_summary.json]\(\</absolute/path/to/Quandora result/factor-mining/\<factor\_slug>/run\_summary.json>) IS factor card: \[factor\_card\_is.json]\(\</absolute/path/to/Quandora result/factor-mining/\<factor\_slug>/factor\_card\_is.json>) ALL factor card: \[factor\_card\_all.json]\(\</absolute/path/to/Quandora result/factor-mining/\<factor\_slug>/factor\_card\_all.json>) Artifact manifest: \[artifact\_manifest.json]\(\</absolute/path/to/Quandora result/factor-mining/\<factor\_slug>/artifact\_manifest.json>)
 
 For CLI/TUI hosts, use plain absolute paths, not Markdown links:
 
-Result folder: /absolute/path/to/Quandora result/factor-mining/<factor_slug>/
-Artifact folder: /absolute/path/to/Quandora result/factor-mining/<factor_slug>/artifacts/
-PNG chart folder: /absolute/path/to/Quandora result/factor-mining/<factor_slug>/artifacts/
-Plugin source: /absolute/path/to/Quandora result/factor-mining/<factor_slug>/plugin.py
-Run summary: /absolute/path/to/Quandora result/factor-mining/<factor_slug>/run_summary.json
-IS factor card: /absolute/path/to/Quandora result/factor-mining/<factor_slug>/factor_card_is.json
-ALL factor card: /absolute/path/to/Quandora result/factor-mining/<factor_slug>/factor_card_all.json
-Artifact manifest: /absolute/path/to/Quandora result/factor-mining/<factor_slug>/artifact_manifest.json
+Result folder: /absolute/path/to/Quandora result/factor-mining/\<factor\_slug>/ Artifact folder: /absolute/path/to/Quandora result/factor-mining/\<factor\_slug>/artifacts/ PNG chart folder: /absolute/path/to/Quandora result/factor-mining/\<factor\_slug>/artifacts/ Plugin source: /absolute/path/to/Quandora result/factor-mining/\<factor\_slug>/plugin.py Run summary: /absolute/path/to/Quandora result/factor-mining/\<factor\_slug>/run\_summary.json IS factor card: /absolute/path/to/Quandora result/factor-mining/\<factor\_slug>/factor\_card\_is.json ALL factor card: /absolute/path/to/Quandora result/factor-mining/\<factor\_slug>/factor\_card\_all.json Artifact manifest: /absolute/path/to/Quandora result/factor-mining/\<factor\_slug>/artifact\_manifest.json
 
 If the host could not write files, print:
 
-Result folder: not available in this host
-Artifact folder: not available in this host
+Result folder: not available in this host Artifact folder: not available in this host
 
 ## plugin.py Contract
 
 Use this minimum shape when the user has not supplied an existing plugin. The metadata values must be static top-level literals so Quandora can parse them without executing source code.
 
-```text
+```
 from typing import Any, Dict
 
 import pandas as pd
@@ -209,13 +197,13 @@ Keep `build_signal` and `FACTOR_SECTIONS` compute logic aligned. Return a `pd.Da
 
 ## Security
 
-- Use only Quandora actions for formal product workflows.
-- Never ask for OpenAI API keys, Codex auth files, BYOK secrets, frontend user credentials, raw Factor Mining credentials, local execution keys, `vt_` keys, bearer tokens, or service tokens.
-- Never print, persist in logs, or summarize full credential values.
-- Do not call hosted generation endpoints; the active agent generates factor source in its current host session.
-- Do not call frontend-user credential management, BYOK, Codex profile, task publishing, internal service URLs, or generic URL/API surfaces.
-- Do not import, exec, eval, or otherwise execute generated `plugin.py`.
-- Do not submit filesystem paths instead of inline `plugin_source`.
-- Do not print generated `plugin.py` source in summaries.
-- Treat downstream IDs, presigned URLs, and service metadata as private.
-- Artifact `404` and `410` responses mean unavailable. Authentication, authorization, network, malformed response, and server errors must fail clearly with redacted messages.
+* Use only Quandora actions for formal product workflows.
+* Never ask for OpenAI API keys, Codex auth files, BYOK secrets, frontend user credentials, raw Factor Mining credentials, local execution keys, `vt_` keys, bearer tokens, or service tokens.
+* Never print, persist in logs, or summarize full credential values.
+* Do not call hosted generation endpoints; the active agent generates factor source in its current host session.
+* Do not call frontend-user credential management, BYOK, Codex profile, task publishing, internal service URLs, or generic URL/API surfaces.
+* Do not import, exec, eval, or otherwise execute generated `plugin.py`.
+* Do not submit filesystem paths instead of inline `plugin_source`.
+* Do not print generated `plugin.py` source in summaries.
+* Treat downstream IDs, presigned URLs, and service metadata as private.
+* Artifact `404` and `410` responses mean unavailable. Authentication, authorization, network, malformed response, and server errors must fail clearly with redacted messages.
