@@ -154,7 +154,7 @@ In Claude Code, open `/mcp` and authenticate `quandora`, then start a new chat.
 
 Claude Desktop can use the connected Quandora tools in chat, but local result-folder archiving is only guaranteed in local agent environments such as Claude Code, Codex, and OpenClaw. Claude Desktop's built-in file creation uses Claude's sandbox and may provide downloadable files rather than writing directly to a chosen local folder.
 
-Factor Mining chart downloads use returned server `source_name` values for API calls and save local PNGs to returned `standard_local_path` values. Local filenames intentionally remove the `default_` prefix and p2/p3 suffixes.
+Factor Mining chart downloads use returned server `source_name` values for API calls and save local PNGs to returned `standard_local_path` values. When available, the raw signal artifact is saved as `signal_raw.parquet` in the factor result folder.
 
 #### OpenClaw
 

@@ -21,7 +21,7 @@ When the host supports local files, Factor Mining archives each run under:
 Quandora result/factor-mining/aggressive_flow_exhaustion_reversal/
 ```
 
-The archive is named from the factor slug, preferably the generated `FACTOR_TYPE`. It contains the submitted `plugin.py`, a redacted `run_summary.json`, `factor_card_is.json` and `factor_card_all.json` when available, `artifact_manifest.json`, and PNG charts under `artifacts/is/` and `artifacts/all/`. PNG API calls use the returned server `source_name`; local files are saved to `standard_local_path`, whose filenames intentionally remove the `default_` prefix and p2/p3 suffixes. The agent prints the result, artifact, and chart folder paths after each run so the user can open the files directly.
+The archive is named from the factor slug, preferably the generated `FACTOR_TYPE`. It contains the submitted `plugin.py`, a redacted `run_summary.json`, `factor_card_is.json` and `factor_card_all.json` when available, `artifact_manifest.json`, PNG charts under `artifacts/is/` and `artifacts/all/`, and the raw signal parquet at `signal_raw.parquet` when available. PNG API calls use the returned server `source_name`; local files are saved to `standard_local_path`. The agent prints the result, artifact, and chart folder paths after each run so the user can open the files directly.
 
 ## Skills
 
