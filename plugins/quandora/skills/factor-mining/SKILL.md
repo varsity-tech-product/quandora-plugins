@@ -46,7 +46,7 @@ Before writing `plugin.py`, call `factor_mining_get_plugin_contract` and use the
 - For a public task, pass either the selected `task_id` before session creation or the created `session_id` after `factor_mining_create_task_session`.
 - For a custom idea, pass the full custom `task_payload` before session creation or the created `session_id` after `factor_mining_create_custom_session`.
 - Use `plugin_contract.allowed_data` to decide which input columns the factor may use.
-- Use `plugin_contract.fwd_period` unless the user explicitly asked for another supported horizon.
+- Use `plugin_contract.fwd_period` after the contract is returned. For custom ideas, set `task_payload.fwd_period` to `7` unless the user explicitly asks for another supported horizon.
 - Use `plugin_contract.data_columns[].python_kwarg` for `build_signal` parameters.
 - For every C# runtime queue/buffer enqueue and every numeric C# runtime expression, use the matching `plugin_contract.data_columns[].csharp_double_expression`.
 - Follow `plugin_contract.runtime_rules` for required globals, `FACTOR_SECTIONS`, runtime variant, leak rules, extra-buffer rules, and reserved identifiers.
@@ -60,7 +60,7 @@ Start with `factor_mining_status`. If authorization is missing or the tools are 
 Determine whether the user wants a public task or a custom idea:
 
 - For public tasks, call `factor_mining_list_public_tasks`, show concise choices, and ask the user to pick one unless they explicitly ask the agent to choose. Then call `factor_mining_get_plugin_contract` with the selected `task_id` or create the session with `factor_mining_create_task_session` and call `factor_mining_get_plugin_contract` with the returned `session_id`.
-- For a custom idea, prepare a clear title, category, description, non-empty `allowed_data`, and `fwd_period`. Include every input column the generated factor needs, such as `close`, `volume`, `funding_rate_close`, or `open_interest_close`. Call `factor_mining_get_plugin_contract` with that `task_payload` before session creation, or create the session with `factor_mining_create_custom_session` and call `factor_mining_get_plugin_contract` with the returned `session_id`.
+- For a custom idea, prepare a clear title, category, description, non-empty `allowed_data`, and `fwd_period`. Use `fwd_period: 7` unless the user explicitly asks for another supported horizon. Include every input column the generated factor needs, such as `close`, `volume`, `funding_rate_close`, or `open_interest_close`. Call `factor_mining_get_plugin_contract` with that `task_payload` before session creation, or create the session with `factor_mining_create_custom_session` and call `factor_mining_get_plugin_contract` with the returned `session_id`.
 
 Do not write `plugin.py` until the plugin construction contract has been returned. If the contract cannot be fetched, stop and report that plugin authoring is blocked by missing contract metadata.
 
@@ -74,6 +74,10 @@ Quandora result/factor-mining/aggressive_flow_exhaustion_reversal/artifacts/
 Use only the factor slug as the canonical archive directory. The latest run for a factor updates that factor's folder. Keep session and run ids only inside `run_summary.json` / `artifact_manifest.json` when they are needed for traceability, not in the user-facing directory name.
 
 Before submission, call `factor_mining_request_dedup_context` with the session context and revise the factor if the returned similar-factor guidance shows a near duplicate.
+
+Before drafting, form a concise research thesis. For public tasks, stay inside the task's economic direction and allowed data. For custom ideas, stay inside the user's stated idea. Consider two or three plausible mechanisms, then choose the one with the clearest economic rationale and the best fit to the plugin contract. Prefer genuinely different mechanisms over parameter variants of the same formula.
+
+For named indicators or established formulas, use the canonical inputs when the plugin contract allows them. For example, MFI should use high, low, close, and volume when those columns are available. If required inputs are unavailable, clearly treat the factor as a variant and reflect that in `FACTOR_NAME`, `FACTOR_TYPE`, description, and formula.
 
 Create or locate one `plugin.py` source:
 
@@ -92,15 +96,19 @@ Use `factor_mining_resume_run` when a prior run was interrupted.
 
 ### Waiting Policy
 
-If `upload_backtest_wait` returns `running`, call `factor_mining_resume_run` at most 6 times in the current request. If the run is still `running`, stop waiting, keep the saved files, and tell the user the run is still in progress. Always print the result folder path.
+If `upload_backtest_wait` returns `running`, call `factor_mining_resume_run` at most 4 times in the current request.
+
+If the run is still `running` after the fourth resume, stop waiting and treat the archive as a pending run snapshot, not a completed result. Save only files that are already true at that point, such as `plugin.py` and a redacted pending run summary. Do not fetch factor cards, PNG charts, raw parquet, or artifact manifests until a later `factor_mining_resume_run` returns a terminal status. In the final response, clearly say the backtest is still running, artifacts are not available yet, and the user can ask to resume later. Always print the result folder path.
 
 ### Artifact Handling
 
-Treat the terminal `factor_mining_upload_backtest_wait` or `factor_mining_resume_run` response as the run summary. After a backtest reaches a terminal state, use the window-card response as the manifest for factor cards and chart files. Also request the raw signal parquet artifact when the host exposes that tool:
+Run artifact handling only after `factor_mining_upload_backtest_wait` or `factor_mining_resume_run` returns a terminal status such as `succeeded`, `failed`, or `cancelled`. If the run is still `running`, skip this section.
+
+Treat the terminal response as the run summary. After a backtest reaches a terminal state, use the window-card response as the manifest for factor cards and chart files. Also request the raw signal parquet artifact when the host exposes that tool:
 
 1. Save the redacted upload/resume result as `run_summary.json`.
-2. Call `factor_mining_get_backtest_window_cards` with `windows: ["is", "all"]` and the bare backtest `job_id` from `run.run_id` or `run.job_ids[]`.
-3. Save each available returned `factor_card` to the returned `standard_local_name`: `factor_card_is.json` and `factor_card_all.json`.
+2. Call `factor_mining_get_backtest_window_cards` with `windows: ["is"]` and the bare backtest `job_id` from `run.run_id` or `run.job_ids[]`.
+3. Save the available returned `factor_card` to the returned `standard_local_name`: `factor_card_is.json`.
 4. For every returned `png_artifacts[].source_name`, call `factor_mining_create_backtest_png_download_ticket`. The ticket response gives a short-lived Remote MCP download URL for the PNG bytes. Download that URL directly to the returned `standard_local_path`, then verify `size_bytes` and `md5_hex` when the response provides them.
 5. Some hosts cannot download URLs directly from tool output, and a ticket may expire before it is consumed. In that case, call `factor_mining_get_backtest_png_artifact_chunk` for the same server `source_name`. Use `standard_local_path` only as the local output path. Loop with `offset=0`, `limit=262144`, decode each `content_b64` chunk, append bytes to `standard_local_path`, and stop when `next_offset` is null.
 6. Call `factor_mining_create_backtest_raw_artifact_download_ticket` with the same bare backtest `job_id` and `name: "step4/signal_raw.parquet"`. If a ticket is returned, download it directly to `signal_raw.parquet` in the factor result folder, then verify `size_bytes` and `sha256_hex` when provided.
@@ -115,14 +123,9 @@ Quandora result/factor-mining/<factor_slug>/
   signal_raw.parquet
   run_summary.json
   factor_card_is.json
-  factor_card_all.json
   artifact_manifest.json
   artifacts/
     is/
-      group_return_plot.png
-      cs_nav_curves.png
-      cs_profile_4panel.png
-    all/
       group_return_plot.png
       cs_nav_curves.png
       cs_profile_4panel.png
@@ -144,28 +147,26 @@ Summarize status, factor name, key metrics from the IS factor card when availabl
 
 Never show job IDs, download URLs, bearer tokens, raw credentials, or full `plugin.py` source in user-facing summaries. It is safe to show local result and artifact folder paths created by the current host.
 
-At the end of every completed, failed, or interrupted run, always explicitly show absolute paths for the result folder, artifact folder, PNG chart folder, `plugin.py`, `run_summary.json`, `factor_card_is.json`, `factor_card_all.json`, and `artifact_manifest.json`. If a specific file was not created, say `not created` for that line. Still print the result folder if available.
+At the end of every completed, failed, or interrupted run, always explicitly show absolute paths for the result folder, artifact folder, PNG chart folder, `plugin.py`, `run_summary.json`, `factor_card_is.json`, and `artifact_manifest.json`. If a specific file was not created, say `not created` for that line. Still print the result folder if available.
 
 For GUI/Desktop hosts, use Markdown links with absolute local paths and angle-bracket link targets so paths with spaces work:
 
 Result folder: [Open result folder](</absolute/path/to/Quandora result/factor-mining/<factor_slug>/>)
 Artifact folder: [Open artifact folder](</absolute/path/to/Quandora result/factor-mining/<factor_slug>/artifacts/>)
-PNG chart folder: [Open PNG chart folder](</absolute/path/to/Quandora result/factor-mining/<factor_slug>/artifacts/>)
+PNG chart folder: [Open PNG chart folder](</absolute/path/to/Quandora result/factor-mining/<factor_slug>/artifacts/is/>)
 Plugin source: [plugin.py](</absolute/path/to/Quandora result/factor-mining/<factor_slug>/plugin.py>)
 Run summary: [run_summary.json](</absolute/path/to/Quandora result/factor-mining/<factor_slug>/run_summary.json>)
 IS factor card: [factor_card_is.json](</absolute/path/to/Quandora result/factor-mining/<factor_slug>/factor_card_is.json>)
-ALL factor card: [factor_card_all.json](</absolute/path/to/Quandora result/factor-mining/<factor_slug>/factor_card_all.json>)
 Artifact manifest: [artifact_manifest.json](</absolute/path/to/Quandora result/factor-mining/<factor_slug>/artifact_manifest.json>)
 
 For CLI/TUI hosts, use plain absolute paths, not Markdown links:
 
 Result folder: /absolute/path/to/Quandora result/factor-mining/<factor_slug>/
 Artifact folder: /absolute/path/to/Quandora result/factor-mining/<factor_slug>/artifacts/
-PNG chart folder: /absolute/path/to/Quandora result/factor-mining/<factor_slug>/artifacts/
+PNG chart folder: /absolute/path/to/Quandora result/factor-mining/<factor_slug>/artifacts/is/
 Plugin source: /absolute/path/to/Quandora result/factor-mining/<factor_slug>/plugin.py
 Run summary: /absolute/path/to/Quandora result/factor-mining/<factor_slug>/run_summary.json
 IS factor card: /absolute/path/to/Quandora result/factor-mining/<factor_slug>/factor_card_is.json
-ALL factor card: /absolute/path/to/Quandora result/factor-mining/<factor_slug>/factor_card_all.json
 Artifact manifest: /absolute/path/to/Quandora result/factor-mining/<factor_slug>/artifact_manifest.json
 
 If the host could not write files, print:
