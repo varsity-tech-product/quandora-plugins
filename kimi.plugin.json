@@ -1,6 +1,6 @@
 {
   "name": "quandora",
-  "version": "3.0-preview",
+  "version": "3.1-preview",
   "description": "Quandora plugin for factor and strategy creation, analysis, and simulated Paper Trading.",
   "keywords": [
     "quandora",

@@ -35,6 +35,10 @@ as future controlled runs rather than reporting nonexistent results.
 - Are major style, size, liquidity, and market alternatives understood or queued for testing?
 - Are important artifacts missing or null?
 - Does the evidence include a distinct validation scope, or only IS/ALL evidence that includes IS?
+- Does exact Factor lineage use one of the 12 first-seven-day bucket fields excluded from default
+  Paper-ready recommendations? `trade_vol_max_b` and `trade_vol_max_s` are not in that set.
+- Would required history be complete for every selected Factor? Paper fails required-history
+  readiness before Lean instead of silently dropping incomplete symbols.
 
 ## Decisions
 

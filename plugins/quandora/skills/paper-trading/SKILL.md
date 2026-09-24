@@ -5,7 +5,7 @@ description: Use when the user asks for simulated trading, paper trading, curren
 
 # Quandora Paper Trading
 
-Bundled plugin version: 3.0-preview
+Bundled plugin version: 3.1-preview
 
 Use this skill through the authenticated `quandora` MCP connection. It operates only on
 the current user's product-safe StrategyRun, Paper run, and Strategy Portfolio handles. It is
@@ -73,6 +73,16 @@ There is deliberately no Paper archive, unarchive, resume, parent Portfolio list
 positions, parent net position, or parent Paper equity tool. Never invent or imply these abilities.
 Do not call `sb_submit_run` from this skill. Hand Strategy work to `$strategy-building`; use Paper
 tools here only after an eligible source exists.
+
+Raw Factor inputs remain governed by the Factor Plugin Contract before they reach Paper Trading.
+This Skill must not copy the `binance_intraday` field registry, realign the D feature row to D+1,
+shift it again, backfill a missing row, or treat the pre-00:02 UTC publication SLA as an arrival
+guarantee. Trading consumes the frozen Portfolio/Strategy contract and reported runtime
+observations. Paper validates every required history column and bar before Lean execution; missing
+required data retries or fails the run according to the runtime deadline and does not silently
+filter that symbol into a smaller universe. The 12 first-seven-day bucket exclusions are default
+Factor recommendation guidance, not a Paper runtime fallback; `trade_vol_max_b` and
+`trade_vol_max_s` are not in that exclusion set.
 
 ## Global Safety Rules
 
