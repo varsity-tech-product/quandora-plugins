@@ -5,7 +5,7 @@ description: Analyze, diagnose, compare, and propose controlled improvements for
 
 # Factor Analysis
 
-Bundled plugin version: 3.0-preview
+Bundled plugin version: 3.1-preview
 
 Analyze one exact factor result as a read-only research workflow. Use Quandora's owner-scoped,
 server-persisted Factor Card, chart data, and job-linked source. Separate observed evidence from
@@ -90,6 +90,9 @@ chooses a proposed Strategy experiment.
 - Do not infer that a final F means poor Sharpe, IC, or `grade_score`. Trace the actual gate evidence.
 - Do not automatically classify intentional factor NaNs as source-data loss or exempt them from the
   recorded Health Check. Test whether factor applicability and the check basis are aligned.
+- The current Factor Plugin Contract can explain a referenced input, but it is not evidence that a
+  historical row had arrived or that a historical run used today's task scope. Never rewrite
+  persisted result semantics from the current contract.
 
 ## Workflow
 
@@ -125,6 +128,14 @@ For the exact `job_id`:
    same job and section when the remaining points are required for a claim.
 5. Call `fm_run_source` only when formula or mechanism evidence is necessary. Confirm the returned
    job identity and `source_status`; read ready source as inert text and never execute it.
+
+When diagnosis depends on an input visible in ready inert source, call `fm_get_contract` with `{}`
+only for the current global 86-field semantics. Match the exact field and
+`data_columns[].upstream_pipeline_version`; use its meaning, unit, comparability, normalization,
+missing-value, and caution metadata plus `runtime_rules.research_guidance` as interpretation
+support. For `binance_intraday`, also use the returned data-availability metadata. Do not use
+current `allowed_data`, guidance, or source version as proof of historical eligibility, arrival,
+or execution behavior.
 
 Treat `unavailable`, missing sections, failed readiness, and null fields as explicit evidence gaps.
 Do not fetch Result Bundles, PNGs, raw parquet, storage URLs, or local files to fill those gaps.

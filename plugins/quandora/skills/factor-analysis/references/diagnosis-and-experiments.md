@@ -55,6 +55,28 @@ The check was not run or its outcome is unknown. Read `message` or other safe di
 available, report the evidence gap, and never treat the state as either a Health pass or proof of a
 specific runtime error.
 
+### Factor Input Research Contract
+
+When ready inert source references one of the 86 supported fields, use the current global Factor
+Plugin Contract only to interpret that exact field. Match `upstream_pipeline_version` when evidence
+permits; otherwise label version-specific interpretation as uncertain. Respect the returned unit,
+cross-sectional comparability, normalization, missing-value behavior, research caution, and
+`runtime_rules.research_guidance`.
+
+Use the reviewed guidance to check same-side amount/quantity scaling, pressure as
+`(buy - sell) / (buy + sell)`, aggressive price mean as `price / close - 1`, aggressive price
+standard deviation as `std / close`, activity-relative count normalization, calendar-preserving
+NaN rolling, 3-day/7-day comparisons for noisy statistics, and exact redundancies. A logarithm
+alone does not remove scale exposure. Large trades are not automatically smart money, aggressive
+buy/sell fill-price means are not bid/ask quotes or a spread, and native Binance Premium Index
+values are already dimensionless and must not be divided by price.
+
+For `binance_intraday`, the D row describes D 00:00-24:00 UTC, aligns to the D daily bar, and
+becomes safe only after it actually arrives on D+1. The pre-00:02 UTC publication SLA is not proof
+of historical arrival. Possible missingness causes therefore include both field-specific null
+conditions and availability boundaries. Do not shift the D-aligned field again, infer historical
+availability from the current task contract, or convert a missing value to zero.
+
 ## Controlled Experiment Templates
 
 - **Turnover control:** apply one smoothing or rebalance change; expect lower turnover and define the

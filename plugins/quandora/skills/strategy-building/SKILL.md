@@ -5,7 +5,7 @@ description: Use when the user asks to list available, eligible, or selectable S
 
 # Quandora Strategy Building
 
-Bundled plugin version: 3.0-preview
+Bundled plugin version: 3.1-preview
 
 Use this skill through the authenticated Quandora connection exposed by the host as
 `quandora`. It owns factor selection, Strategy creation or revision, and Strategy backtests for
@@ -46,6 +46,12 @@ documented guidance branches below.
 Official, Mine, and Shared selections use the same `sb_submit_run` path. Do not load the Paper
 Trading skill or present Strategy composition as Paper preparation. A later Paper Trading request
 is a separate workflow.
+
+The Factor Plugin Contract owns raw input definitions, including `binance_intraday` semantics and
+D/D+1 availability. Strategy construction consumes exact admitted Factor identities; it must not
+copy the 86-field semantic registry or reviewed research policy, select raw data columns,
+re-normalize a Factor's inputs, or apply an additional date shift. Route a request to author or
+change an input-level thesis to `$factor-mining` before returning to the eligible Factor inventory.
 
 The normal Strategy workflow must not require or call `sb_import_factor`. Import-only actions are
 not global prerequisites, and an ordinary Strategy task must continue when they are absent. Check

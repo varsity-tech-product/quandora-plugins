@@ -5,7 +5,7 @@ description: Analyze, diagnose, compare, and propose controlled improvements for
 
 # Strategy Analysis
 
-Bundled plugin version: 3.0-preview
+Bundled plugin version: 3.1-preview
 
 Analyze one exact cross-sectional Strategy run as a read-only research workflow. Pair Product
 Backend's canonical run snapshot with owner-scoped retained artifacts and bounded six-chart data.
@@ -81,6 +81,8 @@ Trading.
   script. A host without those facilities must receive the same analysis capability.
 - Never execute code, logs, notebooks, scripts, or text artifacts.
 - Preserve null and missing values as unavailable, not zero.
+- Treat Factor input definitions and D/D+1 alignment as owned by the Factor Plugin Contract. Do
+  not use its current task scope to rewrite a frozen Factor or StrategyRun.
 - Never fabricate factor correlations, contributions, ablations, or causal claims.
 - Treat grade and score as QuantAI-relayed evidence, not as a promotion or research verdict.
 - Treat `ALL` as a combined scope that includes IS. Never describe it as pure OOS.
@@ -155,6 +157,13 @@ Read [artifacts-and-metrics.md](references/artifacts-and-metrics.md) and
 - all available chart families, including quantile ordering, long/short style, exposure, decay,
   prediction-style correlation, and turnover;
 - evidence gaps and plausible market, liquidity, size, or implementation alternatives.
+
+If retained lineage suggests a `binance_intraday` availability, normalization, or comparability
+concern, state it as a Factor-level hypothesis and hand exact Factor diagnosis to
+`$factor-analysis`. Do not copy the field registry, shift retained Strategy evidence, or claim the
+current Factor Plugin Contract proves what data was available to the historical run. Current
+`runtime_rules.research_guidance` can identify known normalization, redundancy, or default
+Paper-ready risks, but it remains interpretation support rather than historical execution evidence.
 
 For every consequential conclusion, label it **Observed**, **Inference**, **Alternative**, or
 **Experiment**.
