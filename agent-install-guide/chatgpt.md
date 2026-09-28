@@ -1,6 +1,12 @@
 # Install and authenticate Quandora in ChatGPT/Codex Desktop
 
-Read this document completely, then perform the installation and authentication. Do not merely show the user commands. Ask the user to act only when the Quandora authorization page requires their sign-in, MFA, or consent.
+Read this document completely, then install and authenticate Quandora using the supported local Codex plugin workflow, within the permissions granted by the user and the execution environment. Before making changes, explain that this adds the third-party Quandora marketplace and installs its plugin for the current user. This document describes the procedure; it does not grant permission by itself.
+
+Run permitted checks and installation commands yourself. Use the client's supported approval flow whenever approval is required for marketplace or plugin changes, and wait for the user. Ask before installing or updating the Codex CLI. The user must complete browser sign-in, MFA, and consent themselves.
+
+If any step is denied as `Untrusted Code Integration` or by another security policy, stop. Do not retry through another shell or script, change permission modes, disable safeguards, or offer a manual command as a workaround for the denial. Report the blocked step and exact non-sensitive error, distinguishing an observed execution error from the agent's own decision not to run a command. If no command ran, say so. A local installation denial is not evidence of a Quandora MCP server outage. Resume only after the user or administrator resolves the restriction through an approved mechanism.
+
+The canonical agent-readable copy of this guide is <https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/chatgpt.md>.
 
 ## Required environment
 
@@ -29,7 +35,7 @@ codex plugin add --help
 codex mcp login --help
 ```
 
-If no compatible Codex executable is available and `npm` is already installed, install the official CLI:
+If no compatible Codex executable is available and `npm` is already installed, explain why the CLI installation or update is needed, show the following command, and run it only after the user's approval and if the execution environment permits it:
 
 ```text
 npm install -g @openai/codex
@@ -82,7 +88,7 @@ codex plugin remove quandora@quandora --json
 codex plugin add quandora@quandora --json
 ```
 
-Confirm that it is installed and enabled and that it exposes all five expected skills.
+Confirm that it is installed and enabled and that it exposes all five expected skills. Compare the installed version with the version advertised by the refreshed marketplace, not a hardcoded version in this guide. If they still differ after the scoped update above, stop and report both versions; do not repeat removal and installation in a loop.
 
 ## 4. Start OAuth authorization
 
@@ -114,7 +120,7 @@ codex mcp get quandora --json
 codex mcp list --json
 ```
 
-Report success only when all of the following are true:
+Verify installation, authorization, and MCP tool availability separately. Confirm installation and authorization only when all of the following are true:
 
 1. `quandora@quandora` is installed and enabled from the expected marketplace.
 2. Its installed version matches the current marketplace entry.
@@ -122,4 +128,13 @@ Report success only when all of the following are true:
 4. `quandora` points to `https://mcp.quandora.ai/quant` over remote Streamable HTTP.
 5. OAuth is complete and the MCP server is connected.
 
-After verification, tell the user that Quandora is installed and authorized. Ask them to start a new local desktop task before using the newly installed skills and MCP tools.
+After those checks pass, use the client's supported MCP tool discovery to verify that the plugin-managed server exposes the expected Quandora tools. Plugin inventory or a connected status alone is not proof of tool availability. Do not request or extract credentials to perform this check, and do not submit a factor, strategy, backtest, or trading task merely to test installation.
+
+If the current task cannot load the newly installed tools, report installation and authorization as complete but tool verification as pending. Ask the user to start a new local desktop task and perform the read-only tool discovery there; do not claim full completion before it succeeds.
+
+End with the observed status and next step, distinguishing:
+
+- **Installation blocked:** report the blocked step and non-sensitive evidence; no claim of MCP connectivity.
+- **Installed, authorization pending:** the plugin is present, but OAuth has not completed successfully.
+- **Installed and authorized, tool verification pending or failed:** explain whether a new local task is required or discovery returned an error.
+- **Complete:** installation, authorization, and read-only MCP tool discovery have all passed.
