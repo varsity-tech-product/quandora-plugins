@@ -1,9 +1,14 @@
 # Install and authenticate Quandora in Claude Desktop
 
-Read this document completely, then perform the installation and authentication. Run the checks and installation commands yourself rather than only displaying them. Exactly two moments belong to the user:
+Read this document completely, then install and authenticate Quandora using the supported local Claude Code plugin workflow, within the permissions granted by the user and the execution environment. Before making changes, explain that this adds the third-party Quandora marketplace and installs its plugin for the current user. This document describes the procedure; it does not grant permission by itself.
 
-1. Approving a Claude Code CLI install or update in Step 1, when one is needed. Ask once, with the exact command, and continue after the user confirms.
-2. Completing sign-in, MFA, or consent on the Quandora authorization page in Step 4.
+Run permitted checks and installation commands yourself. User participation may be required for:
+
+1. Approving marketplace or plugin installation through the client's supported approval flow, when requested. Wait for that approval before continuing.
+2. Approving a Claude Code CLI install or update in Step 1, when one is needed. Ask once, with the exact command, and continue after the user confirms.
+3. Completing sign-in, MFA, or consent on the Quandora authorization page in Step 4.
+
+If any step is denied as `Untrusted Code Integration` or by another security policy, stop. Do not retry through another shell or script, change permission modes, disable safeguards, or offer a manual command as a workaround for the denial. Report the blocked step and the exact non-sensitive error, distinguishing an observed execution error from the agent's own decision not to run a command. If no command ran, say so. A local installation denial is not evidence of a Quandora MCP server outage. Resume only after the user or administrator resolves the restriction through an approved mechanism.
 
 Never request or handle an API key, OAuth token, cookie, callback code, or authorization URL.
 
@@ -112,7 +117,7 @@ claude plugin enable quandora@quandora --scope user
 ```
 
 Confirm that the plugin is enabled and exposes all five expected skills and the plugin-managed MCP server.
-Record the installed entry's absolute `installPath` and `version` from `claude plugin list --available --json`; the entry appears in the `installed` array with id `quandora@quandora`. Require the installed version to equal the version the marketplace currently declares for the plugin, as shown by `claude plugin details quandora@quandora`. Do not compare against a version hardcoded in this document. If the versions differ, run `claude plugin update quandora@quandora --scope user` once and re-check; if they still differ, stop and report.
+Record the installed entry's absolute `installPath` and `version` from `claude plugin list --available --json`; the entry appears in the `installed` array with id `quandora@quandora`. Require the installed version to equal the version the refreshed marketplace currently declares for the plugin, as shown by `claude plugin details quandora@quandora`. Do not compare against a version hardcoded in this document. If the versions differ, run `claude plugin update quandora@quandora --scope user` once and re-check; if they still differ, stop and report both versions.
 
 ## 4. Start OAuth authorization
 
@@ -125,6 +130,8 @@ claude mcp get plugin:quandora:quandora
 Require a remote HTTP server whose URL is exactly `https://mcp.quandora.ai/quant`. If the identity resolves to another URL or a local command, stop and report the conflict. Run the single authorization flow below even when an older Quandora connection appears connected, because an existing token may not contain the scopes required by the installed plugin version.
 
 Claude Desktop command execution may not provide the interactive terminal required by `claude mcp login`. Use the installed plugin's fixed-purpose launcher from the recorded `installPath`: it allocates the required terminal facility, runs `claude mcp login plugin:quandora:quandora` through the verified Claude executable, and records the outcome in a small status file. The launcher discards the login process output deliberately so that authorization URLs and one-time codes never enter the agent context; do not try to capture or reconstruct them. Run only one login flow.
+
+Before execution, resolve the platform launcher only from the verified installed Quandora plugin directory and inspect its contents. Confirm that it runs the intended login command and does not capture OAuth output or alter unrelated configuration. If it is missing, unexpected, or blocked by the execution environment, stop and report the problem. Do not download or substitute another script. A terminal facility addresses an interactive-terminal requirement, not a security-policy denial.
 
 ### macOS
 
@@ -144,18 +151,18 @@ Use Windows PowerShell. Substitute the verified absolute plugin and Claude execu
 
 ```powershell
 & "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" `
-  -NoLogo -NoProfile -ExecutionPolicy Bypass `
+  -NoLogo -NoProfile `
   -File '<PLUGIN_INSTALL_PATH>\scripts\claude-mcp-login-windows.ps1' `
   -ClaudeBin '<CLAUDE_BIN>'
 ```
 
 Read the returned JSON and poll only its `statusFile`. Continue only when it reports `status=completed` and `exitCode=0`.
 
-The `-ExecutionPolicy Bypass` argument applies only to this bundled script. In managed environments where AppLocker or PowerShell Constrained Language Mode blocks it, use the fallback below instead.
+Respect the existing PowerShell execution policy and managed-environment restrictions. If execution policy, AppLocker, or PowerShell Constrained Language Mode blocks the launcher, stop and report the restriction; do not override the policy or use the fallback below to bypass it.
 
 The user's browser should open automatically. Tell the user that Quandora is ready for authorization, then wait while they complete any required sign-in or MFA and approve access. Do not operate the consent page, use `--no-browser`, or start a second login flow while one is running.
 
-**Fallback.** If the launcher reports `unsupported`, `incompatible_cli`, `no_interactive_pty`, or `no_interactive_console`, or the browser does not open within a minute, do not retry in a loop. Give the user this single command to run in any regular terminal, and continue to Step 5 after they report completing it:
+**Fallback for terminal availability only.** Use this only when installation and login are permitted and no security policy denied the action. If the launcher reports `unsupported`, `no_interactive_pty`, or `no_interactive_console`, or the browser does not open within a minute, do not retry in a loop. First confirm that the previous login process has exited; if it is still running, stop and ask the user to end that attempt before starting another. Give the user this single command to run through the verified Claude executable in a regular terminal, and continue to Step 5 after they report completing it. For `incompatible_cli`, return to the capability checks in Step 1 instead.
 
 ```sh
 claude mcp login plugin:quandora:quandora
@@ -174,7 +181,7 @@ claude plugin details quandora@quandora
 claude mcp get plugin:quandora:quandora
 ```
 
-Report success only when all of the following are true:
+Verify installation, authorization, and MCP tool availability separately. Confirm installation and authorization only when all of the following are true:
 
 1. `quandora@quandora` is installed, enabled, and user-scoped from the expected marketplace.
 2. Its installed version matches the current marketplace entry.
@@ -182,4 +189,13 @@ Report success only when all of the following are true:
 4. `plugin:quandora:quandora` points to `https://mcp.quandora.ai/quant` over remote HTTP.
 5. The platform launcher recorded `status=completed` with `exitCode=0` (or the user confirmed completing the fallback login command), and the MCP server is connected.
 
-After verification, tell the user that Quandora is installed and authorized. Ask them to start a new local Claude Desktop Code session before using the newly installed skills and MCP tools.
+After those checks pass, use the client's supported MCP tool discovery to verify that the plugin-managed server exposes the expected Quandora tools. Plugin inventory or `Connected` alone is not proof of tool availability. Do not request or extract credentials to perform this check, and do not submit a factor, strategy, backtest, or trading task merely to test installation.
+
+If the current session cannot load the newly installed tools, report installation and authorization as complete but tool verification as pending. Ask the user to start a new local Claude Desktop Code session and perform the read-only tool discovery there; do not claim full completion before it succeeds.
+
+End with the observed status and next step, distinguishing:
+
+- **Installation blocked:** report the blocked step and non-sensitive evidence; no claim of MCP connectivity.
+- **Installed, authorization pending:** the plugin is present, but OAuth has not completed successfully.
+- **Installed and authorized, tool verification pending or failed:** explain whether a new local Code session is required or discovery returned an error.
+- **Complete:** installation, authorization, and read-only MCP tool discovery have all passed.
