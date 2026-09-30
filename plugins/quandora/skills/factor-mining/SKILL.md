@@ -5,7 +5,7 @@ description: Use when the user explicitly asks about caller-owned or reusable Fa
 
 # Quandora Factor Mining
 
-Bundled plugin version: 3.1-preview
+Bundled plugin version: 3.2-preview
 
 Use this skill to run Factor Mining through the authenticated Quandora connection exposed by the host as `quandora`.
 

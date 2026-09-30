@@ -5,7 +5,7 @@ description: Use when the user asks to list available, eligible, or selectable S
 
 # Quandora Strategy Building
 
-Bundled plugin version: 3.1-preview
+Bundled plugin version: 3.2-preview
 
 Use this skill through the authenticated Quandora connection exposed by the host as
 `quandora`. It owns factor selection, Strategy creation or revision, and Strategy backtests for
