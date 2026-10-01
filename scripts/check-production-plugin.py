@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the production Quandora plugin package and 3.1 research boundaries."""
+"""Validate the production Quandora plugin package and research boundaries."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PLUGIN = ROOT / "plugins" / "quandora"
 SKILLS = PLUGIN / "skills"
-VERSION = "3.1-preview"
+VERSION = "3.2-preview"
 EXPECTED_SKILLS = {
     "factor-analysis",
     "factor-mining",

@@ -5,7 +5,7 @@ description: Analyze, diagnose, compare, and propose controlled improvements for
 
 # Strategy Analysis
 
-Bundled plugin version: 3.1-preview
+Bundled plugin version: 3.2-preview
 
 Analyze one exact cross-sectional Strategy run as a read-only research workflow. Pair Product
 Backend's canonical run snapshot with owner-scoped retained artifacts and bounded six-chart data.
@@ -145,6 +145,12 @@ ticket, storage URL, or local file to replace it. On `pending`, `not_available`,
 artifacts that remain trustworthy.
 
 ### 5. Diagnose The Result
+
+When interpreting Strategy costs, call `qd_get_guidance` with
+`guide_id: "operation.strategy.result.read"` and
+`sections: ["funding_net_cash_flow", "strategy_cost_metrics"]`. Read the approved
+Guide alongside the exact run's returned summary metrics. If Guidance or result
+reads fail, state the limitation; do not guess missing values or bypass MCP.
 
 Read [artifacts-and-metrics.md](references/artifacts-and-metrics.md) and
 [six-chart-diagnostics.md](references/six-chart-diagnostics.md). Evaluate:

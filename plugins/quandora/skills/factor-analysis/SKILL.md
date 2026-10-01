@@ -5,7 +5,7 @@ description: Analyze, diagnose, compare, and propose controlled improvements for
 
 # Factor Analysis
 
-Bundled plugin version: 3.1-preview
+Bundled plugin version: 3.2-preview
 
 Analyze one exact factor result as a read-only research workflow. Use Quandora's owner-scoped,
 server-persisted Factor Card, chart data, and job-linked source. Separate observed evidence from
