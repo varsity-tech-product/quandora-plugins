@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PLUGIN = ROOT / "plugins" / "quandora"
 SKILLS = PLUGIN / "skills"
-VERSION = "3.2-preview"
+VERSION = "3.3-preview"
 EXPECTED_SKILLS = {
     "factor-analysis",
     "factor-mining",

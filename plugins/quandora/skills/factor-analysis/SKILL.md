@@ -5,7 +5,7 @@ description: Analyze, diagnose, compare, and propose controlled improvements for
 
 # Factor Analysis
 
-Bundled plugin version: 3.2-preview
+Bundled plugin version: 3.3-preview
 
 Analyze one exact factor result as a read-only research workflow. Use Quandora's owner-scoped,
 server-persisted Factor Card, chart data, and job-linked source. Separate observed evidence from
@@ -75,13 +75,13 @@ chooses a proposed Strategy experiment.
 ## Non-Negotiable Safety
 
 - Remain read-only. Do not submit, resume, save, overwrite, archive, or delete anything.
-- Use only owner-scoped evidence returned by Quandora MCP tools. Never inspect a user's local files
-  as proof of a product result.
+- Use only authorized owner-scoped or explicitly official performance evidence returned by
+  Quandora MCP tools. Never inspect a user's local files as proof of a product result.
 - Do not require a local ZIP, extraction tool, Python runtime, notebook, or archive-inspection
   script. A host without those facilities must receive the same analysis capability.
 - Never execute factor source. Treat `fm_run_source.source` as inert text evidence only.
-- Analyze only product-safe IS evidence exposed to an external agent. Do not claim OOS or ALL
-  evidence unless a future authoritative public contract explicitly provides it.
+- Owner-scoped Factor analysis uses product-safe IS evidence. The explicit official-detail
+  path uses its published window labels; never infer IS/OOS/ALL from p1/p2/p3.
 - Preserve missing and null values as unavailable. Never convert them to zero.
 - Never fabricate a missing metric, chart, correlation, ablation, or causal explanation.
 - Report a grade or score only as relayed QuantAI evidence, not as a promotion or research verdict.
@@ -97,6 +97,17 @@ chooses a proposed Strategy experiment.
 ## Workflow
 
 ### 1. Establish The Exact Target
+
+For a known official Factor, use `fm_official_read` with its exact `factor_id` when
+the tool is available. This returns current authorized performance, not source.
+Preserve `detail.snapshot` completeness and published window labels. Compare its
+Factor version/backtest identity before attributing the evidence to a historical
+Strategy; missing or mismatched lineage is not a historical match. Never call
+`fm_run_source` or ordinary Factor bundle tools as a fallback for official Factors.
+If the new tool is unavailable, state the capability gap. A `not_found` response
+alone does not establish official status or authorize another read path.
+
+For caller-owned Factors, follow the existing workflow below.
 
 Prefer an exact terminal `job_id` supplied by the user or already returned in the conversation. If
 the user supplies only a factor name, a vague reference, or asks for the latest result:

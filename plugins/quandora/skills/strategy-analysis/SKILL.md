@@ -5,7 +5,7 @@ description: Analyze, diagnose, compare, and propose controlled improvements for
 
 # Strategy Analysis
 
-Bundled plugin version: 3.2-preview
+Bundled plugin version: 3.3-preview
 
 Analyze one exact cross-sectional Strategy run as a read-only research workflow. Pair Product
 Backend's canonical run snapshot with owner-scoped retained artifacts and bounded six-chart data.
@@ -75,7 +75,8 @@ Trading.
 
 - Remain read-only. Do not submit, resume, save, overwrite, archive, or mutate any run.
 - Do not automatically create ablations, reruns, or Paper Trading runs.
-- Use only owner-scoped evidence returned by Quandora MCP tools. Never inspect user-local files as
+- Use only authorized evidence returned by Quandora MCP tools: owner-scoped Strategy results
+  and the explicit source-free official Factor performance path. Never inspect user-local files as
   proof of a Strategy result.
 - Do not require a local ZIP, extraction tool, Python runtime, notebook, or archive-inspection
   script. A host without those facilities must receive the same analysis capability.
@@ -129,6 +130,35 @@ the evidence needed for the question:
 Treat each artifact status independently. Missing, pending, unavailable, or null evidence must stay
 explicitly missing. Do not use `logs` or `code` unless the user explicitly asks for inert text
 review; never execute either.
+
+### Oversized Trade Files
+
+If `sb_get_artifact` returns `too_large` for `trades`, call `sb_file_ticket` with
+that exact `run_id` and `artifact: "trades"`. Present the returned `download_url`
+as a clickable download link, with its expiry/single-use limitation. Do not consume
+the link to test it before handing it to the user. If it expires or was consumed,
+request a fresh ticket when the user needs it. Do not retry the same oversized
+inline read or rerun the backtest. Preserve non-ready download statuses honestly.
+
+This delivers the existing file to the user; it does not mean the Agent has read
+its contents. Do not claim per-trade, symbol or monthly contribution findings from
+a download ticket alone. Do not require local scripts or automatically download
+and execute analysis code. This fallback is for the trade file, not six-chart evidence.
+
+### Official Factors In A Strategy
+
+Use returned composition/eligible-factor metadata to identify an official Factor;
+do not infer official status from `not_found`. If `fm_official_read` is available,
+call it with the exact known `factor_id` for performance. It reuses the authorized
+official detail service and never returns plugin source. Preserve snapshot
+completeness and the published window labels; do not relabel p1/p2/p3 as IS/OOS.
+Compare returned version/backtest identity with the Strategy's recorded lineage.
+`evidence_scope: current_official_detail` alone does not prove a historical match.
+If identity is missing or different, describe it as current official performance
+and keep historical-version evidence explicitly unavailable. Never use source,
+ordinary Factor bundles, or guessed job IDs to work around access restrictions.
+If the tool is absent during rollout, report that capability gap without repeating
+owner-scoped calls. Private and shared Factor access rules are unchanged.
 
 ### 4. Read Six-Chart Numerical Evidence
 
