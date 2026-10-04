@@ -269,3 +269,12 @@ Paper Trading can prepare or select an eligible owner-scoped source, run its sou
 ### License
 
 This repository is licensed under the Apache License 2.0. See [LICENSE](LICENSE).
+
+### Strategy evidence access
+
+Oversized trade artifacts can be offered through the existing `sb_file_ticket`
+download instead of retrying an inline read. A download link is not evidence that
+the Agent has analyzed the file. Official Factor performance uses the additive
+`fm_official_read` tool when available, preserving source restrictions and the
+identity of the returned evidence. Deploy PB support, then Auth, before publishing
+this plugin update. Existing owner-scoped reads remain unchanged.
