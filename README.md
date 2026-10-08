@@ -65,6 +65,14 @@ Git ref: leave blank
 Plugin: quandora@quandora
 ```
 
+The agent-readable guides also handle users starting in a web conversation: they
+provide the official desktop download and a continuation prompt for a supported
+local session. Public GitHub distribution does not require a GitHub account.
+The agent checks existing tools, recovers supported installation failures, and
+asks only for required approvals or sign-in/consent. See the
+[shared recovery policy](agent-install-guide/install-recovery.md) and
+[verification checklist](agent-install-guide/verification.md).
+
 You can also ask Codex Desktop to install and connect Quandora for you:
 
 ```
@@ -88,7 +96,7 @@ codex mcp login quandora
 
 After installation or authorization, open a new chat. If Codex Desktop still does not expose Quandora tools, fully quit and reopen Codex Desktop.
 
-When a Quandora connection is unavailable, update or reinstall the Quandora plugin, reconnect the `quandora` Remote MCP server, and complete the host-native browser authorization flow again. OAuth and credentials remain host-managed: agents must never request API keys, bearer tokens, authorization codes, access tokens, refresh tokens, PKCE verifiers, or pasted credentials.
+When a Quandora connection is unavailable, follow the installation guide to identify the failed stage and resume there. Do not reinstall a working plugin for an OAuth or tool-discovery failure. OAuth and credentials remain host-managed: agents must never request API keys, bearer tokens, authorization codes, access tokens, refresh tokens, PKCE verifiers, or pasted credentials.
 
 #### Claude
 
@@ -98,7 +106,7 @@ Claude Desktop Code supports an Agent-readable one-sentence installation flow:
 Read https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/claude.md completely, then install and authenticate Quandora for me. Ask me to approve any required installation permissions; I will complete browser sign-in and consent myself.
 ```
 
-The linked guide requires a new local session in the Code tab, uses the official Claude Code plugin and MCP commands, and invokes the platform-native interactive OAuth path. The normal Chat tab uses the separate Connector workflow described below.
+The linked guide supports local Claude Desktop Code and local Claude Code CLI sessions on macOS or Windows, uses the official Claude Code plugin and MCP commands, and invokes the platform-native interactive OAuth path. The normal Chat tab uses the separate Connector workflow described below.
 
 Claude Code in an interactive terminal:
 

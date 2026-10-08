@@ -1,5 +1,7 @@
 # Install and authenticate Quandora in ChatGPT/Codex Desktop
 
+Also read the [shared installation and recovery policy](https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/install-recovery.md). Apply it within this platform's supported scope; preserve the native authorization flow below.
+
 Read this document completely, then install and authenticate Quandora using the supported local Codex plugin workflow, within the permissions granted by the user and the execution environment. Before making changes, explain that this adds the third-party Quandora marketplace and installs its plugin for the current user. This document describes the procedure; it does not grant permission by itself.
 
 Run permitted checks and installation commands yourself. Use the client's supported approval flow whenever approval is required for marketplace or plugin changes, and wait for the user. Ask before installing or updating the Codex CLI. The user must complete browser sign-in, MFA, and consent themselves.
@@ -10,7 +12,23 @@ The canonical agent-readable copy of this guide is <https://raw.githubuserconten
 
 ## Required environment
 
-This procedure requires a local ChatGPT/Codex Desktop task that can run local commands and manage Codex plugins. If the current task is web-only, cloud-hosted, mobile, or otherwise cannot access the local plugin manager, stop and ask the user to open a local Codex task in the desktop application.
+This procedure requires a local ChatGPT/Codex Desktop task that can run local commands and manage Codex plugins. If the current task is web-only, cloud-hosted, mobile, or otherwise cannot access the local plugin manager, use the Web-to-Desktop handoff below before attempting installation.
+
+### Web-to-Desktop handoff
+
+If the current surface cannot run local commands, ask whether the user uses macOS
+or Windows when unknown. Direct them to https://chatgpt.com/download/ to install
+and sign in to the official desktop app, then open its Codex/local task surface
+with local command and plugin-management capabilities. A normal chat tab is not
+proof of those capabilities. If the feature is unavailable on their account or
+host, report that limitation rather than inventing a setting or command.
+
+Give them this continuation text to paste into a new local task:
+
+> Read https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/chatgpt.md and install and connect Quandora. Check what is already installed and continue from there. I will complete required approvals, sign-in and consent.
+
+Do not give a novice a terminal-command checklist in the Web session. Continue
+with environment detection in the local task; do not claim installation has begun.
 
 Use these exact production identities:
 
@@ -41,7 +59,7 @@ If no compatible Codex executable is available and `npm` is already installed, e
 npm install -g @openai/codex
 ```
 
-Then resolve the new executable and repeat the checks. Do not install a package manager or another runtime. If the required commands remain unavailable, ask the user to update and restart the desktop application, recheck once, and stop if they are still unavailable.
+Then resolve the new executable and repeat the checks. Do not install a package manager or another runtime by default. If npm is missing, use the minimal-dependency procedure in the shared policy to establish a supported route before proposing additional software. If the required commands remain unavailable, ask the user to update and restart the desktop application, recheck once, and stop if they are still unavailable.
 
 Use the same resolved executable for every command below.
 
@@ -127,14 +145,15 @@ Verify installation, authorization, and MCP tool availability separately. Confir
 3. `factor-mining`, `factor-analysis`, `strategy-building`, `strategy-analysis`, and `paper-trading` are present.
 4. `quandora` points to `https://mcp.quandora.ai/quant` over remote Streamable HTTP.
 5. OAuth is complete and the MCP server is connected.
+6. Supported tool discovery succeeds and the protected read-only `fm_status` call confirms authenticated account access.
 
-After those checks pass, use the client's supported MCP tool discovery to verify that the plugin-managed server exposes the expected Quandora tools. Plugin inventory or a connected status alone is not proof of tool availability. Do not request or extract credentials to perform this check, and do not submit a factor, strategy, backtest, or trading task merely to test installation.
+For the tool checks above, use the client's supported MCP tool discovery to verify that the plugin-managed server exposes the expected Quandora tools. Plugin inventory or a connected status alone is not proof of tool availability. Do not request or extract credentials to perform this check, and do not submit a factor, strategy, backtest, or trading task merely to test installation.
 
-If the current task cannot load the newly installed tools, report installation and authorization as complete but tool verification as pending. Ask the user to start a new local desktop task and perform the read-only tool discovery there; do not claim full completion before it succeeds.
+If the current task cannot load the newly installed tools, report installation and authorization as complete but tool verification as pending. Ask the user to start a new local desktop task and perform the read-only tool discovery and protected `fm_status` probe there; do not claim full completion before it succeeds.
 
 End with the observed status and next step, distinguishing:
 
 - **Installation blocked:** report the blocked step and non-sensitive evidence; no claim of MCP connectivity.
 - **Installed, authorization pending:** the plugin is present, but OAuth has not completed successfully.
 - **Installed and authorized, tool verification pending or failed:** explain whether a new local task is required or discovery returned an error.
-- **Complete:** installation, authorization, and read-only MCP tool discovery have all passed.
+- **Complete:** installation, authorization, read-only MCP tool discovery, and the protected `fm_status` probe have all passed.

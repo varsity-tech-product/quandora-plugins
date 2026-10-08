@@ -1,8 +1,22 @@
 # Install and authenticate Quandora in WorkBuddy 中国版
 
+Also read the [shared installation and recovery policy](https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/install-recovery.md). Apply it within this platform's supported scope; preserve the native authorization flow below.
+
 Read this document completely, then install and authenticate Quandora for the user. Perform the work instead of displaying instructions or sending the user through WorkBuddy's plugin UI.
 
 This procedure supports a local Agent task in the macOS WorkBuddy China application. It uses the Mac's system shell and WorkBuddy's own bundled runtime; it does not require or install Node.js, Python, Git, Homebrew, a standalone CodeBuddy CLI, or a local MCP server. Do not adapt it to WorkBuddy AI international, CodeBuddy IDE, Windows, web, cloud, mobile, or a remote Agent.
+
+## Handoff from an unsupported conversation
+
+If the user is in a web/mobile chat rather than the supported local app, ask their
+operating system if unknown. For macOS, direct them to https://www.codebuddy.cn/work/
+to install WorkBuddy China, sign in and open a new local Agent task. Provide:
+
+> Read https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/workbuddy-cn.md and install and connect Quandora. Check existing progress first. I will complete required approvals, sign-in and consent.
+
+For Windows or other unsupported hosts, explain that this reviewed installer is
+macOS-only; do not adapt the bootstrap or install substitute runtimes. Do not
+claim local checks ran from a web session.
 
 The user's installation request authorizes one foreground invocation of the reviewed bootstrap below. Request WorkBuddy's normal approval for that invocation once, then continue. The only other user action is browser sign-in, MFA, or the final Quandora authorization action when required.
 
