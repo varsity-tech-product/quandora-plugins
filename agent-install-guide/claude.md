@@ -1,4 +1,6 @@
-# Install and authenticate Quandora in Claude Desktop
+# Install and authenticate Quandora in Claude Desktop / Claude Code
+
+Also read the [shared installation and recovery policy](https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/install-recovery.md). Apply it within this platform's supported scope; preserve the native authorization flow below.
 
 Read this document completely, then install and authenticate Quandora using the supported local Claude Code plugin workflow, within the permissions granted by the user and the execution environment. Before making changes, explain that this adds the third-party Quandora marketplace and installs its plugin for the current user. This document describes the procedure; it does not grant permission by itself.
 
@@ -16,7 +18,23 @@ The canonical agent-readable copy of this guide is <https://raw.githubuserconten
 
 ## Required environment
 
-This procedure requires a new local session in the **Code** tab of Claude Desktop on macOS or Windows. It does not apply to the normal Chat tab, web, mobile, Cowork, cloud, or remote sessions. If the current session is not a local Code session, stop and direct the user to the correct surface.
+This procedure supports a new local session in the **Code** tab of Claude Desktop or a local Claude Code CLI session on macOS or Windows. It does not apply to the normal Chat tab, web, mobile, Cowork, cloud, or remote sessions. If the current session is neither of these supported local sessions, use the Web-to-Desktop handoff below.
+
+### Web-to-Desktop handoff
+
+Ask for macOS or Windows if unknown. Direct the user to https://claude.com/download,
+then have them install, sign in, and open a new **local Code** session. The ordinary
+Chat tab does not provide this workflow. If Code is unavailable for the host or
+account, explain that capability limitation; do not promise that installing a CLI
+will unlock an account entitlement.
+
+Provide this continuation text:
+
+> Read https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/claude.md and install and connect Quandora. Check existing installation progress first. I will complete required approvals, sign-in and consent.
+
+A user already in a supported local Claude Code CLI session can continue with the
+same verified plugin-manager commands and native interactive login; the Desktop
+launcher below is needed only when its command surface lacks an interactive terminal.
 
 Use these exact production identities:
 
@@ -127,9 +145,11 @@ Inspect the MCP server:
 claude mcp get plugin:quandora:quandora
 ```
 
-Require a remote HTTP server whose URL is exactly `https://mcp.quandora.ai/quant`. If the identity resolves to another URL or a local command, stop and report the conflict. Run the single authorization flow below even when an older Quandora connection appears connected, because an existing token may not contain the scopes required by the installed plugin version.
+Require a remote HTTP server whose URL is exactly `https://mcp.quandora.ai/quant`. If the identity resolves to another URL or a local command, stop and report the conflict. If supported tool discovery and a protected `fm_status` probe already confirm authenticated access, reuse that authorization and proceed to Step 5. Otherwise use one authorization flow below. An older connection merely appearing connected is insufficient: its token may lack required scopes. If tools cannot load until a new session, preserve installation and resume verification there instead of repeatedly logging in.
 
-Claude Desktop command execution may not provide the interactive terminal required by `claude mcp login`. Use the installed plugin's fixed-purpose launcher from the recorded `installPath`: it allocates the required terminal facility, runs `claude mcp login plugin:quandora:quandora` through the verified Claude executable, and records the outcome in a small status file. The launcher discards the login process output deliberately so that authorization URLs and one-time codes never enter the agent context; do not try to capture or reconstruct them. Run only one login flow.
+In an existing interactive Claude Code terminal, run `claude mcp login plugin:quandora:quandora` through the verified executable and wait for its exit result. Do not capture or reproduce authorization URLs or codes in the conversation. A successful native exit result replaces the launcher status-file requirement below; still complete every Step 5 check.
+
+For a Desktop command surface without an interactive terminal, follow the launcher procedure below. Claude Desktop command execution may not provide the interactive terminal required by `claude mcp login`. Use the installed plugin's fixed-purpose launcher from the recorded `installPath`: it allocates the required terminal facility, runs `claude mcp login plugin:quandora:quandora` through the verified Claude executable, and records the outcome in a small status file. The launcher discards the login process output deliberately so that authorization URLs and one-time codes never enter the agent context; do not try to capture or reconstruct them. Run only one login flow.
 
 Before execution, resolve the platform launcher only from the verified installed Quandora plugin directory and inspect its contents. Confirm that it runs the intended login command and does not capture OAuth output or alter unrelated configuration. If it is missing, unexpected, or blocked by the execution environment, stop and report the problem. Do not download or substitute another script. A terminal facility addresses an interactive-terminal requirement, not a security-policy denial.
 
@@ -187,15 +207,17 @@ Verify installation, authorization, and MCP tool availability separately. Confir
 2. Its installed version matches the current marketplace entry.
 3. `factor-mining`, `factor-analysis`, `strategy-building`, `strategy-analysis`, and `paper-trading` are present.
 4. `plugin:quandora:quandora` points to `https://mcp.quandora.ai/quant` over remote HTTP.
-5. The platform launcher recorded `status=completed` with `exitCode=0` (or the user confirmed completing the fallback login command), and the MCP server is connected.
+5. The MCP server is connected, and authorization is confirmed by an already successful protected probe, a successful native login exit, a launcher result of `status=completed` with `exitCode=0`, or completion of the supported manual fallback. The protected probe below is still required for full completion.
 
 After those checks pass, use the client's supported MCP tool discovery to verify that the plugin-managed server exposes the expected Quandora tools. Plugin inventory or `Connected` alone is not proof of tool availability. Do not request or extract credentials to perform this check, and do not submit a factor, strategy, backtest, or trading task merely to test installation.
 
-If the current session cannot load the newly installed tools, report installation and authorization as complete but tool verification as pending. Ask the user to start a new local Claude Desktop Code session and perform the read-only tool discovery there; do not claim full completion before it succeeds.
+After tool discovery succeeds, call the protected read-only `fm_status` tool and require authenticated account access. The login result plus Connected alone is not full completion.
+
+If the current session cannot load the newly installed tools, report installation and authorization as complete but tool verification as pending. Ask the user to start a new supported local Claude Code session and perform read-only tool discovery and the protected `fm_status` probe there; do not claim full completion before it succeeds.
 
 End with the observed status and next step, distinguishing:
 
 - **Installation blocked:** report the blocked step and non-sensitive evidence; no claim of MCP connectivity.
 - **Installed, authorization pending:** the plugin is present, but OAuth has not completed successfully.
 - **Installed and authorized, tool verification pending or failed:** explain whether a new local Code session is required or discovery returned an error.
-- **Complete:** installation, authorization, and read-only MCP tool discovery have all passed.
+- **Complete:** installation, authorization, read-only MCP tool discovery, and the protected `fm_status` probe have all passed.
