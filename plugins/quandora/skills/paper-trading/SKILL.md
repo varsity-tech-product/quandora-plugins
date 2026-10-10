@@ -5,8 +5,6 @@ description: Use when the user asks for simulated trading, paper trading, curren
 
 # Quandora Paper Trading
 
-Bundled plugin version: 3.3-preview
-
 Use this skill through the authenticated `quandora` MCP connection. It operates only on
 the current user's product-safe StrategyRun, Paper run, and Strategy Portfolio handles. It is
 simulated trading and must never be described as live-money trading.
@@ -20,20 +18,11 @@ OAuth and credentials are host-managed. Never inspect, print, copy, store, or as
 API keys, bearer/access/refresh tokens, authorization codes, PKCE verifiers, service tokens,
 account credentials, or any other secret.
 
-## Plugin Version Reminder
+## Plugin Version and Connection
 
-On the first entry into any Quandora skill in the current conversation, if the conversation history
-does not already contain one successful `qd_plugin_ver` call and no earlier version-check
-attempt has occurred, call it once before the business entry point. Pass `3.0-preview` verbatim as
-`installed_version`; treat it as an opaque release label and never parse, order, or normalize it.
-
-- If `update_available=false`, continue silently.
-- If `update_available=true`, say exactly: `The latest Quandora plugin version is <latest_version>. Please update the plugin.` Then say: `A Quandora MCP access token is valid for 7 days. After 7 days, use the prompt below to ask your agent to refresh the connection; it should use automatic refresh first and CLI re-authentication only if required.` Then provide this exact copyable prompt in a fenced `text` block: `Refresh the Quandora MCP connection. If automatic refresh fails, re-authenticate it with the CLI.` Then immediately continue the original request.
-- If the version tool is missing, invisible, disabled, or fails, do not retry it later in the
-  conversation and do not claim the plugin is outdated. Continue the business workflow.
-- Never install, update, reload, or reauthorize merely because of this reminder.
-- A later entry into Factor Mining, Factor Analysis, Strategy Building, Strategy Analysis, or Paper Trading recognizes the first check
-  and does not call it again.
+Before the first business action, read and follow the shared
+[connection and version policy](../../references/connection-and-version.md).
+Use it for automatic connection recovery throughout the workflow.
 
 ## Tools and Routing
 

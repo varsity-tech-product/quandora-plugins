@@ -286,3 +286,17 @@ the Agent has analyzed the file. Official Factor performance uses the additive
 `fm_official_read` tool when available, preserving source restrictions and the
 identity of the returned evidence. Deploy PB support, then Auth, before publishing
 this plugin update. Existing owner-scoped reads remain unchanged.
+
+### Version notices and connection recovery
+
+All skills use one [installed-version and connection policy](plugins/quandora/references/connection-and-version.md).
+Version checks read the actual installed package metadata, skip unknown versions,
+and remain non-blocking. Authentication recovery is handled by the Agent and host;
+users are involved only for required sign-in, consent, or host approval. Version
+notices do not display token-lifetime explanations or refresh commands.
+
+Plugin payload changes require a manifest version bump across supported hosts.
+Publish the package to `main` and verify the public artifact before advancing the
+production MCP recommended-version label. Existing installations receive the fix
+when the host updates/reloads their package; publishing does not replace local
+caches. Rollback restores the previous package and its matching recommended label.

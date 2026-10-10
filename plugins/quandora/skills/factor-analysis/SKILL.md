@@ -5,57 +5,20 @@ description: Analyze, diagnose, compare, and propose controlled improvements for
 
 # Factor Analysis
 
-Bundled plugin version: 3.3-preview
-
 Analyze one exact factor result as a read-only research workflow. Use Quandora's owner-scoped,
 server-persisted Factor Card, chart data, and job-linked source. Separate observed evidence from
 inference, alternative explanations, and proposed experiments. Never turn an optimization idea
 into an automatic submission.
 
-OAuth and all credentials are handled by the host. Quandora access tokens expire after 7 days, and
-the host MCP client should use its stored rotating refresh token automatically. Never inspect,
+OAuth and all credentials are handled by the host. The host MCP client handles automatic token refresh. Never inspect,
 print, copy, store, or ask the user to paste API keys, bearer tokens, authorization codes, access
 tokens, refresh tokens, PKCE verifiers, service tokens, or other credentials.
 
-## Plugin Version Reminder
+## Plugin Version and Connection
 
-On the first entry into any Quandora skill in the current conversation, if the conversation history
-does not already contain one successful `qd_plugin_ver` call and no earlier version-check
-attempt has occurred, call it once before the business entry point. Pass the bundled plugin version
-declared by the current skill verbatim as `installed_version`; never infer it from memory, the
-remote latest version, or the host name.
-
-Treat the bundled version as an opaque release label: pass it verbatim and never parse, order, or
-normalize it.
-
-- If `update_available=false`, continue silently.
-- If `update_available=true`, say exactly: `The latest Quandora plugin version is <latest_version>.
-  Please update the plugin.` Then say: `A Quandora MCP access token is valid for 7 days.
-  After 7 days, use the prompt below to ask your agent to refresh the connection; it should use
-  automatic refresh first and CLI re-authentication only if required.` Then provide this exact
-  copyable prompt in a fenced `text` block: `Refresh the Quandora MCP connection. If
-  automatic refresh fails, re-authenticate it with the CLI.` Then immediately continue the user's
-  original request.
-- If `qd_plugin_ver` is missing, disabled, invisible, or fails, do not report that the
-  plugin is outdated, do not retry the check anywhere later in the current conversation, and
-  continue the original request without a version message or any change to the business workflow.
-  OAuth or connection failures continue through the existing safe connection-handling path; never
-  bypass MCP with raw HTTP.
-- Never install, update, uninstall, or reload a plugin; execute an update command; ask whether to
-  update; immediately start OAuth or reauthorize merely because of the version result; provide a
-  platform-specific command in the version reminder; or delay the original request. The copyable
-  prompt is information for the user to invoke after 7 days, not permission to run it during the
-  version check.
-- A later entry into Factor Mining, Factor Analysis, Strategy Building, Strategy Analysis, or Paper
-  Trading in the same conversation recognizes the prior successful version check and does not call
-  it or remind again.
-- Treat `qd_plugin_ver` as optional for connection readiness. Its absence alone never
-  triggers connection recovery or changes the required business-tool set.
-
-The version check is not a business action and does not change any exact call-count, pagination, or
-mutation constraint below.
-
-<!-- end-plugin-version-reminder -->
+Before the first business action, read and follow the shared
+[connection and version policy](../../references/connection-and-version.md).
+Use it for automatic connection recovery throughout the workflow.
 
 ## Scope And Routing
 
