@@ -14,6 +14,9 @@ diagnosis.
 
 OAuth and all credentials are handled by the host. The host MCP client handles automatic token refresh. Never inspect, print, copy, store, or ask the user to paste API keys, bearer tokens, authorization codes, access tokens, refresh tokens, PKCE verifiers, service tokens, or other credentials.
 
+For archive waits, stale `sync_failed`, inline `too_large`, or bundle channel limits,
+follow [Strategy delivery recovery](../../references/strategy-delivery-recovery.md).
+
 ## Plugin Version and Connection
 
 Before the first business action, read and follow the shared
@@ -414,7 +417,7 @@ Use this URL-first delivery once per request:
 4. Verify exact size and SHA-256, ZIP magic/openability, and safe relative ZIP entry paths, then
    atomically rename the verified `.partial` to `{user_home}/Quandora result/strategy/{strategy_slug}.zip`.
 
-If the URL is unavailable, blocked by local host network policy, expired, or fails after that one retry, automatically use `sb_bundle_chunk` with the same exact public `result.run.id` and `snapshot_revision`. The fallback uses the already-working authenticated MCP connection and requires no new host-native file sink or shell network access.
+If the URL is unavailable, blocked by local host network policy, expired, or fails after that one retry, use `sb_bundle_chunk` only when metadata size is at most 10 MiB; otherwise report the download-channel limitation without a chunk call. For an eligible fallback, use `sb_bundle_chunk` with the same exact public `result.run.id` and `snapshot_revision`. The fallback uses the already-working authenticated MCP connection and requires no new host-native file sink or shell network access.
 
 1. Start at offset `0` and request at most `262,144` raw bytes per call. For every valid response, decode and append `content_b64` before acting on `terminal`; never print or log the base64. A `terminal: true` response may carry the final non-empty `content_b64`, so those bytes are part of the ZIP and must be appended before stopping. When `terminal` is false, require `next_offset` to equal the current offset plus the decoded byte length and continue from exactly that value. When `terminal` is true, require `next_offset` to be null and the appended total to equal `size_bytes`; do not request another public empty chunk.
 2. Enforce the 10 MiB ZIP cap and at most 40 chunk calls. Keep every response bound to the same kind, public run ID, snapshot revision, filename, content type, size, and whole-object SHA. Never mix revisions or append an old partial. Do not start a local receiver that exits when its setup command reaches EOF; use a per-response binary-safe append operation, or keep one verified writer session open until the terminal response has been appended.

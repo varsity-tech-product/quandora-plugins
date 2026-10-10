@@ -13,6 +13,9 @@ OAuth and all credentials are handled by the host. The host MCP client handles a
 print, copy, store, or ask the user to paste API keys, bearer tokens, authorization codes, access
 tokens, refresh tokens, PKCE verifiers, service tokens, or other credentials.
 
+For archive waits, stale `sync_failed`, inline `too_large`, or bundle channel limits,
+follow [Strategy delivery recovery](../../references/strategy-delivery-recovery.md).
+
 ## Plugin Version and Connection
 
 Before the first business action, read and follow the shared
