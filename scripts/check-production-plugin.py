@@ -11,7 +11,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PLUGIN = ROOT / "plugins" / "quandora"
 SKILLS = PLUGIN / "skills"
-VERSION = "3.3-preview"
 EXPECTED_SKILLS = {
     "factor-analysis",
     "factor-mining",
@@ -102,6 +101,22 @@ def support_text(skill: str) -> str:
 
 def main() -> int:
     errors: list[str] = []
+    try:
+        version = load_json(PLUGIN / ".codex-plugin" / "plugin.json")["version"]
+        if not isinstance(version, str) or not re.fullmatch(r"[A-Za-z0-9._+\-]{1,64}", version):
+            raise ValueError("invalid installed release label")
+    except (OSError, json.JSONDecodeError, KeyError, ValueError) as exc:
+        print(f"ERROR: canonical plugin manifest: {exc}", file=sys.stderr)
+        return 1
+    policy = PLUGIN / "references" / "connection-and-version.md"
+    if not policy.is_file():
+        errors.append("missing shared connection-and-version policy")
+    else:
+        policy_text = policy.read_text(encoding="utf-8")
+        if re.search(r"`[0-9]+\.[0-9]+[^`]*`", policy_text):
+            errors.append("shared runtime policy must not hard-code a release label")
+        if "Refresh the Quandora MCP connection." in policy_text or "A Quandora MCP access token is valid for" in policy_text:
+            errors.append("shared runtime policy contains obsolete user-facing token boilerplate")
 
     for path in DIRECT_MANIFESTS:
         try:
@@ -109,8 +124,8 @@ def main() -> int:
         except (OSError, json.JSONDecodeError, ValueError) as exc:
             errors.append(f"{path.relative_to(ROOT)}: invalid manifest: {exc}")
             continue
-        if actual != VERSION:
-            errors.append(f"{path.relative_to(ROOT)}: expected version {VERSION}, got {actual!r}")
+        if actual != version:
+            errors.append(f"{path.relative_to(ROOT)}: expected version {version}, got {actual!r}")
 
     for path in MARKETPLACES:
         try:
@@ -124,8 +139,8 @@ def main() -> int:
         except (OSError, json.JSONDecodeError, ValueError) as exc:
             errors.append(f"{path.relative_to(ROOT)}: invalid manifest: {exc}")
             continue
-        if document.get("version") != VERSION or plugin_versions != [VERSION]:
-            errors.append(f"{path.relative_to(ROOT)}: marketplace versions must all be {VERSION}")
+        if document.get("version") != version or plugin_versions != [version]:
+            errors.append(f"{path.relative_to(ROOT)}: marketplace versions must all be {version}")
 
     actual_skills = {path.parent.name for path in SKILLS.glob("*/SKILL.md")}
     if actual_skills != EXPECTED_SKILLS:
@@ -136,8 +151,17 @@ def main() -> int:
     for skill in sorted(actual_skills):
         skill_path = SKILLS / skill / "SKILL.md"
         text = skill_path.read_text(encoding="utf-8")
-        if f"Bundled plugin version: {VERSION}" not in text:
-            errors.append(f"{skill}/SKILL.md: bundled version is not {VERSION}")
+        if "[connection and version policy](../../references/connection-and-version.md)" not in text:
+            errors.append(f"{skill}/SKILL.md: missing shared runtime policy")
+        if "installed_version" in text or "Bundled plugin version:" in text:
+            errors.append(f"{skill}/SKILL.md: version logic must use the shared policy, not a copied label or check")
+        normalized_skill = " ".join(text.split()).lower()
+        if any(marker in normalized_skill for marker in (
+            "access token is valid for", "access tokens expire after", "seven-day lifetime",
+            "refresh the quandora mcp connection",
+            "re-authenticate it with the cli",
+        )):
+            errors.append(f"{skill}/SKILL.md: obsolete token lifetime/refresh boilerplate")
         for target in re.findall(r"\[[^\]]+\]\(([^)]+)\)", text):
             if target.startswith(("http://", "https://", "#", "<")):
                 continue
@@ -162,7 +186,7 @@ def main() -> int:
         for error in errors:
             print(f"ERROR: {error}", file=sys.stderr)
         return 1
-    print(f"Quandora production plugin checks passed for {VERSION}.")
+    print(f"Quandora production plugin checks passed for {version}.")
     return 0
 
 

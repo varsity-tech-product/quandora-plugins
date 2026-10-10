@@ -71,4 +71,4 @@ The macOS launcher uses `/usr/bin/script`; the Windows launcher uses Windows Pow
 
 ## Connection Recovery
 
-If the `quandora` connection is unavailable, update or reinstall the Quandora plugin, reconnect the plugin-managed Remote MCP server, and complete the host-native browser authorization flow again. The host owns OAuth and credentials; agents never request API keys, bearer tokens, authorization codes, access tokens, refresh tokens, PKCE verifiers, or pasted credentials.
+The Agent follows the shared [connection and version policy](references/connection-and-version.md): use host-managed automatic refresh and supported reconnect first, resume the task after recovery, and involve the user only for unavoidable sign-in, consent, or host approval. Authentication failure does not require reinstalling a working plugin. Version checks read installed-package metadata; token lifetimes and refresh commands are not user-facing notices.
