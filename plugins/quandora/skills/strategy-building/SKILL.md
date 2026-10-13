@@ -1,6 +1,6 @@
 ---
 name: strategy-building
-description: Use when the user asks to list available, eligible, or selectable Strategy factors, or to compose, create, backtest, resume, retrieve, or archive a cross-sectional Quandora Strategy using Official, Mine, or Shared factors. Route deep result diagnosis and optimization to strategy-analysis.
+description: Use when the user asks to list available, eligible, or selectable Strategy factors, or to compose, create, backtest, rerun, resume, retrieve, or archive a cross-sectional Quandora Strategy using Official, Mine, or Shared factors. Route deep result diagnosis and optimization to strategy-analysis.
 ---
 
 # Quandora Strategy Building
@@ -28,7 +28,7 @@ Use it for automatic connection recovery throughout the workflow.
 Before starting, confirm that the Quandora connection is authenticated and check only the
 actions needed for the requested path. A normal list, composition, submit, observe, and Result
 Bundle workflow uses the relevant subset of `sb_get_contract`, `sb_list_eligible`,
-`sb_factor_detail`, `sb_shared_list`, `sb_shared_add`, `sb_submit_run`, `sb_list_runs`, `sb_get_run`,
+`sb_factor_detail`, `sb_shared_list`, `sb_shared_add`, `sb_submit_run`, `sb_rerun_run`, `sb_list_runs`, `sb_get_run`,
 `sb_resume_run`, `sb_bundle_ticket`, and `sb_bundle_chunk`. `sb_get_artifact` and `sb_file_ticket`
 remain legacy single-artifact compatibility actions. Use `qd_get_guidance` only for one of the
 documented guidance branches below.
@@ -65,6 +65,11 @@ use an alternative service path. Use host-native HTTP only for the one opaque
 or credential-paste flows.
 
 ## Workflow
+
+For another backtest of an existing Strategy, go directly to
+[Backtest an Existing Strategy Again](#backtest-an-existing-strategy-again). Skip factor selection,
+name generation and new-Strategy submission; preserve the exact source StrategyVersion. A request
+to recover or check an existing run uses its current run handle instead.
 
 Bare requests for available, eligible, or selectable Strategy factors, and equivalent Strategy
 factor-pool intent, call only
@@ -117,7 +122,7 @@ monitoring.
   request does not call this action.
 - Immediately after that contract response and before constructing any payload, use this exact
   `sb_submit_run` upload whitelist:
-  `name`, `factor_ids`, `factor_weights`, `ranking`, `strategy_type`, `start_date`, `end_date`,
+  `client_request_id`, `name`, `factor_ids`, `factor_weights`, `ranking`, `strategy_type`, `start_date`, `end_date`,
   `initial_cash`, `taker_fee_rate`, `maker_fee_rate`, `rebalance_bars`, `attribution`.
   Send exactly one of `factor_ids` or `factor_weights`. Never send `idempotency_key`, `kind`,
   `strategy_kind`, `weighting`, `contract_revision`, `product_defaults`, `effective_profile`,
@@ -258,14 +263,17 @@ instruments. Never invent a factor label or use a generic name such as
 `agent_neutral_percent_N_strategy`. Send the generated name as `name` and use the same name in the
 existing deterministic destination-slug logic.
 
-Call `sb_submit_run` exactly once with the validated selection, generated or user-supplied
-`name`, every explicit user option, and only the omitted-field default representation required by
-the returned contract and submit schema. Then observe and archive only the returned run.
+Generate and retain a fresh `client_request_id` (UUID recommended) for each user-intended new
+Strategy creation. Call `sb_submit_run` with that id, the validated selection, generated or
+user-supplied `name`, and every explicit user option. Identical content may intentionally create
+independent Strategies. Never derive the operation id from content, names, or a JSON-RPC request id.
+Then observe and archive only the returned run.
 
 A minimum equal-weight submission is:
 
 ```json
 {
+  "client_request_id": "<new UUID retained for this operation>",
   "name": "Momentum neutral strategy",
   "factor_ids": ["<exact eligible factor_id>"]
 }
@@ -279,14 +287,36 @@ never a `run_id` and must never be used in a Strategy run action.
 If a submit result contains a valid `run.id`, do not submit a modified fallback payload because the
 run is `pending`, `running`, or `submit_unknown`; observe that existing run. A submit error without
 `run.id` means that no trackable run identifier was returned; it does not prove that the server did
-not record a Strategy or StrategyRun. Do not automatically resubmit or mutate the payload after an
-ambiguous submit response, bridge error, or transport error. Correct and retry a weight-total error
-only when the tool explicitly returns the preflight `invalid_payload` validation
-error; otherwise report that submission confirmation failed to avoid duplicate strategy experiments.
+not record a Strategy or StrategyRun. When the original request included `client_request_id`, one
+bounded retry with the identical id and payload can recover the same operation. Never rotate the
+id or change the payload to bypass uncertainty. If a retry is still ambiguous, retain the id and
+report that confirmation remains pending. Legacy requests without an operation id must use their
+existing run handle or unchanged legacy payload; do not retrofit a new id onto uncertain old work.
+For `idempotency_key_reused`, inspect which operation the id belongs to. Use a fresh id only for a
+separately intended new operation. Do not misreport this conflict as proof that identical strategies
+cannot be backtested again.
+
+#### Backtest an Existing Strategy Again
+
+When the user requests another backtest of the same Strategy, read its exact source run with
+`sb_get_run` (use `sb_list_runs` to locate it if needed). Call `sb_rerun_run` with that public
+`run_id`, a fresh `client_request_id`, and only explicitly requested `start_date` / `end_date`
+overrides. This creates another BacktestRun under the same Strategy and exact source StrategyVersion;
+it does not repeat factor discovery or select newer factor versions. Completed sources are allowed.
+Renaming a Strategy does not change its identity. Changed factor selection, weights, ranking or
+direction belongs to a new Strategy or version, not this rerun request.
+
+Omitted dates preserve source submission semantics. An omitted `end_date` still means the
+latest-data default, so a rerun can cover a later period and yield different results. If the server
+reports `strategy_run_version_unavailable`, recover or inspect the source first; do not silently
+rebuild a replacement from current factors. `sb_resume_run` recovers existing work and does not
+mean a user-intended new backtest. For current operation semantics, read `qd_get_guidance` with
+`guide_id: "operation.strategy.backtest"`. Then follow the existing observation and bundle flow
+with the newly returned run handle.
 
 ### 2. Observe the Main Run
 
-The successful `sb_submit_run` response is the initial main-run snapshot; it is not a
+The successful `sb_submit_run` or `sb_rerun_run` response is the initial main-run snapshot; it is not a
 follow-up poll. If that snapshot is terminal, immediately continue with the terminal result and
 archive workflow below. Once the main run is terminal, do not resubmit it to retrieve results.
 
