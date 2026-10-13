@@ -1,6 +1,6 @@
 ---
 name: strategy-building
-description: Use when the user asks to list available, eligible, or selectable Strategy factors, or to compose, create, backtest, resume, retrieve, or archive a cross-sectional Quandora Strategy using Official, Mine, or Shared factors. Route deep result diagnosis and optimization to strategy-analysis.
+description: Use when the user asks to list available, eligible, or selectable Strategy factors, or to compose, create, backtest, rerun, resume, retrieve, or archive a cross-sectional Quandora Strategy using Official, Mine, or Shared factors. Route deep result diagnosis and optimization to strategy-analysis.
 ---
 
 # Quandora Strategy Building
@@ -65,6 +65,11 @@ use an alternative service path. Use host-native HTTP only for the one opaque
 or credential-paste flows.
 
 ## Workflow
+
+For another backtest of an existing Strategy, go directly to
+[Backtest an Existing Strategy Again](#backtest-an-existing-strategy-again). Skip factor selection,
+name generation and new-Strategy submission; preserve the exact source StrategyVersion. A request
+to recover or check an existing run uses its current run handle instead.
 
 Bare requests for available, eligible, or selectable Strategy factors, and equivalent Strategy
 factor-pool intent, call only
