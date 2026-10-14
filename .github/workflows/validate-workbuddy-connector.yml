@@ -1,0 +1,18 @@
+name: Validate WorkBuddy Connector candidate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  connector-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate WorkBuddy Connector candidate
+        run: python3 .github/check-workbuddy-connector.py
