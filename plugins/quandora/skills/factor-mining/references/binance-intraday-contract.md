@@ -29,8 +29,11 @@ Consume `runtime_rules.research_guidance` directly. In particular:
   compress a window;
 - avoid exact redundancies and use the published structural redundancy notes instead of inventing
   a second formula list;
-- treat the exact 12 bucket fields in `default_paper_excluded_columns` as excluded from default
-  Paper-ready recommendations. `trade_vol_max_b` and `trade_vol_max_s` are not excluded.
+- consume the current `runtime_rules.research_guidance.paper_support` and
+  `default_paper_excluded_columns` from the server. All twelve size-bucket fields are
+  supported by the daily Paper runtime; do not maintain a local blanket exclusion.
+  `trade_vol_max_b` and `trade_vol_max_s` are also supported. Field support does not
+  guarantee readiness for a particular symbol, date or history window.
 
 Large trades are not automatically informed or smart-money flow. Apply each returned field rule
 instead of using generic labels as economic interpretation. The stable Task label `Auction`
@@ -66,6 +69,12 @@ every edit and proceed only when validation succeeds. The public contract may de
 semantics; it must not expose or accept internal provider directory names, endpoints, credentials,
 or submission-routing details.
 
-Default Paper exclusions are authoring recommendations, not permission for Paper to shrink the
-runtime universe. Paper required-history validation occurs before Lean and missing required values
-retry or fail according to the runtime deadline.
+An empty `default_paper_excluded_columns` list means no blanket authoring exclusion;
+never resurrect an obsolete twelve-field ban from cached guidance. Size-bucket inputs
+need seven complete prior UTC days of valid threshold history. Default 300-point state
+replay and the factor warmup window are separate coverage requirements, and short-window
+acceptance does not prove complete historical coverage. Paper required-history validation
+occurs before Lean; missing required values retry or fail according to the runtime deadline.
+Do not shrink the universe, zero-fill missing values or shorten business history to bypass
+that validation. Changing an instance's data contract requires a new instance; do not restart
+or migrate an existing run automatically.
