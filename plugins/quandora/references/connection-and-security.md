@@ -28,6 +28,35 @@ Never inspect, print, copy, store, or request credential values, token stores, a
 PKCE verifiers, or pasted secrets. Never bypass MCP with private service APIs, raw internal HTTP,
 or an improvised credential-refresh script.
 
+## Connected, but workflow tools are missing
+
+A successful version check or `get_factor_mining_status` proves only that particular
+read works. It does not prove that the connection exposes the tools needed for the
+user's workflow. A current plugin package cannot add permissions to an existing OAuth grant.
+
+Before declaring a workflow unavailable, use the host's supported tool search/discovery
+and complete any discovery pagination. Compare the resulting catalog with the relevant
+Skill's required tools. For Portfolio creation this includes `list_strategy_folders`,
+`list_strategies`, `create_portfolio` and `submit_portfolio_backtest`. Do not call a mutation
+merely to check availability.
+
+If only a subset is missing, distinguish three cases: incomplete host discovery,
+an older authorization missing workflow scopes, or a server-side surface restriction.
+Use explicit host authorization diagnostics when available; missing tool names alone
+do not establish which case applies. An update notice saying the package is current
+does not resolve any of these cases.
+
+Try supported discovery/reconnect recovery once within the existing grant. If the host
+reports missing scopes or requires new consent, use the existing connector's native
+authorization flow below and let the user approve any additional permissions. Never
+silently broaden a grant. If this host exposes no recovery action, state which workflow
+tools remain absent and that the existing Quandora connector needs authorization/discovery
+recovery; do not stop at a generic "tools unavailable" message or recommend reinstalling.
+
+After recovery, rediscover the required tools and verify a relevant authorized read
+before resuming the user's task. Do not report Portfolio creation as ready solely because
+the version check or Factor status succeeds. Keep unavailable client checks explicit.
+
 ## Host-native authorization fallback
 
 These paths are for the Agent only after automatic recovery cannot restore authorization; they

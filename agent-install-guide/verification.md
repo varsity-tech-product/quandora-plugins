@@ -28,6 +28,7 @@ failure category. Never record tokens, authorization URLs, or callback codes.
 | Public Git HTTPS rewrite/auth failure | Required | Required | Not applicable | No GitHub login/token request; targeted diagnosis, bounded recovery |
 | OAuth timeout / cancellation | Required | Required | Required | No concurrent flows; bounded retry only for transient error; cancellation respected |
 | Tool discovery needs fresh session | Required | Required | Required | Preserve install/auth; verification pending until protected probe succeeds |
+| Current package with only Factor/Trading tools visible | Required | Required | Required | Discover the full catalog, distinguish stale discovery from missing scopes, recover the existing connection, and verify a relevant read; a version/status probe alone is insufficient |
 | Security denial / source conflict | Required | Required | Required | Preserve configuration; no bypass, false success, or retry loop |
 | Unsupported host | Required | Required | Required | Explain capability limit; never silently expand supported platforms |
 
