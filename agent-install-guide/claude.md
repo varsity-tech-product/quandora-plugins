@@ -44,7 +44,7 @@ Use these exact production identities:
 - Plugin: `quandora@quandora`
 - Plugin-managed MCP server: `plugin:quandora:quandora`
 - MCP URL: `https://mcp.quandora.ai/quant`
-- Skills: `factor-mining`, `factor-analysis`, `strategy-building`, `strategy-analysis`, and `paper-trading`
+- Skills: `factor-mining`, `factor-analysis`, `strategy-building`, `strategy-analysis`, `portfolio-building`, `portfolio-analysis`, and `portfolio-trading-analysis`
 
 Do not create a separate MCP entry. The plugin owns the MCP configuration.
 
@@ -134,7 +134,7 @@ claude plugin update quandora@quandora --scope user
 claude plugin enable quandora@quandora --scope user
 ```
 
-Confirm that the plugin is enabled and exposes all five expected skills and the plugin-managed MCP server.
+Confirm that the plugin is enabled and exposes all seven expected skills and the plugin-managed MCP server.
 Record the installed entry's absolute `installPath` and `version` from `claude plugin list --available --json`; the entry appears in the `installed` array with id `quandora@quandora`. Require the installed version to equal the version the refreshed marketplace currently declares for the plugin, as shown by `claude plugin details quandora@quandora`. Do not compare against a version hardcoded in this document. If the versions differ, run `claude plugin update quandora@quandora --scope user` once and re-check; if they still differ, stop and report both versions.
 
 ## 4. Start OAuth authorization
@@ -145,7 +145,7 @@ Inspect the MCP server:
 claude mcp get plugin:quandora:quandora
 ```
 
-Require a remote HTTP server whose URL is exactly `https://mcp.quandora.ai/quant`. If the identity resolves to another URL or a local command, stop and report the conflict. If supported tool discovery and a protected `fm_status` probe already confirm authenticated access, reuse that authorization and proceed to Step 5. Otherwise use one authorization flow below. An older connection merely appearing connected is insufficient: its token may lack required scopes. If tools cannot load until a new session, preserve installation and resume verification there instead of repeatedly logging in.
+Require a remote HTTP server whose URL is exactly `https://mcp.quandora.ai/quant`. If the identity resolves to another URL or a local command, stop and report the conflict. If supported tool discovery and a protected `get_factor_mining_status` probe already confirm authenticated access, reuse that authorization and proceed to Step 5. Otherwise use one authorization flow below. An older connection merely appearing connected is insufficient: its token may lack required scopes. If tools cannot load until a new session, preserve installation and resume verification there instead of repeatedly logging in.
 
 In an existing interactive Claude Code terminal, run `claude mcp login plugin:quandora:quandora` through the verified executable and wait for its exit result. Do not capture or reproduce authorization URLs or codes in the conversation. A successful native exit result replaces the launcher status-file requirement below; still complete every Step 5 check.
 
@@ -205,19 +205,19 @@ Verify installation, authorization, and MCP tool availability separately. Confir
 
 1. `quandora@quandora` is installed, enabled, and user-scoped from the expected marketplace.
 2. Its installed version matches the current marketplace entry.
-3. `factor-mining`, `factor-analysis`, `strategy-building`, `strategy-analysis`, and `paper-trading` are present.
+3. `factor-mining`, `factor-analysis`, `strategy-building`, `strategy-analysis`, `portfolio-building`, `portfolio-analysis`, and `portfolio-trading-analysis` are present.
 4. `plugin:quandora:quandora` points to `https://mcp.quandora.ai/quant` over remote HTTP.
 5. The MCP server is connected, and authorization is confirmed by an already successful protected probe, a successful native login exit, a launcher result of `status=completed` with `exitCode=0`, or completion of the supported manual fallback. The protected probe below is still required for full completion.
 
 After those checks pass, use the client's supported MCP tool discovery to verify that the plugin-managed server exposes the expected Quandora tools. Plugin inventory or `Connected` alone is not proof of tool availability. Do not request or extract credentials to perform this check, and do not submit a factor, strategy, backtest, or trading task merely to test installation.
 
-After tool discovery succeeds, call the protected read-only `fm_status` tool and require authenticated account access. The login result plus Connected alone is not full completion.
+After tool discovery succeeds, call the protected read-only `get_factor_mining_status` tool and require authenticated account access. The login result plus Connected alone is not full completion.
 
-If the current session cannot load the newly installed tools, report installation and authorization as complete but tool verification as pending. Ask the user to start a new supported local Claude Code session and perform read-only tool discovery and the protected `fm_status` probe there; do not claim full completion before it succeeds.
+If the current session cannot load the newly installed tools, report installation and authorization as complete but tool verification as pending. Ask the user to start a new supported local Claude Code session and perform read-only tool discovery and the protected `get_factor_mining_status` probe there; do not claim full completion before it succeeds.
 
 End with the observed status and next step, distinguishing:
 
 - **Installation blocked:** report the blocked step and non-sensitive evidence; no claim of MCP connectivity.
 - **Installed, authorization pending:** the plugin is present, but OAuth has not completed successfully.
 - **Installed and authorized, tool verification pending or failed:** explain whether a new local Code session is required or discovery returned an error.
-- **Complete:** installation, authorization, read-only MCP tool discovery, and the protected `fm_status` probe have all passed.
+- **Complete:** installation, authorization, read-only MCP tool discovery, and the protected `get_factor_mining_status` probe have all passed.

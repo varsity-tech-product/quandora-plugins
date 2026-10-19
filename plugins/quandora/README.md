@@ -1,74 +1,130 @@
 # Quandora
 
-Quandora provides Factor Mining, Factor Analysis, Strategy Building, Strategy Analysis, and Paper Trading through one authenticated Remote MCP connection.
+This package contains seven user-facing Skills and one authenticated production MCP connection.
+Use it for production research and Simulation workflows. Real Live evidence is read-only through MCP.
 
-## Factor Mining
+## Skills and responsibility
 
-Factor Mining lists public tasks or creates a custom research session, generates contract-compliant `plugin.py` source, runs server-side validation and backtesting, and retrieves one verified FM-owned Result Bundle ZIP when the host supports local files.
+| Skill | Owns | Routes elsewhere |
+| --- | --- | --- |
+| `factor-mining` | Hypothesis, Factor source/validation, authorized backtests, history and export | Deep Factor diagnosis |
+| `factor-analysis` | Existing Factor evidence, validity and controlled experiment design | Authoring and submission |
+| `strategy-building` | Eligible Factors, immutable Strategy definitions and requested backtests | Deep diagnosis and multi-Strategy composition |
+| `strategy-analysis` | Existing Strategy results and reusable logic cards | Definition changes and backtest submission |
+| `portfolio-building` | Candidate selection, initial capital weights, immutable Portfolios, backtests, discovery/favorites and sharing | Deep Portfolio diagnosis and Trading management |
+| `portfolio-analysis` | Actual-member Portfolio backtest comparisons and incremental-value diagnosis | Selection/creation, sharing and forward evidence |
+| `portfolio-trading-analysis` | Simulation account/run management and Simulation/real Live forward analysis | Backtest authoring and all real Live writes |
 
-## Factor Analysis
+The first six Skills cover backtests; the seventh covers forward tests. The
+[research intent and evidence contract](references/research-workflows.md) defines request modes,
+capability-aware analysis and handoffs. Design-only requests do not create resources. Exact supplied
+members/weights are not silently optimized. Analysis suggestions do not authorize experiments;
+already-authorized work continues through the owning builder without repeated confirmation.
 
-Factor Analysis is a read-only workflow over owner-scoped server-persisted evidence. It resolves one exact result, checks the server Factor Card's Health and rating evidence, reads bounded chart data, and treats job-linked source as inert text when mechanism diagnosis requires it. It never requires a local ZIP, Python runtime, notebook, or archive-inspection script.
+Each Skill uses only relevant tools and preserves opaque identities and pagination. Portfolio
+research accepts one to five distinct immutable Strategies with equal or explicit positive initial
+capital weights. Capital allocation is not continuous rebalancing. Definitions and Runs remain
+separate, and actual source StrategyRuns and aligned windows govern comparisons. Missing advanced
+joint-risk evidence limits conclusions rather than generating invented correlations or contributions.
 
-## Strategy Building
+Portfolio backtests use `submit_portfolio_backtest` on the exact immutable definition, following
+its current exchange/schema contract. FM prepares missing or stale sources; PB returns persisted
+state and authoritative research. Preserve the automatic association returned by
+`get_portfolio_backtest` in `run.automatic_paper`; pending/absent association does not authorize
+an extra start. Portfolio Trading Analysis observes that exact association and owns explicitly
+requested Simulation operations. Legacy simulated `live` aliases do not describe real Live accounts.
+Real Live uses separate account-oriented read tools; its writes remain frontend-only.
 
-Strategy Building lists eligible factors with authoritative source labels, composes cross-sectional strategies, submits and monitors runs, and retrieves one verified Strategy Result Bundle ZIP. Official factors use their exact admitted factor, version, and job references through the versioned source workflow.
+## Connection
 
-## Strategy Analysis
+Supported hosts load the plugin's `quandora` remote HTTP MCP declaration. Complete the
+host-native browser authorization flow for initial setup; reload tools only when the host requires it.
+Do not create a local MCP server or paste credentials.
 
-Strategy Analysis pairs the canonical owner-scoped Strategy run snapshot with retained server artifacts and bounded six-chart numerical data. It diagnoses performance, risk, turnover, exposure, style, and implementation evidence, then proposes controlled experiments without automatically creating a run or starting Paper Trading.
+The Agent lets the host refresh the connection automatically first, then uses supported reconnect
+or tool discovery and resumes the task. User interaction is limited to unavoidable sign-in or
+consent after terminal authorization failure or an explicit host consent requirement. Do not
+reinstall a working plugin, display token lifetimes, or ask users to run refresh commands.
+Version diagnostics remain on demand and use the actual installed package metadata.
+See [Connection and Security](references/connection-and-security.md) for bounded retries, uncertain
+mutation recovery, and host-native fallbacks. Never request secrets or bypass MCP with internal HTTP.
 
-## Paper Trading
+### Claude Desktop Code authorization bridge
 
-Paper Trading prepares or selects eligible owner-scoped sources and supports confirmed single-strategy and static independent-sleeve Strategy Portfolio Paper workflows. It can start, monitor, inspect, and terminally stop simulated runs; read current PnL, closed position history, fills, funding, equity, and bounded strategy code; and never places live-money trades or automatically changes another workflow.
+The plugin intentionally ships these two host-support assets:
 
-## Result Files
+```text
+scripts/claude-mcp-login-macos.sh
+scripts/claude-mcp-login-windows.ps1
+```
 
-When local writes are available, verified bundles are stored beneath the current user's home directory:
+They support the authorization step of the one-click Claude Desktop Code Agent installation flow,
+where redirected command input/output cannot host the official interactive `claude mcp login`
+prompt. Both launch only `plugin:quandora:quandora` in a native interactive
+terminal, keep OAuth output out of status files, and require manual browser identity and consent.
+They are not general shell utilities, local MCP servers, or credential helpers. Interactive Claude
+Code users should use the direct host command instead.
+
+## Search and pagination
+
+Factor discovery actions accept supported `query` and `filters` fields. Canonical Strategy and
+Portfolio Folder/Run lists use parent identities and pagination, without query/filter arguments. Continuation requests
+must preserve the same query, filters, archive mode, and page size while copying the returned
+opaque page token byte-for-byte.
+
+## Result files
+
+All complete Result Bundle exports use `download_result_bundle(kind, id)`. Follow
+[Unified Result Bundle Download](references/result-bundle-download.md) for the canonical
+selectors, retryable HTTP links, resume and integrity verification. Large ZIPs do not use
+MCP base64 chunks; the host needs an HTTP/file download capability.
+
+When local file writes are supported, verified Factor and Strategy bundles use these default
+workspace-relative destinations:
 
 ```text
 Quandora result/factor/<factor_slug>.zip
 Quandora result/strategy/<strategy_slug>.zip
 ```
 
-The returned remote filename remains transport metadata. The verified FM-owned ZIP is the canonical local output and is not automatically extracted, deleted, or rebuilt. Its runtime manifest is authoritative for included, pending, and omitted items. Analysis reads server evidence directly and does not use these local exports as proof of a product result.
+The validated Factor source's exact non-empty lowercase snake_case `FACTOR_TYPE` determines the
+factor slug; it never silently falls back to a generic `factor` slug. The user-facing submitted
+Strategy name determines the Strategy slug. The verified archive remains intact, and returned
+metadata and manifests are authoritative for readiness, contents, omissions, and integrity.
 
-## Skills
+## Safety boundary
 
-```text
-skills/
-  factor-analysis/
-  factor-mining/
-  paper-trading/
-  strategy-analysis/
-  strategy-building/
-```
+- OAuth and credentials are host-managed and must never be requested, printed, copied, or stored.
+- Carry explicit authorization across ordinary calls and Skill handoffs; ask only for missing
+  consequential choices or authority.
+- An ambiguous response is not proof of failure and does not authorize a changed replacement.
+- Simulation lifecycle and real Live read-only inspection are separate; all Live changes are frontend-only.
+- User-facing answers follow the user's language while preserving tool names and schema fields
+  exactly.
 
-## CodeBuddy and the WorkBuddy China edition
+Community discovery supports authorized contextual research and separate Portfolio favorites.
+Sharing supports public or specified-user grants with required UTC dates, active-grant extensions
+and concurrency-checked intro edits. Current grant/channel constraints are server-owned; shared
+child visibility does not create Mine ownership or execution eligibility. Factor/Strategy stars
+remain independent of LibraryFolder placement.
 
-The CodeBuddy-compatible plugin manifest registers all five skills and the plugin-managed `quandora` remote HTTP MCP server. The macOS WorkBuddy China flow is documented in `agent-install-guide/workbuddy-cn.md` and uses three reviewed, single-purpose components:
+Simulation creation/start uses a recoverable operation with the same request identity on retries.
+PB owns capital, quotas, grants and lifecycle rules. Net-ledger evidence owns account finance;
+legacy member observations must not be summed into an authoritative net account. Real Live reads
+preserve observation freshness and the bounded recent scope of orders/fills.
 
-```text
-scripts/
-  workbuddy-cn-bootstrap-macos.sh
-  workbuddy-cn-install-macos.js
-  workbuddy-cn-oauth-macos.js
-```
+Named-object discovery uses `search_quandora_objects`; exact identities, current/historical source
+filters and authorization remain authoritative. Strategy backtest intent uses a fresh
+`client_request_id` per requested Run and the same identity only for unchanged retries.
 
-The POSIX bootstrap uses only macOS system utilities to discover and validate the signed WorkBuddy China application and active configuration, then downloads and hash-verifies the two JavaScript components from the public production repository. The installer uses WorkBuddy's bundled runtime and plugin manager with closed stdin, bounded child processes, exact production trust anchors, and no shell interpolation. The OAuth helper verifies the installed plugin and production endpoint, uses WorkBuddy's native OAuth implementation and account-scoped encrypted store, opens the browser for user consent, and makes a protected `fm_status` verification call. These scripts bind to capabilities rather than a username, application/config location, WorkBuddy/CLI/plugin version, processor architecture, port, session, or cache version; they do not scan other connectors, expose OAuth material, install a runtime, or create a second MCP entry.
+## Production host installation support
 
-## Claude Desktop Code OAuth Launchers
+Production also retains the reviewed WorkBuddy support scripts:
 
-Claude Desktop Code Agents normally run commands with redirected input and output, while the official `claude mcp login` flow requires an interactive terminal. This plugin ships two fixed-purpose launchers:
+- `scripts/workbuddy-cn-bootstrap-macos.sh`
+- `scripts/workbuddy-cn-install-macos.js`
+- `scripts/workbuddy-cn-oauth-macos.js`
+- `scripts/workbuddy-mcp-login-macos.sh`
+- `scripts/workbuddy-mcp-login-windows.ps1`
 
-```text
-scripts/
-  claude-mcp-login-macos.sh
-  claude-mcp-login-windows.ps1
-```
-
-The macOS launcher uses `/usr/bin/script`; the Windows launcher uses Windows PowerShell 5.1 to start a native console. Both invoke only `plugin:quandora:quandora`, retain the remote MCP transport, avoid OAuth output logging, and leave browser identity and consent to the user.
-
-## Connection Recovery
-
-The Agent follows the shared [connection and version policy](references/connection-and-version.md): use host-managed automatic refresh and supported reconnect first, resume the task after recovery, and involve the user only for unavoidable sign-in, consent, or host approval. Authentication failure does not require reinstalling a working plugin. Version checks read installed-package metadata; token lifetimes and refresh commands are not user-facing notices.
+Use the [production installation guides](../../agent-install-guide/workbuddy-cn.md) for their supported scope and integrity checks.

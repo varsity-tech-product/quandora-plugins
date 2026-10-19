@@ -1,6 +1,6 @@
 # Six-Chart Diagnostics
 
-Use `sb_analysis_data` for retained six-chart numerical evidence. Start with `chart: "overview"`,
+Use `get_strategy_backtest_analysis_data` for retained six-chart numerical evidence. Start with `chart: "overview"`,
 then request only the chart pages needed for the user's question. JSON null remains missing data.
 
 ## Adaptive Diagnostic Groups
@@ -15,7 +15,10 @@ Diagnostic grouping is separate from actual portfolio selection:
 | below 9 | 2 | `max(2, min(4, median))` | 0.50 |
 
 `Q1` is the lowest prediction group and `QN` the highest. Diagnostic spread is
-`(QN - Q1) / 2`. Read actual Strategy Top/Bottom selection only from `sb_get_run.parameters.ranking`.
+`(QN - Q1) / 2`. Read actual Strategy Top/Bottom selection from
+`get_strategy` → `strategy.specification.ranking`, using the immutable `strategy_id` of the
+selected Run. Factor composition comes from that Strategy's `factor_references` and
+`specification.weighting`; chart parameters describe diagnostic groups, not the definition.
 
 ## Chart 1: Prediction Quantiles
 
@@ -33,8 +36,9 @@ Diagnostic grouping is separate from actual portfolio selection:
 
 - Inspect whether style exposure is persistent, episodic, or changes sign.
 - A stable exposure can explain persistent performance but also reduce incremental alpha.
-- Size currently means the logarithm of trailing 90 natural-day median positive quote volume. It is
-  not open-interest notional.
+- Interpret Size from returned chart/style metadata. When that metadata declares the trailing
+  90-natural-day median-positive-quote-volume convention, Size is its logarithm rather than
+  open-interest notional.
 
 ## Chart 4: Prediction Decay
 
@@ -50,7 +54,8 @@ Diagnostic grouping is separate from actual portfolio selection:
 
 ## Chart 6: Daily Turnover
 
-- Read the current Strategy single-sided `/2` convention.
+- Apply the returned or declared Strategy turnover convention; the standard retained projection is
+  single-sided `/2`.
 - Relate spikes to exposure changes, rebalance cadence, or regime transitions.
 - Use the retained EMA only as a smoother; do not replace the raw series with it.
 

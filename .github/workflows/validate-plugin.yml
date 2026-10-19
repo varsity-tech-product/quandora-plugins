@@ -1,0 +1,20 @@
+name: Validate production plugin package
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  package-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate manifests and skills
+        run: python3 scripts/check-production-plugin.py
+      - name: Check connection policy regressions
+        run: python3 scripts/test_production_plugin.py

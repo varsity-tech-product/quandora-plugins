@@ -20,10 +20,10 @@ Useful controlled tests include:
 - change ranking breadth while keeping composition and fees fixed;
 - change rebalance cadence while measuring turnover, costs, and decay;
 - rerun with one suspected style control;
-- change one fee assumption to assess implementation fragility.
+- inspect cost exposure without proposing changes to server-owned fees.
 
-Current server evidence does not guarantee per-factor correlations or automatic ablations. Propose them
-as future controlled runs rather than reporting nonexistent results.
+The public evidence described by this Skill does not guarantee per-factor correlations or automatic
+ablations. Propose them as future controlled runs rather than reporting nonexistent results.
 
 ## Paper Readiness Questions
 
@@ -45,8 +45,8 @@ as future controlled runs rather than reporting nonexistent results.
 - **Reject:** integrity or results contradict the intended mechanism.
 - **Research:** important alternatives or evidence gaps remain.
 - **Controlled rerun:** one or more falsifiable changes should be tested through `$strategy-building`.
-- **Consider Paper:** evidence is sufficient for user review, but actual Paper start remains a
-  separate explicit action through `$paper-trading`.
+- **Consider Paper:** evidence is sufficient for user review, but Portfolio preparation can proceed within an existing authorized task; read PB automatic Paper
+  after its backtest, and reserve an additional start for an explicit separate request.
 
 Never start, stop, or monitor Paper Trading from this skill. Never present Paper readiness as a
 guarantee of live performance.

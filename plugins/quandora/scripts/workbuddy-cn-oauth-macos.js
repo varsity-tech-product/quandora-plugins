@@ -193,18 +193,18 @@ async function verifyProtectedTool(tokens) {
       params: {},
     });
     const tools = listed.rpc?.result?.tools;
-    if (!Array.isArray(tools) || !tools.some((tool) => tool?.name === "fm_status")) {
-      fail("The authenticated Quandora MCP server does not expose fm_status.");
+    if (!Array.isArray(tools) || !tools.some((tool) => tool?.name === "get_factor_mining_status")) {
+      fail("The authenticated Quandora MCP server does not expose get_factor_mining_status.");
     }
 
     const called = await mcpRequest(accessToken, sessionId, {
       jsonrpc: "2.0",
       id: 3,
       method: "tools/call",
-      params: { name: "fm_status", arguments: {} },
+      params: { name: "get_factor_mining_status", arguments: {} },
     });
     if (!called.rpc?.result || called.rpc.result.isError === true) {
-      fail("The protected Quandora fm_status verification call failed.");
+      fail("The protected Quandora get_factor_mining_status verification call failed.");
     }
     emitProgress("protected_probe_completed");
     return tools.length;
@@ -571,7 +571,7 @@ async function main() {
     `${JSON.stringify({
       status: "completed",
       authenticated: true,
-      protectedProbe: "fm_status",
+      protectedProbe: "get_factor_mining_status",
       toolCount,
       browserAuthorizationOpened: !reusedAuthorization,
     })}\n`,

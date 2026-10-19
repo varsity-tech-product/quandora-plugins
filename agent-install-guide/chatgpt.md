@@ -38,7 +38,7 @@ Use these exact production identities:
 - Plugin: `quandora@quandora`
 - MCP server: `quandora`
 - MCP URL: `https://mcp.quandora.ai/quant`
-- Skills: `factor-mining`, `factor-analysis`, `strategy-building`, `strategy-analysis`, and `paper-trading`
+- Skills: `factor-mining`, `factor-analysis`, `strategy-building`, `strategy-analysis`, `portfolio-building`, `portfolio-analysis`, and `portfolio-trading-analysis`
 
 Do not create a separate MCP entry. The plugin owns the MCP configuration. Never request or handle an API key, OAuth token, cookie, callback code, or authorization URL.
 
@@ -106,7 +106,7 @@ codex plugin remove quandora@quandora --json
 codex plugin add quandora@quandora --json
 ```
 
-Confirm that it is installed and enabled and that it exposes all five expected skills. Compare the installed version with the version advertised by the refreshed marketplace, not a hardcoded version in this guide. If they still differ after the scoped update above, stop and report both versions; do not repeat removal and installation in a loop.
+Confirm that it is installed and enabled and that it exposes all seven expected skills. Compare the installed version with the version advertised by the refreshed marketplace, not a hardcoded version in this guide. If they still differ after the scoped update above, stop and report both versions; do not repeat removal and installation in a loop.
 
 ## 4. Start OAuth authorization
 
@@ -142,18 +142,18 @@ Verify installation, authorization, and MCP tool availability separately. Confir
 
 1. `quandora@quandora` is installed and enabled from the expected marketplace.
 2. Its installed version matches the current marketplace entry.
-3. `factor-mining`, `factor-analysis`, `strategy-building`, `strategy-analysis`, and `paper-trading` are present.
+3. `factor-mining`, `factor-analysis`, `strategy-building`, `strategy-analysis`, `portfolio-building`, `portfolio-analysis`, and `portfolio-trading-analysis` are present.
 4. `quandora` points to `https://mcp.quandora.ai/quant` over remote Streamable HTTP.
 5. OAuth is complete and the MCP server is connected.
-6. Supported tool discovery succeeds and the protected read-only `fm_status` call confirms authenticated account access.
+6. Supported tool discovery succeeds and the protected read-only `get_factor_mining_status` call confirms authenticated account access.
 
 For the tool checks above, use the client's supported MCP tool discovery to verify that the plugin-managed server exposes the expected Quandora tools. Plugin inventory or a connected status alone is not proof of tool availability. Do not request or extract credentials to perform this check, and do not submit a factor, strategy, backtest, or trading task merely to test installation.
 
-If the current task cannot load the newly installed tools, report installation and authorization as complete but tool verification as pending. Ask the user to start a new local desktop task and perform the read-only tool discovery and protected `fm_status` probe there; do not claim full completion before it succeeds.
+If the current task cannot load the newly installed tools, report installation and authorization as complete but tool verification as pending. Ask the user to start a new local desktop task and perform the read-only tool discovery and protected `get_factor_mining_status` probe there; do not claim full completion before it succeeds.
 
 End with the observed status and next step, distinguishing:
 
 - **Installation blocked:** report the blocked step and non-sensitive evidence; no claim of MCP connectivity.
 - **Installed, authorization pending:** the plugin is present, but OAuth has not completed successfully.
 - **Installed and authorized, tool verification pending or failed:** explain whether a new local task is required or discovery returned an error.
-- **Complete:** installation, authorization, read-only MCP tool discovery, and the protected `fm_status` probe have all passed.
+- **Complete:** installation, authorization, read-only MCP tool discovery, and the protected `get_factor_mining_status` probe have all passed.

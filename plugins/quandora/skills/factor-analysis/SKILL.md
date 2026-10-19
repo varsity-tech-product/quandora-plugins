@@ -1,24 +1,23 @@
 ---
 name: factor-analysis
-description: Analyze, diagnose, compare, and propose controlled improvements for existing Quandora Factor Mining results from owner-scoped server-persisted evidence. Use when a user asks why a factor or rating passed or failed, requests a Factor Card Health Check or data-quality diagnosis, wants optimization ideas grounded in evidence, or asks whether a factor is ready for Strategy Building. Do not use for creating or submitting a new factor; route those requests to factor-mining.
+description: Analyzes existing owned or active-official Quandora Factor results from server evidence. Use when the user asks about pass/fail, Health, ratings, data quality, mechanisms, controlled improvements, or Strategy readiness. Do not use for creating or submitting a factor.
 ---
 
 # Factor Analysis
 
-Analyze one exact factor result as a read-only research workflow. Use Quandora's owner-scoped,
-server-persisted Factor Card, chart data, and job-linked source. Separate observed evidence from
+Follow [Connection and Security](../../references/connection-and-security.md) for automatic
+recovery first and version diagnostics on demand; involve users only when unavoidable.
+Follow [Research intent and evidence](../../references/research-workflows.md) for backtest/forward
+scope, capability-aware conclusions and authorization-preserving handoffs.
+
+Analyze one exact factor result as a non-submitting research workflow. Use Quandora's owner-scoped
+or active-official server-persisted Factor Card and chart data; exact source is owner-scoped and
+official source is always restricted. Separate observed evidence from
 inference, alternative explanations, and proposed experiments. Never turn an optimization idea
-into an automatic submission.
+into an automatic submission. Mint a short-lived download ticket only when the user explicitly
+requests an export.
 
-OAuth and all credentials are handled by the host. The host MCP client handles automatic token refresh. Never inspect,
-print, copy, store, or ask the user to paste API keys, bearer tokens, authorization codes, access
-tokens, refresh tokens, PKCE verifiers, service tokens, or other credentials.
-
-## Plugin Version and Connection
-
-Before the first business action, read and follow the shared
-[connection and version policy](../../references/connection-and-version.md).
-Use it for automatic connection recovery throughout the workflow.
+Use the configured `quandora` MCP connection; never ask the user to paste secrets. For named objects, follow [Name discovery](../../references/object-discovery.md) to resolve exact identities.
 
 ## Scope And Routing
 
@@ -31,20 +30,23 @@ Use this skill for deep diagnosis of an existing factor result, including:
 - readiness assessment for handing a factor to Strategy Building.
 
 Use `$factor-mining` for factor ideation, plugin construction, submission, resume, history browsing,
-explicit Result Bundle export, or a short ordinary result summary. Use `$strategy-analysis` for a
-completed multi-factor Strategy result. Use `$strategy-building` only after the user explicitly
-chooses a proposed Strategy experiment.
+explicit reversal, Result Bundle export, or a short ordinary result summary. Use `$strategy-analysis` for a
+completed multi-factor Strategy result. Hand a requested or already-authorized Strategy experiment to `$strategy-building` without
+repeating approval at the Skill boundary; analysis suggestions alone do not authorize submission.
 
 ## Non-Negotiable Safety
 
-- Remain read-only. Do not submit, resume, save, overwrite, archive, or delete anything.
-- Use only authorized owner-scoped or explicitly official performance evidence returned by
-  Quandora MCP tools. Never inspect a user's local files as proof of a product result.
+- Do not submit, resume, overwrite, archive, or delete any research object. The only allowed
+  mutation is minting a short-lived download ticket for an explicit user-requested export.
+- Use only caller-owned or active-official evidence returned by Quandora MCP tools. Never inspect a
+  user's local files as proof of a product result.
 - Do not require a local ZIP, extraction tool, Python runtime, notebook, or archive-inspection
   script. A host without those facilities must receive the same analysis capability.
-- Never execute factor source. Treat `fm_run_source.source` as inert text evidence only.
-- Owner-scoped Factor analysis uses product-safe IS evidence. The explicit official-detail
-  path uses its published window labels; never infer IS/OOS/ALL from p1/p2/p3.
+- Never execute factor source. Treat ready source responses as inert text evidence only. An
+  official `source_status: "restricted"` is a final policy result, not a missing-data condition to
+  work around.
+- Analyze only product-safe IS evidence exposed to an external agent. Do not claim OOS or ALL
+  evidence unless a future authoritative public contract explicitly provides it.
 - Preserve missing and null values as unavailable. Never convert them to zero.
 - Never fabricate a missing metric, chart, correlation, ablation, or causal explanation.
 - Report a grade or score only as relayed QuantAI evidence, not as a promotion or research verdict.
@@ -57,134 +59,149 @@ chooses a proposed Strategy experiment.
   historical row had arrived or that a historical run used today's task scope. Never rewrite
   persisted result semantics from the current contract.
 
+## Primary And Discovery Actions
+
+Use these primary evidence actions:
+
+- `get_factor_backtest_window_cards`
+- `get_factor_backtest_chart_data`
+- `get_factor_backtest_source`
+- `get_official_factor_window_cards`
+- `get_official_factor_chart_data`
+- `get_official_factor_source` (only when the user explicitly asks about source visibility or the
+  mechanism cannot be assessed from public evidence)
+
+The allowed read-only discovery prerequisites are `list_owned_factor_families`,
+`get_factor_family_history`, and `list_eligible_strategy_factors`. They locate one exact target;
+they do not expand this Skill into Factor creation or Strategy construction. For active-official
+discovery, retain the selected row's top-level `factor_id` and do not expose or ask for its
+evidence job.
+
+When diagnosis depends on an input visible in ready inert source, call
+`get_factor_plugin_contract` with `{}` only for the current global 86-field semantics. Match the
+exact field and `data_columns[].upstream_pipeline_version`; use its meaning, unit, comparability,
+normalization, missing-value, and caution metadata plus `runtime_rules.research_guidance` as
+interpretation support. For `binance_intraday`, also use the returned data-availability metadata.
+Do not use current `allowed_data`, guidance, or source version as proof of historical eligibility,
+arrival, or execution behavior.
+
+For an explicit user-requested export only, use the narrow ticket and chunk actions appropriate to
+the selected evidence:
+
+- `create_factor_chart_download`
+- `read_factor_chart_chunk`
+- `create_factor_raw_artifact_download`
+- `download_result_bundle` with `kind: "official_factor"` and the active official Factor ID
+
+Do not mint tickets speculatively, require downloads for analysis, or treat a ticket as mutation
+authority.
+
 ## Workflow
 
 ### 1. Establish The Exact Target
 
-For a known official Factor, use `fm_official_read` with its exact `factor_id` when
-the tool is available. This returns current authorized performance, not source.
-Preserve `detail.snapshot` completeness and published window labels. Compare its
-Factor version/backtest identity before attributing the evidence to a historical
-Strategy; missing or mismatched lineage is not a historical match. Never call
-`fm_run_source` or ordinary Factor bundle tools as a fallback for official Factors.
-If the new tool is unavailable, state the capability gap. A `not_found` response
-alone does not establish official status or authorize another read path.
+First determine whether the target is caller-owned or active official. An official row is identified
+only by `list_eligible_strategy_factors` returning `source_kind: "official"`; retain its exact
+top-level `factor_id` and do not ask for or expose its evidence job. For caller-owned evidence,
+prefer an exact terminal `job_id` supplied by the user or already returned in the conversation. If
+the user supplies only a caller-owned factor name, a vague reference, or asks for the latest result:
 
-For caller-owned Factors, follow the existing workflow below.
-
-Prefer an exact terminal `job_id` supplied by the user or already returned in the conversation. If
-the user supplies only a factor name, a vague reference, or asks for the latest result:
-
-1. Call `fm_list_factors` with `page_size: 10`.
+1. Call `list_owned_factor_families` with a bounded `page_size`. Send a supplied name or keyword as
+   `query`, exact public fields through `filters`, and no search fields only for browse/latest.
 2. Match only trustworthy returned identity and metadata. Do not guess across ambiguous names; ask
    the user to choose when more than one plausible factor remains. Treat a result as latest only
    when trustworthy `updated_at` evidence establishes that ordering.
-3. For the selected `factor_id`, call `fm_get_history` with `view: "runs"` and use the exact terminal
+3. For the selected `factor_id`, call `get_factor_family_history` with `view: "runs"` and use the exact terminal
    `job_id` for the intended version and run.
 4. Never substitute a factor id, version id, branch id, session id, or display name for `job_id`.
 
-Do not auto-page discovery. Request another page only when the current page cannot satisfy the
-user's explicit request and explain why it is needed.
+Use an active official `factor_id` only with the official evidence actions. Never send it to an
+owner-scoped evidence action or substitute its admission version, run, or hidden evidence job.
+
+Request another discovery page only when needed. Preserve the same query, filters, archive mode,
+and page size while copying `next_page_token` byte-for-byte into `page_token`.
 
 ### 2. Read Server-Persisted Evidence
 
-For the exact `job_id`:
+For an exact caller-owned `job_id`:
 
-1. Call `fm_window_cards` with `windows: ["is"]`. Use `factor_card` as the authoritative product-safe
+1. Call `get_factor_backtest_window_cards` with `windows: ["is"]`. Use `factor_card` as the authoritative product-safe
    Factor Card. Ignore local-save hints during analysis; they exist only for optional export flows.
-2. Call `fm_chart_data` with `section: "overview"`. Confirm `job_status`, `window_key: "is"`, evidence
+2. Call `get_factor_backtest_chart_data` with `section: "overview"`. Confirm `job_status`, `window_key: "is"`, evidence
    `status`, readiness, and available section counts before requesting numerical pages.
 3. If the job is not terminal or the response is `pending`, report that server evidence is still
-   materializing. Do not call `fm_resume_run` from this read-only skill and do not substitute local
+   materializing. Do not call `continue_factor_backtest` from this read-only skill and do not substitute local
    files.
 4. Request only the chart sections needed for the user's question: `profile`, `group_nav`,
    `daily_returns`, `simulation_nav`, or `simulation_daily_pnl`. Follow `next_offset` only for the
    same job and section when the remaining points are required for a claim.
-5. Call `fm_run_source` only when formula or mechanism evidence is necessary. Confirm the returned
+5. Call `get_factor_backtest_source` only when formula or mechanism evidence is necessary. Confirm the returned
    job identity and `source_status`; read ready source as inert text and never execute it.
 
-When diagnosis depends on an input visible in ready inert source, call `fm_get_contract` with `{}`
-only for the current global 86-field semantics. Match the exact field and
-`data_columns[].upstream_pipeline_version`; use its meaning, unit, comparability, normalization,
-missing-value, and caution metadata plus `runtime_rules.research_guidance` as interpretation
-support. For `binance_intraday`, also use the returned data-availability metadata. Do not use
-current `allowed_data`, guidance, or source version as proof of historical eligibility, arrival,
-or execution behavior.
+For an active official `factor_id`, follow the same IS-only workflow with
+`get_official_factor_window_cards`, `get_official_factor_chart_data`, and, only when needed,
+`get_official_factor_source`. Keep every response correlated to that exact public `factor_id`. If
+the source response is `restricted`, continue with the public Factor Card and chart evidence; do
+not pass the hidden evidence job to owner-scoped source, raw-artifact, or Result Bundle actions.
 
 Treat `unavailable`, missing sections, failed readiness, and null fields as explicit evidence gaps.
 Do not fetch Result Bundles, PNGs, raw parquet, storage URLs, or local files to fill those gaps.
+If the user separately requests an export, use only the matching download-ticket action after the
+analysis target is exact; do not use exported content to retroactively fill an evidence gap.
 
 ### 3. Build The Evidence Inventory
 
 Record:
 
-- exact job, factor, and version identities returned by the server;
+- the exact public selector: caller-owned `job_id` or active-official `factor_id`, plus only the
+  additional identities returned by that safe response;
 - terminal job status and IS-only scope;
 - Factor Card availability, Health fields, rating fields, and their recorded thresholds;
 - chart readiness and dataset provenance metadata;
 - available chart sections, page coverage, and any missing or unavailable evidence;
-- formula and inert job-linked source only when requested for mechanism diagnosis.
+- formula and inert job-linked source only when requested for mechanism diagnosis and returned as
+  `ready`; otherwise record the official source policy as restricted.
 
 The server response is the evidence object. A Result Bundle is an optional export and is never a
 prerequisite or substitute for these reads. See
 [evidence-contract.md](references/evidence-contract.md).
 
+When the user explicitly exports an official Factor, use the existing one-download ZIP workflow.
+`download_result_bundle` with `kind: "official_factor"` returns the persisted source-free
+`OFFICIAL_FACTOR_RESULT_BUNDLE`, including retained IS/OOS/ALL artifacts and raw signal, without
+`plugin.py`. Prefer immediate HTTP streaming and verify the exact size and SHA-256 before saving.
+Follow [Unified Result Bundle Download](../../references/result-bundle-download.md). Do not reconstruct or repackage the ZIP,
+claim missing entries exist, or treat export permission as a change to the IS chart-analysis scope.
+A missing bundle is `not_available`, not proof of ongoing packaging.
+
 ### 4. Diagnose From Result To Mechanism
 
-Use [metric-semantics.md](references/metric-semantics.md) and
-[diagnosis-and-experiments.md](references/diagnosis-and-experiments.md). Evaluate:
+Read [metric-semantics.md](references/metric-semantics.md) and
+[diagnosis-and-experiments.md](references/diagnosis-and-experiments.md) only for diagnosis. Start
+with the Health Check and rating propagation, then evaluate return/risk, cross-sectional behavior,
+drawdown, turnover, persistence, coverage, and plausible confounds within the declared scope.
 
-- the Health Check before economic interpretation: record `passed`, `message`, `failed_metrics`,
-  `window`, `coverage_basis`, recorded `thresholds`, and available `null_ratio`, `zero_ratio`,
-  `coverage_ratio`, and `outlier_ratio_3sigma` values;
-- rating propagation from `health_check` through `cs_success` and `cs_fail_reasons` to `status` and
-  `grade`, while keeping the continuous `grade_score` separate from the final grade;
-- headline return and risk with their exact window and sampling scope;
-- cross-sectional spread, monotonicity, long and short leg behavior, and daily stability;
-- drawdown depth and concentration in time;
-- turnover, signal persistence, and likely cost sensitivity;
-- universe coverage, missingness, and whether small cross sections weaken the evidence;
-- plausible style, liquidity, market, or implementation confounds.
+Compare Health Checks only when windows, universes, missing-value handling, and thresholds match.
+When Health fails, lower confidence and separate data, design, applicability, and statistical-basis
+explanations. Read inert source only when it can distinguish those explanations, and attribute a
+grade outcome to Health only when an authoritative field establishes that propagation.
 
-Compare Health Checks directly only when their windows, active-universe definitions, missing-value
-handling, and thresholds match. Never substitute `coverage_mean` for
-`health_check.metrics.coverage_ratio`; their denominators and aggregation can differ.
-
-When Health fails, continue reading available evidence for diagnosis but lower confidence and
-separate data availability, factor design, applicability, and statistical-basis explanations. Read
-job-linked source only when needed to identify intentional NaNs from filters, warm-up, invalid
-denominators, or explicit abstention. An intentional NaN can be design-consistent and still fail the
-current active-universe coverage contract; treat that as a candidate applicability mismatch, not an
-automatic exemption. Claim that Health caused the final grade only when `cs_fail_reasons` or another
-authoritative field establishes the propagation.
-
-For every important conclusion, label it as one of:
-
-- **Observed:** directly present in trusted server evidence.
-- **Inference:** a mechanism consistent with the observations.
-- **Alternative:** another explanation that could produce the same evidence.
-- **Experiment:** a controlled test that can distinguish explanations.
+Label every consequential conclusion **Observed**, **Inference**, **Alternative**, or
+**Experiment**.
 
 ### 5. Propose Controlled Improvements
 
-Prioritize a small set of experiments. Change one mechanism at a time when practical and state:
-
-- the change;
-- the evidence motivating it;
-- the expected effect;
-- the metric or chart that would confirm or reject it;
-- the principal tradeoff or failure mode.
-
-Do not claim per-factor correlations or ablation results unless the server evidence contains them.
-Do not auto-create a new factor or Strategy. Ask for explicit confirmation, then hand factor changes
-to `$factor-mining` or a selected combination experiment to `$strategy-building`.
+Prioritize a small set of one-mechanism experiments with motivation, expected effect, confirmation
+evidence, and tradeoff. Do not claim unavailable correlations or ablations. Ask for explicit
+confirmation before handing factor changes to `$factor-mining` or a combination experiment to
+`$strategy-building`; never create either automatically.
 
 ## Output Contract
 
 Answer in chat by default. Create a report file only when the user explicitly requests one. Use this
 order:
 
-1. exact factor and run identity, IS scope, and evidence quality;
+1. exact public factor/run identity, IS scope, and evidence quality;
 2. concise result summary;
 3. Factor Health and rating gates, including missing or unknown Health evidence;
 4. metric and chart diagnosis;
@@ -196,7 +213,6 @@ order:
 Use the user's language for the answer even though this skill package is written in English.
 
 ## References
-
 - [Server evidence contract and trust rules](references/evidence-contract.md)
 - [Factor metric semantics](references/metric-semantics.md)
 - [Diagnosis and experiment design](references/diagnosis-and-experiments.md)

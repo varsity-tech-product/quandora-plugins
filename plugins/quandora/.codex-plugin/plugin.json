@@ -1,7 +1,7 @@
 {
   "name": "quandora",
-  "version": "3.3.4-preview",
-  "description": "Quandora plugin for factor and strategy creation, analysis, and simulated Paper Trading.",
+  "version": "4.0.0-preview",
+  "description": "Quandora provides Factor Mining, Factor Analysis, Strategy Building, Strategy Analysis, Portfolio Building, Portfolio Analysis, and Portfolio Trading Analysis for backtest research and forward-test management.",
   "author": {
     "name": "Varsity Tech Product",
     "url": "https://github.com/varsity-tech-product"
@@ -14,9 +14,11 @@
     "factor-mining",
     "factor-analysis",
     "backtesting",
-    "strategy",
+    "strategy-building",
+    "portfolio-building",
+    "portfolio-analysis",
     "strategy-analysis",
-    "paper-trading",
+    "portfolio-trading-analysis",
     "quant"
   ],
   "skills": "./skills/",
@@ -24,7 +26,7 @@
   "interface": {
     "displayName": "Quandora",
     "shortDescription": "Use Quandora services from your agent.",
-    "longDescription": "Quandora supports factor research and backtesting, server-evidence analysis, cross-sectional Strategy construction and diagnosis, and confirmed simulated Paper Trading workflows.",
+    "longDescription": "Quandora provides Factor Mining, Factor Analysis, Strategy Building, Strategy Analysis, Portfolio Building, Portfolio Analysis, and Portfolio Trading Analysis for backtest research and forward-test management.",
     "developerName": "Varsity Tech Product",
     "category": "Productivity",
     "capabilities": [
@@ -33,12 +35,9 @@
     ],
     "websiteURL": "https://github.com/varsity-tech-product/quandora-plugins",
     "defaultPrompt": [
-      "Use Quandora Factor Mining to show public tasks.",
-      "Use Quandora Factor Mining with my custom factor idea.",
-      "Use Quandora Factor Analysis to diagnose an existing factor result.",
-      "Use Quandora Strategy Building to combine existing factors into a cross-sectional strategy.",
-      "Use Quandora Strategy Analysis to diagnose a completed strategy result.",
-      "Use Quandora Paper Trading to select an eligible source and start a simulated run after confirmation."
+      "Use Quandora Portfolio Building to select complementary Strategies and backtest my Portfolio.",
+      "Use Quandora Portfolio Analysis to compare my Portfolio with its actual members.",
+      "Use Quandora Portfolio Trading Analysis to inspect my Simulation or real Live performance."
     ],
     "brandColor": "#F28C00",
     "composerIcon": "./assets/quandora.png",
