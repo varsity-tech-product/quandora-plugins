@@ -221,3 +221,11 @@ mutation recovery, and host-native fallbacks. Never request secrets or bypass MC
 ## License
 
 Licensed under the Apache License 2.0. See [LICENSE](LICENSE).
+
+## Keeping Quandora updated
+
+Agents check the release on first use per session. With existing update authority, refresh the
+marketplace before updating the installed plugin; preserve explicit pins and authentication.
+See the [host update guide](agent-install-guide/update.md) for Codex, Claude Code, other-host
+limits, and the distinction between installation and loading. Offline clients and cached sessions
+may not receive release notices immediately.

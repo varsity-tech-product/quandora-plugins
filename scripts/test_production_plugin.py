@@ -166,8 +166,17 @@ class ConnectionPolicyTests(unittest.TestCase):
         self.rejected("hardcoded release label")
 
     def test_mandatory_probe_in_shared_policy(self):
-        self.append(self.policy, "On first entry call `check_quandora_plugin_version`.")
-        self.rejected("mandatory version probe")
+        self.append(self.policy, "Before every business call run `check_quandora_plugin_version`.")
+        self.rejected("repeated blocking version probe")
+
+    def test_update_guide_ships_inside_plugin(self):
+        (self.plugin / "references/plugin-update.md").unlink()
+        self.rejected("missing bundled plugin update guide")
+
+    def test_marketplace_refresh_cannot_be_skipped(self):
+        guide = self.plugin / "references/plugin-update.md"
+        guide.write_text(guide.read_text().replace("codex plugin marketplace upgrade quandora", "skip refresh"))
+        self.rejected("host-managed refresh/update command")
 
     def test_unsafe_mutation_recovery(self):
         self.policy.write_text(self.policy.read_text().replace("original idempotency key", "new idempotency key"))

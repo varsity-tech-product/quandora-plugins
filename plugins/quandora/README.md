@@ -45,7 +45,8 @@ The Agent lets the host refresh the connection automatically first, then uses su
 or tool discovery and resumes the task. User interaction is limited to unavoidable sign-in or
 consent after terminal authorization failure or an explicit host consent requirement. Do not
 reinstall a working plugin, display token lifetimes, or ask users to run refresh commands.
-Version diagnostics remain on demand and use the actual installed package metadata.
+Check the release once per session using actual installed package metadata, then follow the
+[host update guide](references/plugin-update.md) within existing update authority.
 See [Connection and Security](references/connection-and-security.md) for bounded retries, uncertain
 mutation recovery, and host-native fallbacks. Never request secrets or bypass MCP with internal HTTP.
 

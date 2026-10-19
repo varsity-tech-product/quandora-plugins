@@ -669,6 +669,8 @@ def _check_skills(
     for skill_name, path in sorted(skill_files.items()):
         text = path.read_text(encoding="utf-8")
         for retired in sorted(RETIRED_TOOL_NAMES):
+            if retired == "qd_plugin_ver" and path == PLUGIN_ROOT / "references/plugin-update.md":
+                continue
             if re.search(rf"(?<![A-Za-z0-9_]){re.escape(retired)}(?![A-Za-z0-9_])", text):
                 errors.append(f"{skill_name}/SKILL.md: retired tool name remains: {retired}")
 
@@ -777,6 +779,8 @@ def _check_runtime_markdown(errors: list[str], skill_files: dict[str, Path]) -> 
                     f"{path.relative_to(REPOSITORY_ROOT)}: contains {meaning}: {needle!r}"
                 )
         for retired in sorted(RETIRED_TOOL_NAMES):
+            if retired == "qd_plugin_ver" and path == PLUGIN_ROOT / "references/plugin-update.md":
+                continue
             if re.search(rf"(?<![A-Za-z0-9_]){re.escape(retired)}(?![A-Za-z0-9_])", text):
                 errors.append(
                     f"{path.relative_to(REPOSITORY_ROOT)}: retired tool name remains: {retired}"
@@ -896,10 +900,22 @@ def _check_connection_policy(errors: list[str], skill_files: dict[str, Path]) ->
         "first inspect the existing operation/status", "original idempotency key",
         "terminal authorization failure", "Respect cancellation and security denials",
         "Do not display token lifetimes", "same installed package",
-        "never as a mandatory entry probe", "without guessing",
+        "A failed check is nonblocking", "without guessing",
+        "Preserve explicit version pins", "existing update authorization",
     ):
         if marker not in text.replace("**", ""):
             errors.append(f"shared connection policy: missing recovery boundary {marker!r}")
+    guide = PLUGIN_ROOT / "references/plugin-update.md"
+    if not guide.is_file():
+        errors.append("missing bundled plugin update guide")
+    else:
+        guide_text = guide.read_text()
+        for command in ("codex plugin marketplace upgrade quandora",
+                        "codex plugin add quandora@quandora --json",
+                        "claude plugin marketplace update quandora",
+                        "claude plugin update quandora@quandora"):
+            if command not in guide_text:
+                errors.append("update guide missing host-managed refresh/update command")
     paths = [REPOSITORY_ROOT / "README.md", *PLUGIN_ROOT.rglob("*.md")]
     for path in paths:
         text = " ".join(path.read_text(encoding="utf-8").split())
@@ -909,8 +925,8 @@ def _check_connection_policy(errors: list[str], skill_files: dict[str, Path]) ->
             (r"update or reinstall", "premature reinstall guidance"),
             (r"(?:access )?token is valid for", "user-facing token lifetime boilerplate"),
             (r"Refresh the Quandora MCP connection", "user-facing refresh prompt"),
-            (r"(?:first entry|before the business entry point).*check_quandora_plugin_version",
-             "mandatory version probe"),
+            (r"before every business call.*check_quandora_plugin_version",
+             "repeated blocking version probe"),
         ):
             if re.search(pattern, text, re.IGNORECASE):
                 errors.append(f"{path.relative_to(REPOSITORY_ROOT)}: {reason}")
