@@ -26,7 +26,7 @@ The production trust anchors are:
 - Plugin and scope: `quandora@quandora`, `user`
 - MCP URL and OAuth resource: `https://mcp.quandora.ai/quant`
 - OAuth authorization server: `https://mcp.quandora.ai`
-- Protected verification tool: `fm_status`
+- Protected verification tool: `get_factor_mining_status`
 
 Never request, read, print, copy, or relay an OAuth token, authorization code, client secret, authorization URL, password, passkey, MFA code, or cookie. Do not create a separate MCP entry, replace a conflicting marketplace, edit a plugin cache, or change another plugin.
 
@@ -45,7 +45,7 @@ trap quandora_cleanup EXIT
   --output "$quandora_bootstrap" \
   'https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/plugins/quandora/scripts/workbuddy-cn-bootstrap-macos.sh' || exit 1
 quandora_bootstrap_sha=$(/usr/bin/shasum -a 256 "$quandora_bootstrap" | /usr/bin/awk '{print $1}')
-[ "$quandora_bootstrap_sha" = '055deeb23f06769d6876ad0bef965b3c08784953284932487b7f56535f44f05f' ] || { echo 'Quandora bootstrap integrity check failed.' >&2; exit 1; }
+[ "$quandora_bootstrap_sha" = '9865df92bc95535a69876ec85200880c6e4761eee03f045c4cd954893297a389' ] || { echo 'Quandora bootstrap integrity check failed.' >&2; exit 1; }
 /bin/sh "$quandora_bootstrap"
 ```
 
@@ -57,7 +57,7 @@ Plugin state changes go only through WorkBuddy's bundled public plugin manager w
 
 Only when the installer emits `{"status":"progress","step":"browser_opened"}`, tell the user that the Quandora browser page is open and wait while they complete sign-in, MFA, and the final authorization action. Do not operate that page or start a second attempt. If stored authorization passes the protected probe, no browser event is emitted and no browser action is required.
 
-Success is one final JSON object whose `status` is `completed`, `installed`, `enabled`, and `authenticated` are `true`, `plugin` is `quandora@quandora`, `scope` is `user`, `version` matches the validated marketplace and installed manifests, `protectedProbe` is `fm_status`, and `toolCount` is a positive integer.
+Success is one final JSON object whose `status` is `completed`, `installed`, `enabled`, and `authenticated` are `true`, `plugin` is `quandora@quandora`, `scope` is `user`, `version` matches the validated marketplace and installed manifests, `protectedProbe` is `get_factor_mining_status`, and `toolCount` is a positive integer.
 
 On `host_login_required`, ask the user to sign in to WorkBuddy, start a new local Agent task, and paste the same one-sentence request again. On `host_update_required`, direct the user to WorkBuddy **Personal Center → Check for Updates**, then restart WorkBuddy and retry in a new task; if the application is missing, use `https://www.codebuddy.cn/work/`. These are the official recovery paths—do not install a standalone CLI or another runtime as a substitute.
 

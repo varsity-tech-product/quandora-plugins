@@ -7,7 +7,7 @@ Do not start a factor backtest or trade to verify an installation.
 
 Run `python3 scripts/check-production-plugin.py` and `git diff --check`.
 Verify that each platform guide links the shared recovery policy, preserves the
-production repository and MCP identity, and requires authenticated `fm_status`
+production repository and MCP identity, and requires authenticated `get_factor_mining_status`
 before reporting full completion. Check README entry prompts still resolve to
 the corresponding guides. Keep Claude launchers and WorkBuddy bootstrap hashes
 unchanged unless explicitly updating and testing their implementation.

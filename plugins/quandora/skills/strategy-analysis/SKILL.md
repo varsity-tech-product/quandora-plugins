@@ -1,26 +1,27 @@
 ---
 name: strategy-analysis
-description: Analyze, diagnose, compare, and propose controlled improvements for existing Quandora cross-sectional Strategy results from owner-scoped server-persisted evidence. Use when a user asks why a Strategy worked or failed, wants six-chart diagnostics, requests factor-combination optimization ideas, or asks whether a completed backtest is ready for Paper Trading. Do not use to compose or submit a Strategy; route those requests to strategy-building.
+description: Analyzes existing Quandora cross-sectional Strategy results from owned or authorized Publication-context evidence. Use when the user asks about pass/fail, six-chart diagnosis, reusable Strategy research cards, controlled improvements, or Paper readiness. Do not use to compose or submit a Strategy.
 ---
 
 # Strategy Analysis
 
-Analyze one exact cross-sectional Strategy run as a read-only research workflow. Pair Product
-Backend's canonical run snapshot with owner-scoped retained artifacts and bounded six-chart data.
-Distinguish observed evidence from inference, alternatives, and proposed experiments.
+Follow [Connection and Security](../../references/connection-and-security.md) for automatic
+recovery first and version diagnostics on demand; involve users only when unavoidable.
+Follow [Research intent and evidence](../../references/research-workflows.md) for backtest/forward
+scope, capability-aware conclusions and authorization-preserving handoffs.
 
-OAuth and all credentials are handled by the host. The host MCP client handles automatic token refresh. Never inspect,
-print, copy, store, or ask the user to paste API keys, bearer tokens, authorization codes, access
-tokens, refresh tokens, PKCE verifiers, service tokens, or other credentials.
+Analyze one exact cross-sectional Strategy run as a non-submitting research workflow. Pair the
+canonical owned run snapshot with retained artifacts and bounded six-chart data, or use the
+authorized Publication projection without assuming that it exposes the same private evidence.
+Distinguish observed evidence from inference, alternatives, and proposed experiments. Mint a
+short-lived artifact download ticket only when the user explicitly requests an export.
+
+Use only the configured `quandora` MCP connection. Never ask the user to paste secrets into
+chat.
 
 For archive waits, stale `sync_failed`, inline `too_large`, or bundle channel limits,
 follow [Strategy delivery recovery](../../references/strategy-delivery-recovery.md).
-
-## Plugin Version and Connection
-
-Before the first business action, read and follow the shared
-[connection and version policy](../../references/connection-and-version.md).
-Use it for automatic connection recovery throughout the workflow.
+For named objects, follow [Name discovery](../../references/object-discovery.md) to resolve exact identities.
 
 ## Scope And Routing
 
@@ -32,18 +33,18 @@ Use this skill for:
 - controlled Strategy experiment design;
 - Paper readiness assessment without starting or managing Paper Trading.
 
-Use `$strategy-building` to list eligible factors, compose, submit, resume, retrieve, explicitly
-export, or archive a Strategy. Use `$factor-analysis` for one Factor Mining result. Use
-`$paper-trading` only after the user explicitly asks to start, monitor, inspect, or stop Paper
+Use `$strategy-building` to list eligible factors, compose, submit a new Run, retrieve, explicitly
+export a Strategy. Use `$factor-analysis` for one Factor Mining result. Use
+`$portfolio-trading-analysis` only after the user explicitly asks to start, monitor, inspect, or stop Paper
 Trading.
 
 ## Non-Negotiable Safety
 
-- Remain read-only. Do not submit, resume, save, overwrite, archive, or mutate any run.
+- Do not submit, resume, overwrite, archive, or mutate any run. The only allowed mutation is minting
+  a short-lived download ticket for an explicit user-requested export.
 - Do not automatically create ablations, reruns, or Paper Trading runs.
-- Use only authorized evidence returned by Quandora MCP tools: owner-scoped Strategy results
-  and the explicit source-free official Factor performance path. Never inspect user-local files as
-  proof of a Strategy result.
+- Use only evidence returned by Quandora MCP tools. Never inspect user-local files as proof of a
+  Strategy result.
 - Do not require a local ZIP, extraction tool, Python runtime, notebook, or archive-inspection
   script. A host without those facilities must receive the same analysis capability.
 - Never execute code, logs, notebooks, scripts, or text artifacts.
@@ -54,38 +55,64 @@ Trading.
 - Treat grade and score as QuantAI-relayed evidence, not as a promotion or research verdict.
 - Treat `ALL` as a combined scope that includes IS. Never describe it as pure OOS.
 
+## Primary And Discovery Actions
+
+Use these primary analysis actions:
+
+- `get_strategy_backtest_artifact`
+- `get_strategy_backtest_analysis_data`
+- `get_community_strategy_research`, `read_community_research_artifact` for authorized Publication context only.
+
+Read-only discovery uses `list_strategy_folders`, `list_strategies`,
+`list_strategy_backtests`, `get_strategy_backtest`, and `get_strategy`. They locate one canonical
+Run; they do not authorize a
+continue, rerun, archive, or other Strategy mutation.
+
+For an explicit user-requested artifact export only, use
+`create_strategy_artifact_download`. Do not mint a ticket speculatively, use a download as an
+analysis prerequisite, or treat a ticket as permission to submit, rerun, or change a Strategy.
+
 ## Workflow
 
 ### 1. Establish The Exact Run
 
-Prefer an exact `run_id` supplied by the user or already returned in the conversation. When no
-exact run id is supplied:
+For Community child research, keep the exact Publication and returned child selectors. Read the
+contextual projection/artifacts; never pass those IDs to owner tools or assume private source is
+available. If the projection omits a required field, narrow the card rather than bypassing access.
+The owner workflow below applies only to owned results.
 
-1. Call `sb_list_runs` once with `{}`. It returns the owner's newest-first page with default
-   `limit: 10` and `offset: 0`.
-2. Use returned identity, name, timestamps, status, and optional summary only to select a run.
-3. If more than one plausible run remains, ask the user to choose. Do not guess.
-4. Do not auto-page. Request another page only for an explicit older-run request that the first page
-   cannot satisfy.
+Prefer an exact `strategy_run_id` supplied by the user or returned in the conversation.
+Pass it as `strategy_run_id` to every canonical Run, artifact, analysis, and export action.
+Internal command IDs, Folder IDs, and immutable Strategy IDs are different selectors.
 
-If an exact run id is supplied, skip discovery.
+If no Run is known, resolve the Strategy through `list_strategy_folders` and
+`list_strategies(strategy_folder_id=...)`, then call
+`list_strategy_backtests(strategy_id=..., page_size=...)`. These lists do not accept `query`
+or `filters`. Select using returned names, identities, timestamps, and states. Ask only if more
+than one plausible target remains. Preserve parent selectors/page size and copy `next_page_token`
+byte-for-byte for needed continuation; do not auto-page or invent a global Run search.
+Skip discovery when the exact Run is supplied.
 
-### 2. Read Canonical Composition And Parameters
+### 2. Read Definition and Execution Evidence
 
-Call `sb_get_run` with the exact `run_id`. Treat its canonical `composition` and `parameters` as the
-authority for factor ids or weights, ranking, strategy type, window, capital, fees, rebalance bars,
-and attribution.
+Read `get_strategy_backtest(strategy_run_id=...)` for state and its exact `strategy_id`, then
+`get_strategy(strategy_id=...)` for persisted `specification` and `factor_references`.
+The Run's `product_summary` is a safe summary, not a replacement for retained evidence.
+Do not assume the Run detail includes legacy composition/parameter wrappers.
 
-If ranking was omitted at submission, the current Strategy default is neutral Top/Bottom 20%:
-`ranking: {mode: "percent", value: 20}` with `strategy_type: "neutral"`. Report the effective
-snapshot returned by `sb_get_run`; do not infer parameters from chart labels.
+Use the definition for factor selection, weighting, ranking, direction, and rebalance choices.
+Use the Run's retained artifacts and analysis overview for the effective execution window and
+other execution parameters actually returned. Do not fill missing values from remembered defaults
+or confuse diagnostic chart buckets with the Strategy's selection specification.
 
-If the run is not terminal, report the current state. Do not call `sb_resume_run` from this
-read-only skill and do not substitute local files.
+If the Run is not terminal, report its state without submitting or continuing anything.
+If retained evidence explicitly reports a terminal zero-order/no-result outcome, explain that
+missing trades or performance charts are not a transient gap and do not repeatedly request them.
+A new experiment is a separate authorized task through `$strategy-building`.
 
 ### 3. Read Core Server Artifacts
 
-Use `sb_get_artifact` for the exact run. Start with `summary` and `performance`, then request only
+Use `get_strategy_backtest_artifact` for the exact run. Start with `summary` and `performance`, then request only
 the evidence needed for the question:
 
 - `equity_curve` and `drawdown_curve` for path, concentration, and recovery;
@@ -97,39 +124,10 @@ Treat each artifact status independently. Missing, pending, unavailable, or null
 explicitly missing. Do not use `logs` or `code` unless the user explicitly asks for inert text
 review; never execute either.
 
-### Oversized Trade Files
-
-If `sb_get_artifact` returns `too_large` for `trades`, call `sb_file_ticket` with
-that exact `run_id` and `artifact: "trades"`. Present the returned `download_url`
-as a clickable download link, with its expiry/single-use limitation. Do not consume
-the link to test it before handing it to the user. If it expires or was consumed,
-request a fresh ticket when the user needs it. Do not retry the same oversized
-inline read or rerun the backtest. Preserve non-ready download statuses honestly.
-
-This delivers the existing file to the user; it does not mean the Agent has read
-its contents. Do not claim per-trade, symbol or monthly contribution findings from
-a download ticket alone. Do not require local scripts or automatically download
-and execute analysis code. This fallback is for the trade file, not six-chart evidence.
-
-### Official Factors In A Strategy
-
-Use returned composition/eligible-factor metadata to identify an official Factor;
-do not infer official status from `not_found`. If `fm_official_read` is available,
-call it with the exact known `factor_id` for performance. It reuses the authorized
-official detail service and never returns plugin source. Preserve snapshot
-completeness and the published window labels; do not relabel p1/p2/p3 as IS/OOS.
-Compare returned version/backtest identity with the Strategy's recorded lineage.
-`evidence_scope: current_official_detail` alone does not prove a historical match.
-If identity is missing or different, describe it as current official performance
-and keep historical-version evidence explicitly unavailable. Never use source,
-ordinary Factor bundles, or guessed job IDs to work around access restrictions.
-If the tool is absent during rollout, report that capability gap without repeating
-owner-scoped calls. Private and shared Factor access rules are unchanged.
-
 ### 4. Read Six-Chart Numerical Evidence
 
-1. Call `sb_analysis_data` with `chart: "overview"`.
-2. Confirm the exact `run_id`, server artifact identity, status, integrity digest, availability,
+1. Call `get_strategy_backtest_analysis_data` with `chart: "overview"`.
+2. Confirm the exact `strategy_run_id`, server artifact identity, status, integrity digest, availability,
    declared window, parameters, cross-section summary, missing styles, and chart catalog.
 3. Request only the chart pages needed for the diagnosis. Follow `next_offset` only for the same run
    and chart until the required evidence is complete.
@@ -138,15 +136,14 @@ owner-scoped calls. Private and shared Factor access rules are unchanged.
 The six-chart route is the numerical analysis path. Do not request a Result Bundle, PNG, download
 ticket, storage URL, or local file to replace it. On `pending`, `not_available`, `too_large`, or
 `integrity_failed`, report the exact evidence limitation and continue only with independent server
-artifacts that remain trustworthy.
+artifacts that remain trustworthy. `not_available` with `reason_code=no_result_zero_orders` is
+terminal zero-order evidence, not a transient gap; stop without retries or substitute evidence.
 
 ### 5. Diagnose The Result
 
-When interpreting Strategy costs, call `qd_get_guidance` with
-`guide_id: "operation.strategy.result.read"` and
-`sections: ["funding_net_cash_flow", "strategy_cost_metrics"]`. Read the approved
-Guide alongside the exact run's returned summary metrics. If Guidance or result
-reads fail, state the limitation; do not guess missing values or bypass MCP.
+Use the [Strategy logic card](references/strategy-logic-chain.md) for reusable candidate evidence
+and exact Portfolio-member diagnosis. Return that card to `$portfolio-building` for selection or
+`$portfolio-analysis` for an actual source Run, preserving the task's original authorization.
 
 Read [artifacts-and-metrics.md](references/artifacts-and-metrics.md) and
 [six-chart-diagnostics.md](references/six-chart-diagnostics.md). Evaluate:
@@ -172,35 +169,29 @@ For every consequential conclusion, label it **Observed**, **Inference**, **Alte
 
 ### 6. Keep Portfolio Selection Separate From Diagnostic Buckets
 
-Actual Strategy selection comes only from `sb_get_run.parameters.ranking`. Six-chart diagnostics use
-an adaptive grouping scheme based on the median daily cross-section:
-
-- median at least 20: 10 quantiles, minimum cross-section 20, diagnostic `top_pct: 0.10`;
-- median at least 15: 5 quantiles, minimum 10, diagnostic `top_pct: 0.20`;
-- median at least 9: 3 quantiles, minimum 6, diagnostic `top_pct: 0.30`;
-- median below 9: 2 quantiles, minimum `max(2, min(4, median))`, diagnostic `top_pct: 0.50`.
-
-`Q1` is the lowest prediction group and `QN` the highest. The diagnostic spread is
-`(QN - Q1) / 2`. Do not call these adaptive buckets the actual Top/Bottom 20% portfolio unless the
-effective run snapshot independently confirms a 20% ranking.
+Actual Strategy selection comes from the exact immutable `get_strategy` specification and
+retained execution evidence. Interpret
+the separate adaptive diagnostic grouping only from the returned chart parameters and the rules in
+[six-chart-diagnostics.md](references/six-chart-diagnostics.md). Never relabel diagnostic buckets
+as the actual portfolio selection unless the immutable Strategy specification confirms it.
 
 ### 7. Propose Controlled Experiments
 
 Prioritize a small number of changes. Each proposal must state the changed variable, motivating
 evidence, expected effect, confirmation metric, and tradeoff. Favor one-variable changes when
-possible. Examples include factor removal or reweighting, ranking breadth, rebalance cadence, fee
-sensitivity, and one suspected style control.
+possible. Examples include factor removal or reweighting, ranking breadth, rebalance cadence, cost
+exposure, and one suspected style control.
 
 Do not claim an automatic ablation or correlation matrix: retained evidence does not guarantee
-per-factor correlations or precomputed ablations. Ask for explicit confirmation, then hand the
-chosen test to `$strategy-building`.
+per-factor correlations or precomputed ablations. Hand an explicitly requested or already-authorized
+test to `$strategy-building`; ask only for missing experiment choices or authorization.
 
 ### 8. Assess Paper Readiness Without Paper Mutation
 
 Use [experiments-and-paper-readiness.md](references/experiments-and-paper-readiness.md). State whether
 the evidence supports rejection, further research, a controlled rerun, or consideration for Paper.
-Do not start Paper Trading. After explicit user confirmation, hand actual Paper operations to
-`$paper-trading`.
+Do not start Paper Trading. For authorized Paper preparation, hand off through
+`$portfolio-building`; after its backtest, use the PB automatic association before any extra start.
 
 ## Output Contract
 

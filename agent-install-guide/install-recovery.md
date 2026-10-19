@@ -115,7 +115,7 @@ Keep the agent turn/process available until success, bounded timeout, cancellati
 or a genuine required user action. Honor platform-specific manual-terminal fallbacks.
 
 After successful authorization, discover tools through the host and call the
-protected, read-only `fm_status` tool. Confirm that it returns authenticated
+protected, read-only `get_factor_mining_status` tool. Confirm that it returns authenticated
 account status, not an authentication challenge or an error. Do not print account
 identifiers unnecessarily. If discovery needs a fresh session, report verification
 pending and resume discovery/probe there without reinstalling. Do not submit a

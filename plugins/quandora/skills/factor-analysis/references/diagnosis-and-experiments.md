@@ -41,7 +41,7 @@ Possible causes include source-field availability, warm-up, invalid denominators
 or intentional filters and abstention. Inspect inert source and declared applicability. Compare the
 target universe with effective cross-sectional breadth over time when that evidence exists. Do not
 remove a meaningful filter merely to pass Health; first determine whether the factor definition and
-the current Health basis express the same research domain.
+the recorded Health basis express the same research domain.
 
 ### Health Passed But Final Grade Failed
 
@@ -73,9 +73,10 @@ values are already dimensionless and must not be divided by price.
 
 For `binance_intraday`, the D row describes D 00:00-24:00 UTC, aligns to the D daily bar, and
 becomes safe only after it actually arrives on D+1. The pre-00:02 UTC publication SLA is not proof
-of historical arrival. Possible missingness causes therefore include both field-specific null
-conditions and availability boundaries. Do not shift the D-aligned field again, infer historical
-availability from the current task contract, or convert a missing value to zero.
+of historical arrival.
+Possible missingness causes therefore include both field-specific null conditions and availability
+boundaries. Do not shift the D-aligned field again, infer historical availability from the current
+task contract, or convert a missing value to zero.
 
 ## Controlled Experiment Templates
 
@@ -96,7 +97,7 @@ availability from the current task contract, or convert a missing value to zero.
 - **Style control:** neutralize or stratify one suspected style; expect residual spread if the factor
   has incremental content.
 - **Window stability:** rerun the same definition on a distinct declared window when the product
-  workflow supports it. Do not call current external-agent evidence OOS.
+  workflow supports it. Do not call the available external-agent evidence OOS.
 
 For each proposal, state the independent variable, expected change, confirmation metric, and
 tradeoff. Prefer two or three high-information tests over a long optimization list.

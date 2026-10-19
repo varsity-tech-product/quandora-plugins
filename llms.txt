@@ -1,6 +1,6 @@
 # Quandora
 
-> Quandora is a quantitative research platform. This repository is its agent plugin marketplace: plugins for Claude Code / Claude Desktop (and other agents) that provide Factor Mining, Factor Analysis, Strategy Building, Strategy Analysis, and Paper Trading skills over an OAuth-protected MCP server at https://mcp.quandora.ai/quant.
+> Quandora is a quantitative research platform. This repository is its agent plugin marketplace: plugins for Claude Code / Claude Desktop (and other agents) that provide Factor Mining, Factor Analysis, Strategy Building, Strategy Analysis, Portfolio Building, Portfolio Analysis, and Portfolio Trading Analysis skills over an OAuth-protected MCP server at https://mcp.quandora.ai/quant.
 
 ## Agent install guides
 

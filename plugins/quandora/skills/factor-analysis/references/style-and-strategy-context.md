@@ -11,9 +11,9 @@ Treat style explanations as hypotheses unless server evidence directly measures 
 - **Volatility:** a signal may primarily select high- or low-volatility instruments.
 - **Coverage:** missing data can change the effective universe and create selection effects.
 
-When discussing the six-chart Strategy Size style later in the workflow, remember that the current
-definition is the logarithm of trailing 90 natural-day median positive quote volume. It is not open
-interest notional.
+When discussing the six-chart Strategy Size style later in the workflow, use the returned style
+metadata. If it declares trailing 90-natural-day median-positive-quote-volume, Size is its
+logarithm rather than open-interest notional.
 
 ## Readiness For Strategy Building
 

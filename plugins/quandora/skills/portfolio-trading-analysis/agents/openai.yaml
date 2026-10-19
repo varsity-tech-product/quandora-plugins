@@ -1,0 +1,16 @@
+interface:
+  display_name: "Portfolio Trading Analysis"
+  short_description: "Manage Simulation and analyze forward tests"
+  icon_small: "./assets/portfolio-trading-analysis.png"
+  icon_large: "./assets/portfolio-trading-analysis.png"
+  brand_color: "#F28C00"
+  default_prompt: "Use $portfolio-trading-analysis to analyze Simulation or real Live evidence, or manage an explicitly selected Simulation account."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "quandora"
+      description: "Quandora research and forward-test connection"
+      transport: "streamable_http"
+      url: "https://mcp.quandora.ai/quant"
+      oauth_resource: "https://mcp.quandora.ai/quant"

@@ -15,7 +15,8 @@ standalone analysis capability. Read the complete available block before interpr
 - `coverage_basis` identifies the coverage denominator convention.
 
 Apply only the thresholds preserved in the artifact. Do not invent fallback thresholds or recompute
-Health from a projected card. The current common metrics mean:
+Health from a projected card. Interpret common metrics only when the artifact declares the
+corresponding field and scope:
 
 - `null_ratio`: NaN cells divided by active cells;
 - `zero_ratio`: exact-zero cells divided by active cells;
@@ -39,7 +40,8 @@ are present.
 ## Return And Drawdown
 
 - Cross-sectional net return is the portfolio return after the artifact's modeled fees and costs.
-- `cs_return` is annualized as `365 * mean(net_r)` under the current calculation contract.
+- When the artifact declares the standard `cs_return` convention, it is annualized as
+  `365 * mean(net_r)`. Do not apply that formula to an undeclared or differently versioned field.
 - `cs_max_drawdown` is a signed negative drawdown computed from log NAV. A more negative value is a
   deeper drawdown; do not silently convert it to a positive magnitude.
 - Compare Sharpe, return, and drawdown over the same declared window. Do not mix metrics from

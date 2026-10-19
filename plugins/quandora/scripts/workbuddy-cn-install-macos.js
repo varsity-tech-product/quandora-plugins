@@ -38,7 +38,9 @@ const EXPECTED_SKILLS = [
   "factor-analysis",
   "strategy-building",
   "strategy-analysis",
-  "paper-trading",
+  "portfolio-building",
+  "portfolio-analysis",
+  "portfolio-trading-analysis",
 ];
 const OAUTH_PROGRESS_STEPS = new Set([
   "oauth_runtime_ready",
@@ -442,7 +444,7 @@ function parseOAuthResult(stdout) {
   if (
     payload?.status !== "completed" ||
     payload?.authenticated !== true ||
-    payload?.protectedProbe !== "fm_status" ||
+    payload?.protectedProbe !== "get_factor_mining_status" ||
     !Number.isInteger(payload?.toolCount) ||
     payload.toolCount <= 0
   ) {
