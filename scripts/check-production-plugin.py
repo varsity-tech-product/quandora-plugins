@@ -905,6 +905,30 @@ def _check_connection_policy(errors: list[str], skill_files: dict[str, Path]) ->
     ):
         if marker not in text.replace("**", ""):
             errors.append(f"shared connection policy: missing recovery boundary {marker!r}")
+    codex_recovery = PLUGIN_ROOT / "references/codex-authorization-recovery.md"
+    if "](codex-authorization-recovery.md)" not in policy.read_text(encoding="utf-8"):
+        errors.append("shared connection policy: missing Codex authorization recovery link")
+    if not codex_recovery.is_file():
+        errors.append("missing bundled Codex authorization recovery guide")
+    else:
+        recovery_text = " ".join(codex_recovery.read_text(encoding="utf-8").split())
+        for marker in (
+            "`plugin_not_found`", "not an authorization denial",
+            "same desktop host and configuration context",
+            "Do not assume a global `codex` executable shares the desktop configuration",
+            "codex --version", "codex mcp get quandora --json", "codex mcp login --help",
+            "enabled", "Streamable HTTP", "https://mcp.quandora.ai/quant",
+            "codex mcp login quandora", "one foreground native OAuth flow",
+            "Do not ask the user to paste a recovery prompt or run the command",
+            "Respect a security denial; never try another execution path to bypass it",
+            "Only the user approves additional access",
+            "Do not repeat login when the callback succeeds but the grant remains unchanged",
+            "`list_strategy_folders`", "`list_strategies`", "`list_portfolio_folders`",
+            "`list_portfolios`", "Do not use a fixed tool count",
+            "Do not create a Portfolio or submit a backtest as a recovery probe",
+        ):
+            if marker not in recovery_text:
+                errors.append(f"Codex authorization recovery: missing boundary {marker!r}")
     guide = PLUGIN_ROOT / "references/plugin-update.md"
     if not guide.is_file():
         errors.append("missing bundled plugin update guide")

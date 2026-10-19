@@ -118,7 +118,8 @@ codex mcp get quandora --json
 
 Require an enabled remote Streamable HTTP server whose URL is exactly `https://mcp.quandora.ai/quant`. If the name resolves to another URL or a local command, stop and report the conflict.
 
-If it is not authenticated, start one foreground native OAuth flow:
+If it is not authenticated, or authenticated diagnostics confirm that the requested workflow
+needs permissions absent from the current grant, start one foreground native OAuth flow:
 
 ```text
 codex mcp login quandora
@@ -127,6 +128,13 @@ codex mcp login quandora
 The user's browser should open automatically. Tell the user that Quandora is ready for authorization, then wait while they complete any required sign-in or MFA and approve access. Do not operate the consent page for them and do not start a second login while the first is active.
 
 If the first attempt ends because of a timeout or a transient network error, retry once after it has fully exited. Do not use an API key or a local MCP server as a fallback.
+
+For an installed plugin with missing workflow tools, use the bundled
+[Codex native authorization recovery guide](../plugins/quandora/references/codex-authorization-recovery.md).
+The Agent performs the permitted same-host CLI checks and starts the flow; do not ask the user
+to paste a command or a second troubleshooting prompt. A management `plugin_not_found` is
+not proof that the existing MCP connection is missing. Security denials remain binding.
+Do not repeat marketplace or installation steps to repair an otherwise working connection.
 
 ## 5. Verify completion
 
@@ -148,6 +156,11 @@ Verify installation, authorization, and MCP tool availability separately. Confir
 6. Supported tool discovery succeeds and the protected read-only `get_factor_mining_status` call confirms authenticated account access.
 
 For the tool checks above, use the client's supported MCP tool discovery to verify that the plugin-managed server exposes the expected Quandora tools. Plugin inventory or a connected status alone is not proof of tool availability. Do not request or extract credentials to perform this check, and do not submit a factor, strategy, backtest, or trading task merely to test installation.
+
+When recovering an existing workflow, also verify its required permissions and a relevant
+authorized read using the bundled recovery guide. A successful status probe alone does not
+establish that Strategy or Portfolio tools are ready. Do not repeat login after a successful
+callback if the host still reports the old grant; report adoption/verification as pending.
 
 If the current task cannot load the newly installed tools, report installation and authorization as complete but tool verification as pending. Ask the user to start a new local desktop task and perform the read-only tool discovery and protected `get_factor_mining_status` probe there; do not claim full completion before it succeeds.
 

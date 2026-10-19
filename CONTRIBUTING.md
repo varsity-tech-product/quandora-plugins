@@ -25,6 +25,10 @@ All seven Skills share `plugins/quandora/references/connection-and-security.md`.
 The checks enforce automatic recovery first, bounded read retries, uncertain-mutation safety,
 once-per-session installed-metadata release checks, and no user-facing token refresh boilerplate.
 Regression tests mutate disposable package copies and require no database or credentials.
+The bundled Codex recovery guide must preserve same-host/production-target checks, the
+`plugin_not_found` capability fallback, user-only consent and post-login read verification.
+Static policy tests do not prove client OAuth recovery: record the actual host scenarios from
+`agent-install-guide/verification.md`, and leave unexecuted scenarios explicitly pending.
 
 Production publication promotes the reviewed seven-Skill payload from the staging repository while
 preserving the production package identity, MCP/OAuth endpoint, and supported host installation
