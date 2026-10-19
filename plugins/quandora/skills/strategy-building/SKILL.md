@@ -6,7 +6,7 @@ description: Builds one non-optimizer Quandora Strategy and lists available, eli
 # Quandora Strategy Building
 
 Follow [Connection and Security](../../references/connection-and-security.md) for automatic
-recovery first and version diagnostics on demand; involve users only when unavoidable.
+recovery and the once-per-session release check; preserve existing update authority.
 Follow [Research intent and evidence](../../references/research-workflows.md) for backtest/forward
 scope, capability-aware conclusions and authorization-preserving handoffs.
 

@@ -6,7 +6,7 @@ description: Analyzes an existing Quandora Portfolio backtest against its actual
 # Portfolio Analysis
 
 Follow [Connection and Security](../../references/connection-and-security.md) for automatic
-recovery first and version diagnostics on demand; involve users only when unavoidable.
+recovery and the once-per-session release check; preserve existing update authority.
 Use [Research intent and evidence](../../references/research-workflows.md) for scope, evidence
 availability and handoffs, and [Name discovery](../../references/object-discovery.md) for names.
 

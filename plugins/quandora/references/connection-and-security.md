@@ -1,7 +1,7 @@
 # Connection recovery and version diagnostics
 
 Use this shared policy for every Quandora Skill when a real connection failure occurs
-or an explicit version diagnostic is needed. Routine business tasks do not require a version probe.
+and for the first-use release check. A release check never blocks ordinary business work.
 
 ## Recover automatically
 
@@ -53,25 +53,19 @@ expiry using the same URL. Never construct, alter, persist, log, or summarize th
 Follow [Unified Result Bundle Download](result-bundle-download.md). This is not permission
 to call internal APIs or obtain credentials outside the host-managed connection.
 
-## Diagnose versions on demand
+## Check releases once per session
 
-Use `check_quandora_plugin_version` only for a requested version diagnostic or a plausible
-package/server mismatch; never as a mandatory entry probe. Read the actual installed version
-from host-provided installed-plugin metadata, or the `version` field of a manifest in the **same
-installed package** that supplied this Skill. From a Skill directory, `../..` is the package root;
-its `.codex-plugin/plugin.json`, `.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, and
-`.codebuddy-plugin/plugin.json` carry the version. Kimi repository installations also have
-`kimi.plugin.json` at the installed repository root. Prefer the current host's manifest; bundled
-manifests must agree.
+On first Quandora use in each session, read actual installed metadata from the **same installed package**
+that supplied this Skill. Call `check_quandora_plugin_version` once; reuse the result across all Skill
+handoffs. If installed metadata is unavailable, report unknown without guessing. Follow the reviewed
+[host update guide](plugin-update.md) for the legacy query fallback, explicit
+pins, update authority, marketplace refresh and host-specific installation/reload steps.
 
-Never hardcode a release label in Skill instructions. Do not substitute memory, a cache-folder
-name, the host application version, a remote manifest, or the server's latest version. If installed
-metadata is missing, unreadable, or inconsistent, skip the check without guessing or claiming the
-plugin is outdated; explain the limitation only if the user requested the diagnostic.
+A failed check is nonblocking. Do not repeat notices for the same recommended release in the session.
+Respect existing update authorization; a research request alone does not authorize installation.
+Never automatically downgrade or switch release channels. Preserve explicit version pins.
 
-Pass the known value verbatim as `installed_version`, treating it as an opaque release label.
-An unavailable or failed check must not block the business task or become a retry loop. A false
-`update_available` needs no unsolicited notice. A true value means a label mismatch, not proof
-that the installed package is older or unusable: briefly state the installed and recommended
-versions in the user's language and continue the task. A version result is not evidence of expired
-authentication and must not trigger installation, reload, or reauthorization on its own.
+The actual installed version comes from host metadata or this package's host manifest, never from
+memory, the cache folder name, a remote manifest or the server recommendation. Do not hardcode labels.
+Version advice never establishes business compatibility or expired OAuth. Do not reinstall for an
+OAuth failure. Installation is not proof that the current session loaded the updated Skills.
