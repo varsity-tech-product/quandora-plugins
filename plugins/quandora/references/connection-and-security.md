@@ -103,8 +103,10 @@ These paths are for the Agent only after automatic recovery cannot restore autho
 are not boilerplate instructions to display to the user. Use only capabilities actually available
 in the current host, and involve the user only for unavoidable interaction:
 
-- Codex CLI/TUI: `codex mcp login quandora`.
-- Codex Desktop: authorize the existing plugin-provided Quandora connector.
+- Codex Desktop and local CLI/TUI: follow [Codex native authorization recovery](codex-authorization-recovery.md).
+  A plugin-management `plugin_not_found` does not end recovery: check the permitted same-host
+  official CLI route before declaring it unavailable. The Agent starts the supported flow;
+  the user completes required sign-in/consent. Respect explicit security denials.
 - Kimi Code: `/mcp-config login plugin-quandora:quandora`.
 - Claude Code: authenticate `quandora` through `/mcp`.
 - Claude Desktop: authorize the existing `quandora` connector at

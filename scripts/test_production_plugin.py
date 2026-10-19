@@ -141,6 +141,42 @@ class ConnectionPolicyTests(unittest.TestCase):
         self.policy.unlink()
         self.rejected("missing shared connection recovery policy")
 
+    def test_codex_recovery_guide_is_bundled_and_routed(self):
+        guide = self.plugin / "references/codex-authorization-recovery.md"
+        self.assertTrue(guide.is_file())
+        original = self.policy.read_text()
+        self.policy.write_text(original.replace(
+            "](codex-authorization-recovery.md)", "](plugin-update.md)"))
+        self.rejected("missing Codex authorization recovery link")
+        self.policy.write_text(original)
+        guide.unlink()
+        self.rejected("missing bundled Codex authorization recovery guide")
+
+    def test_codex_recovery_preserves_capability_and_consent_boundaries(self):
+        guide = self.plugin / "references/codex-authorization-recovery.md"
+        cases = (
+            "`plugin_not_found`",
+            "same desktop host and configuration context",
+            "Do not assume a global `codex` executable shares the desktop configuration",
+            "codex mcp get quandora --json",
+            "https://mcp.quandora.ai/quant",
+            "codex mcp login quandora",
+            "one foreground native OAuth flow",
+            "Do not ask the user to paste a recovery prompt or run the command",
+            "Respect a security denial; never try another execution path to bypass it",
+            "Only the user approves additional access",
+            "Do not repeat login when the callback succeeds but the grant remains unchanged",
+            "Do not use a fixed tool count",
+            "Do not create a Portfolio or submit a backtest as a recovery probe",
+        )
+        original = guide.read_text()
+        for boundary in cases:
+            with self.subTest(boundary=boundary):
+                self.assertIn(boundary, original)
+                guide.write_text(original.replace(boundary, "Removed recovery boundary"))
+                self.rejected("Codex authorization recovery: missing boundary")
+                guide.write_text(original)
+
     def test_each_skill_routes_to_shared_policy(self):
         for skill in (self.plugin / "skills").glob("*/SKILL.md"):
             with self.subTest(skill=skill.parent.name):

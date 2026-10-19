@@ -218,6 +218,12 @@ Version diagnostics remain on demand and use the actual installed package metada
 See [Connection and Security](plugins/quandora/references/connection-and-security.md) for bounded retries, uncertain
 mutation recovery, and host-native fallbacks. Never request secrets or bypass MCP with internal HTTP.
 
+For missing workflow permissions in Codex Desktop, the Agent selects an available native
+authorization action or the verified same-host official CLI. A plugin-management lookup failure
+does not by itself end recovery. The user only handles required approval, sign-in or consent;
+the Agent verifies the needed reads and resumes the task. See
+[Codex authorization recovery](plugins/quandora/references/codex-authorization-recovery.md).
+
 ## License
 
 Licensed under the Apache License 2.0. See [LICENSE](LICENSE).

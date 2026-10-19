@@ -37,6 +37,29 @@ For issue #38, the editing environment is Linux: macOS/Windows clean-profile
 installation and OAuth scenarios remain **not executed**. Record actual run
 results in the issue/PR when those machines become available.
 
+## Codex workflow authorization recovery
+
+Test the bundled recovery guide with an ordinary Strategy/Portfolio request, without telling
+the Agent to log in or providing a recovery command. Use a disposable profile with a consented
+older grant for the missing-permissions scenario; do not modify a real user's token store.
+These cases require actual host acceptance separately from the repository's static checks.
+
+| Scenario | Expected outcome |
+| --- | --- |
+| Required permissions missing, native action available | Agent starts one native authorization flow; user only handles required approval/sign-in/consent |
+| `plugin_not_found`, same-host CLI permitted | Agent checks executable/context and existing production connection, then starts native CLI login without a second user prompt |
+| Desktop UI automation forbidden, CLI independently permitted | Use verified CLI without automating the desktop UI |
+| Authorization or local execution explicitly denied | Stop the denied operation; do not use a fallback to bypass policy |
+| No native action and no permitted same-host CLI | State the missing capability and verified manual entry if available; no claimed login attempt |
+| Different host/config, wrong endpoint or missing connection | Preserve configuration; no new connector or authorization against the wrong target |
+| User cancels or callback succeeds with unchanged grant | No login loop; report cancelled or grant-adoption failure distinctly |
+| Grant updated, current task catalog still old | Supported discovery refresh or host-required new task; no second OAuth consent |
+| Authorized restricted grant or empty folder | Validate required tool identities and reads, not a universal tool count |
+
+Record the host/CLI versions, package revision, available recovery capability, whether native
+login actually started/completed, and post-recovery read results. Never record credentials or
+authorization URLs. Discover write tools without invoking them as acceptance probes.
+
 ## Publishing and rollback
 
 These guides are fetched from `main`. A guide-only change takes effect when
