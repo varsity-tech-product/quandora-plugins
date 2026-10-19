@@ -16,8 +16,8 @@ first inspect the existing operation/status and reuse the original idempotency k
 canonical action supports retry. Never create a replacement backtest or Trading run, or repeat a
 start/stop with a new key, merely because a response was lost.
 
-Only when the host reports terminal authorization failure or explicitly requires fresh consent
-should the Agent initiate the supported host-native OAuth flow. Ask the user only to complete
+Only when the host reports terminal authorization failure or authenticated diagnostics
+require fresh consent should the Agent initiate the supported host-native OAuth flow. Ask the user only to complete
 unavoidable browser sign-in, MFA, consent, or host approval. Respect cancellation and security
 denials. Resume and verify the original workflow afterward. If the host provides no supported
 recovery capability, explain the concrete connection blocker without inventing commands or
@@ -46,8 +46,44 @@ Use explicit host authorization diagnostics when available; missing tool names a
 do not establish which case applies. An update notice saying the package is current
 does not resolve any of these cases.
 
-Try supported discovery/reconnect recovery once within the existing grant. If the host
-reports missing scopes or requires new consent, use the existing connector's native
+When available, call `get_factor_mining_status` once for this diagnosis. Its
+`connection.scope` is the current authenticated grant and its `tools` array is the
+server's scope- and deployment-filtered catalog. A successful probe with these fields
+is stronger evidence than a cached host catalog. Older servers may omit them; absence
+is unknown, not an empty grant. Do not expose connection IDs or raw scope lists as
+user-facing troubleshooting instructions.
+
+For the requested Strategy/Portfolio workflow, compare only the permissions it needs:
+
+| Required tool | Required scope |
+| --- | --- |
+| `list_strategy_folders`, `list_strategies` | `strategy:definitions.read` |
+| `create_strategy_folder`, `create_strategy` | `strategy:definitions.write` |
+| `list_strategy_backtests`, `get_strategy_backtest` | `strategy:backtests.read` |
+| `submit_strategy_backtest` | `strategy:backtests.create` |
+| `list_portfolios`, `get_portfolio` | `strategy:portfolios.read` |
+| `create_portfolio` | `strategy:portfolios.write` |
+| `list_portfolio_backtests`, `get_portfolio_backtest` | `strategy:portfolio_evaluations.read` |
+| `submit_portfolio_backtest` | `strategy:portfolio_evaluations.create` |
+
+If a required scope is missing, explain that this workflow needs additional permission
+and initiate one supported host-native reauthorization of the existing connector.
+Token refresh or a plugin update cannot add that permission. The host must request
+the needed current scopes explicitly or omit `scope` so the updated Auth server can
+prepare its current default consent set. Never send an empty scope. If the host keeps
+explicitly sending the old scope set, another identical login will not repair it;
+report that concrete host limitation instead of repeating sign-in or reinstalling.
+The authorization page shows the requested permissions and can reuse an existing
+browser login. Only the user may approve the additional access; preserve explicit
+restricted grants and do not demand unrelated permissions for an authorized read.
+
+If the needed tools are in the status catalog but absent from host discovery, refresh
+the host catalog within the current grant; do not request broader permissions. If the
+scope is already granted but the tool is absent from the server catalog, report a
+server exposure problem instead of asking for consent again.
+
+When diagnostics are inconclusive, try supported discovery/reconnect recovery once
+within the existing grant. If the host reports missing scopes or requires new consent, use the existing connector's native
 authorization flow below and let the user approve any additional permissions. Never
 silently broaden a grant. If this host exposes no recovery action, state which workflow
 tools remain absent and that the existing Quandora connector needs authorization/discovery
@@ -56,6 +92,10 @@ recovery; do not stop at a generic "tools unavailable" message or recommend rein
 After recovery, rediscover the required tools and verify a relevant authorized read
 before resuming the user's task. Do not report Portfolio creation as ready solely because
 the version check or Factor status succeeds. Keep unavailable client checks explicit.
+For Portfolio recovery, verify `list_strategy_folders` before resuming creation, and
+confirm that `create_portfolio` and `submit_portfolio_backtest` are discoverable without
+invoking them as probes. If status still reports the old grant after the OAuth callback,
+stop the recovery loop and report that the host has not adopted the new authorization.
 
 ## Host-native authorization fallback
 
