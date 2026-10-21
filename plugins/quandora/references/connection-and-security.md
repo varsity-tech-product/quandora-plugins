@@ -1,7 +1,12 @@
 # Connection recovery and version diagnostics
 
-Use this shared policy for every Quandora Skill when a real connection failure occurs
-and for the first-use release check. A release check never blocks ordinary business work.
+Use this shared policy for every Quandora Skill when a real connection failure occurs,
+for explicit account requests and for the first-use release check. A release check never blocks ordinary business work.
+
+Explicit requests to connect, open authorization, reauthorize or switch accounts route
+to [Quandora Account](../skills/account-connection/SKILL.md). They independently
+authorize initiating one supported native OAuth flow, even with a valid grant.
+Do not wait for a business call to fail. A status-only request stays read-only.
 
 ## Recover automatically
 
@@ -16,8 +21,9 @@ first inspect the existing operation/status and reuse the original idempotency k
 canonical action supports retry. Never create a replacement backtest or Trading run, or repeat a
 start/stop with a new key, merely because a response was lost.
 
-Only when the host reports terminal authorization failure or authenticated diagnostics
-require fresh consent should the Agent initiate the supported host-native OAuth flow. Ask the user only to complete
+For incidental failures, when the host reports terminal authorization failure or authenticated diagnostics
+require fresh consent, the Agent initiates the supported host-native OAuth flow. Explicit account
+requests are the independent trigger described above. Ask the user only to complete
 unavoidable browser sign-in, MFA, consent, or host approval. Respect cancellation and security
 denials. Resume and verify the original workflow afterward. If the host provides no supported
 recovery capability, explain the concrete connection blocker without inventing commands or

@@ -34,6 +34,7 @@ const AGENT_ROUTING_ENV_KEYS = [
   "SERVER__PORT",
 ];
 const EXPECTED_SKILLS = [
+  "account-connection",
   "factor-mining",
   "factor-analysis",
   "strategy-building",

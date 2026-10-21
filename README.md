@@ -17,6 +17,7 @@ Portfolio research, Simulation management and read-only Live analysis.
 
 | Skill | User goal |
 | --- | --- |
+| Quandora Account | Connect, reauthorize, switch accounts, and verify the active identity. |
 | Factor Mining | Turn a research hypothesis into a validated Factor and backtest. |
 | Factor Analysis | Diagnose exact Factor evidence and propose controlled improvements. |
 | Strategy Building | Select eligible Factors, create or revise a Strategy, and submit requested backtests. |
@@ -25,8 +26,9 @@ Portfolio research, Simulation management and read-only Live analysis.
 | Portfolio Analysis | Evaluate an existing Portfolio backtest against its actual members and declared baselines. |
 | Portfolio Trading Analysis | Manage Simulation accounts/runs and analyze Simulation or real Live forward evidence. |
 
-The plugin exposes the same seven Skill directories to each supported host. The first six cover
-backtest research; the seventh covers forward-test management and analysis. Analysis-only requests
+The plugin exposes eight Skill directories to each supported host: account management, six
+backtest research workflows and one forward-test workflow. Account authorization uses the
+host capabilities actually available; the bundled CLI fallback is specific to Codex. Analysis-only requests
 are read-only. Explicit Simulation management uses supported writes; real Live remains read-only.
 Authentication, tool schemas, admission and financial facts remain server-owned. See
 [research workflows and evidence](plugins/quandora/references/research-workflows.md).
@@ -178,6 +180,13 @@ Start a new session, authorize the plugin-provided MCP server, and verify the co
 Complete authorization in the browser, then start a new session before invoking Factor Mining, Factor Analysis, Strategy Building, Strategy Analysis, or Paper Trading.
 
 ## Use
+
+In Codex, select **Quandora Account** from the Skill picker or reference
+`$account-connection` and ask to show the current account, open authorization,
+reauthorize, or switch accounts. Explicit authorization requests start a new native
+flow even when already connected. You complete browser sign-in and consent; the
+agent verifies the active account afterward. See the
+[account workflow](plugins/quandora/skills/account-connection/SKILL.md).
 
 Ask naturally or invoke a Skill explicitly when the host supports Skill commands:
 

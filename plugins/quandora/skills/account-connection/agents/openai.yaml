@@ -1,0 +1,7 @@
+interface:
+  display_name: "Quandora Account"
+  short_description: "Connect, switch, and verify your Quandora account"
+  icon_small: "../../assets/quandora.png"
+  icon_large: "../../assets/quandora.png"
+  brand_color: "#F28C00"
+  default_prompt: "Use $account-connection to connect my Quandora account and verify which account is active."

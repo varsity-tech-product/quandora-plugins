@@ -21,8 +21,8 @@ the installation guide must be updated together when their contents change.
 
 The check is database-free and must remain suitable for pull-request CI.
 
-All seven Skills share `plugins/quandora/references/connection-and-security.md`.
-The checks enforce automatic recovery first, bounded read retries, uncertain-mutation safety,
+All eight Skills share `plugins/quandora/references/connection-and-security.md`.
+The checks enforce automatic recovery first for incidental failures, bounded read retries, uncertain-mutation safety,
 once-per-session installed-metadata release checks, and no user-facing token refresh boilerplate.
 Regression tests mutate disposable package copies and require no database or credentials.
 The bundled Codex recovery guide must preserve same-host/production-target checks, the
@@ -30,7 +30,13 @@ The bundled Codex recovery guide must preserve same-host/production-target check
 Static policy tests do not prove client OAuth recovery: record the actual host scenarios from
 `agent-install-guide/verification.md`, and leave unexecuted scenarios explicitly pending.
 
-Production publication promotes the reviewed seven-Skill payload from the staging repository while
+Account Connection intentionally has no authenticated MCP dependency so it loads before
+login, and no research-workflow prerequisite. Deploy Auth's additive `get_quandora_account`
+tool before recommending this package. Follow
+`plugins/quandora/references/account-connection-verification.md` for current-account,
+explicit reauthorization, two-account switching, cancellation and host-adoption checks.
+
+Production publication promotes the reviewed eight-Skill payload from the staging repository while
 preserving the production package identity, MCP/OAuth endpoint, and supported host installation
 guides. Update every manifest version together. Publish and verify the package before advancing
 the production MCP recommended-version label. Existing hosts must update/reload their package;
