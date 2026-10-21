@@ -45,7 +45,7 @@ trap quandora_cleanup EXIT
   --output "$quandora_bootstrap" \
   'https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/plugins/quandora/scripts/workbuddy-cn-bootstrap-macos.sh' || exit 1
 quandora_bootstrap_sha=$(/usr/bin/shasum -a 256 "$quandora_bootstrap" | /usr/bin/awk '{print $1}')
-[ "$quandora_bootstrap_sha" = '9865df92bc95535a69876ec85200880c6e4761eee03f045c4cd954893297a389' ] || { echo 'Quandora bootstrap integrity check failed.' >&2; exit 1; }
+[ "$quandora_bootstrap_sha" = 'fd1201eb5c9112e3cd1e5c9be382917e92a59b04c1f0ba5b9f6b869e098b3348' ] || { echo 'Quandora bootstrap integrity check failed.' >&2; exit 1; }
 /bin/sh "$quandora_bootstrap"
 ```
 

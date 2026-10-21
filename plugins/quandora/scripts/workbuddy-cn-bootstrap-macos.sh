@@ -7,7 +7,7 @@ readonly BUNDLE_ID='com.tencent.workbuddy.mac'
 readonly TEAM_ID='FN2V63AD2J'
 readonly URL_SCHEME='workbuddy'
 readonly SCRIPT_BASE_DEFAULT='https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/plugins/quandora/scripts'
-readonly INSTALLER_SHA256='19a25e59fe401b7ac339295e159dab42a96c70b67711905db90d6314314fa187'
+readonly INSTALLER_SHA256='b0b50488ed11f224d620bb3af3ccc23c745300b4d6121676ecc2a570adcf70a2'
 readonly OAUTH_SHA256='65db30362772d399a95bd278810c027a39efddf6e70f80bea475d851d4b8c51b'
 readonly MAX_SCRIPT_BYTES=1048576
 

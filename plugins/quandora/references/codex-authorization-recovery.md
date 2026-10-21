@@ -1,8 +1,10 @@
 # Codex native authorization recovery
 
 Use this procedure after the [shared connection policy](connection-and-security.md)
-establishes missing permissions for the requested workflow or terminal authorization failure.
-If permissions are already present, recover discovery or report server exposure instead.
+establishes an explicit request to connect, reauthorize or switch accounts, missing
+permissions for the requested workflow, or terminal authorization failure.
+For an explicit request, start authorization even if the existing grant is valid.
+For incidental failures with permissions already present, recover discovery or report server exposure instead.
 The Agent initiates recovery within the requested task and the host's permissions.
 Do not ask the user to paste a recovery prompt or run the command when the Agent can run it.
 Only the user approves additional access through browser consent or a required host approval.
@@ -48,7 +50,8 @@ If the executable/context cannot be established, report this as an unverified lo
 
 ## Start once and observe the result
 
-For a verified connection with a diagnosed need for authorization, the Agent starts one foreground native OAuth flow:
+For a verified connection with an explicit request or a diagnosed need for authorization,
+the Agent starts one foreground native OAuth flow:
 
 ```text
 codex mcp login quandora
@@ -64,7 +67,18 @@ authorization URLs and callback codes out of summaries and saved logs. Observe t
 command until it exits. Do not operate consent for the user, start concurrent logins,
 or claim that starting the command means authorization succeeded. Respect cancellation.
 
+If the host reports missing or mismatched OAuth issuer information, stop this attempt
+and retain the safe error category and resolved host/CLI versions. Do not disable
+issuer validation, rewrite the callback, or reinstall the plugin as a repair.
+Report authorization incomplete; a host/server compatibility fix requires separate
+diagnosis. A native command being available does not prove that OAuth will succeed.
+
 ## Verify and resume
+
+For account requests, follow [Quandora Account](../skills/account-connection/SKILL.md)
+and make a fresh `get_quandora_account({})` call. Do not claim connection or account
+switch success from a callback alone. Keep business calls paused until the intended
+account is verified. A missing identity tool is an unavailable verification capability.
 
 After a successful callback, use supported MCP discovery and authenticated status diagnostics
 to confirm that the new authorization is in use. Do not repeat login when the callback succeeds but the grant remains unchanged.

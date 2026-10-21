@@ -1,12 +1,13 @@
 # Quandora
 
-This package contains seven user-facing Skills and one authenticated production MCP connection.
+This package contains eight user-facing Skills and one authenticated production MCP connection.
 Use it for production research and Simulation workflows. Real Live evidence is read-only through MCP.
 
 ## Skills and responsibility
 
 | Skill | Owns | Routes elsewhere |
 | --- | --- | --- |
+| `account-connection` | Explicit login, reauthorization, account switching and current identity | Research and Trading operations |
 | `factor-mining` | Hypothesis, Factor source/validation, authorized backtests, history and export | Deep Factor diagnosis |
 | `factor-analysis` | Existing Factor evidence, validity and controlled experiment design | Authoring and submission |
 | `strategy-building` | Eligible Factors, immutable Strategy definitions and requested backtests | Deep diagnosis and multi-Strategy composition |
@@ -15,7 +16,7 @@ Use it for production research and Simulation workflows. Real Live evidence is r
 | `portfolio-analysis` | Actual-member Portfolio backtest comparisons and incremental-value diagnosis | Selection/creation, sharing and forward evidence |
 | `portfolio-trading-analysis` | Simulation account/run management and Simulation/real Live forward analysis | Backtest authoring and all real Live writes |
 
-The first six Skills cover backtests; the seventh covers forward tests. The
+Alongside account management, six Skills cover backtests and one covers forward tests. The
 [research intent and evidence contract](references/research-workflows.md) defines request modes,
 capability-aware analysis and handoffs. Design-only requests do not create resources. Exact supplied
 members/weights are not silently optimized. Analysis suggestions do not authorize experiments;
@@ -41,9 +42,11 @@ Supported hosts load the plugin's `quandora` remote HTTP MCP declaration. Comple
 host-native browser authorization flow for initial setup; reload tools only when the host requires it.
 Do not create a local MCP server or paste credentials.
 
-The Agent lets the host refresh the connection automatically first, then uses supported reconnect
+For incidental failures, the Agent lets the host refresh the connection automatically first, then uses supported reconnect
 or tool discovery and resumes the task. User interaction is limited to unavoidable sign-in or
-consent after terminal authorization failure or an explicit host consent requirement. Do not
+consent after terminal authorization failure, a host consent requirement, or an explicit user
+request to connect, reauthorize or switch accounts. Use [Quandora Account](skills/account-connection/SKILL.md)
+for these requests; verify the active identity after login. Do not
 reinstall a working plugin, display token lifetimes, or ask users to run refresh commands.
 Check the release once per session using actual installed package metadata, then follow the
 [host update guide](references/plugin-update.md) within existing update authority.

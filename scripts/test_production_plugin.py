@@ -43,12 +43,19 @@ class ConnectionPolicyTests(unittest.TestCase):
         self.append(self.policy, "Use `read_strategy_result_bundle_chunk` after HTTP fails.")
         self.rejected("unified Result Bundle export tool")
 
-    def test_seven_research_and_trading_entry_points(self):
+    def test_account_and_seven_research_and_trading_entry_points(self):
         self.assertEqual(
             {p.parent.name for p in (self.plugin / "skills").glob("*/SKILL.md")},
-            {"factor-mining", "factor-analysis", "strategy-building", "strategy-analysis",
+            {"account-connection", "factor-mining", "factor-analysis", "strategy-building", "strategy-analysis",
              "portfolio-building", "portfolio-analysis", "portfolio-trading-analysis"},
         )
+
+    def test_account_skill_cannot_require_authentication_to_load(self):
+        self.append(
+            self.plugin / "skills/account-connection/agents/openai.yaml",
+            'dependencies:\n  tools:\n    - type: "mcp"\n      value: "quandora"',
+        )
+        self.rejected("account-connection must load before MCP authentication")
 
     def test_missing_portfolio_analysis(self):
         (self.plugin / "skills/portfolio-analysis/SKILL.md").unlink()
@@ -66,8 +73,10 @@ class ConnectionPolicyTests(unittest.TestCase):
         (self.plugin / "references/research-workflows.md").unlink()
         self.rejected("missing shared research intent/evidence contract")
 
-    def test_each_skill_routes_to_research_contract(self):
+    def test_each_research_skill_routes_to_research_contract(self):
         for skill in (self.plugin / "skills").glob("*/SKILL.md"):
+            if skill.parent.name == "account-connection":
+                continue
             with self.subTest(skill=skill.parent.name):
                 original = skill.read_text()
                 skill.write_text(original.replace("../../references/research-workflows.md", "../../README.md"))

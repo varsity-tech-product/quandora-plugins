@@ -14,6 +14,7 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 PLUGIN_ROOT = REPOSITORY_ROOT / "plugins" / "quandora"
 SKILLS_ROOT = PLUGIN_ROOT / "skills"
 REQUIRED_SKILLS = {
+    "account-connection",
     "factor-analysis",
     "factor-mining",
     "portfolio-trading-analysis",
@@ -142,6 +143,7 @@ INTRADAY_CONTRACT_MARKERS = {
     ),
 }
 CANONICAL_TOOL_OWNERS = {
+    "account-connection": {"get_quandora_account"},
     "factor-mining": {
         "download_result_bundle",
         "get_factor_mining_status",
@@ -599,7 +601,9 @@ def _check_skills(
                 errors.append(
                     f"{skill_name}/agents/openai.yaml: default prompt must name ${skill_name}"
                 )
-            if 'value: "quandora"' not in agent_text:
+            if skill_name == "account-connection" and "dependencies:" in agent_text:
+                errors.append("account-connection must load before MCP authentication")
+            if skill_name != "account-connection" and 'value: "quandora"' not in agent_text:
                 errors.append(
                     f"{skill_name}/agents/openai.yaml: missing Quandora MCP dependency"
                 )
@@ -806,6 +810,8 @@ def _check_research_workflows(errors: list[str], skill_files: dict[str, Path]) -
         errors.append("missing shared research intent/evidence contract")
         return
     for name, path in skill_files.items():
+        if name == "account-connection":
+            continue
         if "](../../references/research-workflows.md)" not in path.read_text(encoding="utf-8"):
             errors.append(f"{name}: missing shared research intent/evidence link")
 
