@@ -1,0 +1,21 @@
+{
+  "name": "Quandora",
+  "name_zh": "Quandora",
+  "name_en": "Quandora",
+  "description": "Build, test, analyze, and simulate quantitative research with Quandora.",
+  "description_zh": "使用 Quandora 创建、回测和分析量化因子与策略，并运行模拟交易。",
+  "description_en": "Build and analyze quantitative factors and strategies, then run simulated trades with Quandora.",
+  "source": "quandora",
+  "type": "mcp",
+  "examples_zh": [
+    "研究一个新的量化因子并回测",
+    "使用可选因子创建并分析一个策略",
+    "查看当前模拟交易的表现"
+  ],
+  "examples_en": [
+    "Research and backtest a new quantitative factor",
+    "Build and analyze a strategy from eligible factors",
+    "Review the performance of my current simulated trades"
+  ],
+  "minWorkbuddyVersion": "4.24.0"
+}

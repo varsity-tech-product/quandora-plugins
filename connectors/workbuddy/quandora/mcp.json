@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "quandora": {
+      "type": "streamableHttp",
+      "url": "https://mcp.quandora.ai/quant",
+      "timeout": 30000
+    }
+  }
+}
