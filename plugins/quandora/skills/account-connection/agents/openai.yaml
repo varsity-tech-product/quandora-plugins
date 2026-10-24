@@ -1,6 +1,6 @@
 interface:
   display_name: "Quandora Account"
-  short_description: "Connect, switch, and verify your Quandora account"
+  short_description: "Connect your Quandora account or report a problem"
   icon_small: "../../assets/quandora.png"
   icon_large: "../../assets/quandora.png"
   brand_color: "#F28C00"
