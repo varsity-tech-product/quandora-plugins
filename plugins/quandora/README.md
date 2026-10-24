@@ -7,7 +7,7 @@ Use it for production research and Simulation workflows. Real Live evidence is r
 
 | Skill | Owns | Routes elsewhere |
 | --- | --- | --- |
-| `account-connection` | Explicit login, reauthorization, account switching and current identity | Research and Trading operations |
+| `account-connection` | Explicit login, reauthorization, account switching, current identity and problem reports to the Quandora team | Research and Trading operations |
 | `factor-mining` | Hypothesis, Factor source/validation, authorized backtests, history and export | Deep Factor diagnosis |
 | `factor-analysis` | Existing Factor evidence, validity and controlled experiment design | Authoring and submission |
 | `strategy-building` | Eligible Factors, immutable Strategy definitions and requested backtests | Deep diagnosis and multi-Strategy composition |
