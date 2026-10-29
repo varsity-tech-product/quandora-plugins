@@ -4,7 +4,7 @@ Load this reference only after a canonical StrategyRun is terminal and archive s
 bundle metadata, or when the user explicitly requests that Result Bundle.
 
 Call `download_result_bundle` with `kind: "strategy"` and `id` set to the exact `strategy_run_id`. Never
-substitute a Folder, definition, or internal command identifier. Treat the immutable metadata and manifest as
+substitute a Family, definition, or internal command identifier. Treat the immutable metadata and manifest as
 authoritative; readable `available` and persisted readable `partial` snapshots may be delivered.
 
 If the initial response is `pending` with `bundle_materializing`, wait at most ten seconds and make

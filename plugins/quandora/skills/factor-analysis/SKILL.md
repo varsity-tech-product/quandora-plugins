@@ -111,8 +111,8 @@ the user supplies only a caller-owned factor name, a vague reference, or asks fo
 2. Match only trustworthy returned identity and metadata. Do not guess across ambiguous names; ask
    the user to choose when more than one plausible factor remains. Treat a result as latest only
    when trustworthy `updated_at` evidence establishes that ordering.
-3. For the selected `factor_id`, call `get_factor_family_history` with `view: "runs"` and use the exact terminal
-   `job_id` for the intended version and run.
+3. Call `get_factor_family_history` with the selected `factor_family_id` and `view: "runs"`, and
+   use the exact terminal `job_id` for the intended version and run.
 4. Never substitute a factor id, version id, branch id, session id, or display name for `job_id`.
 
 Use an active official `factor_id` only with the official evidence actions. Never send it to an

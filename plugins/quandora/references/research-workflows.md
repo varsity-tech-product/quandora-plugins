@@ -5,6 +5,10 @@ Portfolio Analysis work on backtests. Portfolio Trading Analysis owns forward-te
 and analysis. A Factor supplies a prediction; a Strategy turns admitted Factors into trading
 rules; a Portfolio allocates initial capital between exact Strategies.
 
+A Family (FactorFamily, StrategyFamily, PortfolioFamily) is the immutable lineage tree that holds
+each version of one idea. A LibraryFolder is only the user's classification of finished works;
+moving a work between LibraryFolders never changes its Family.
+
 ## Select the workflow by intent
 
 | User intent | Owner | Action boundary |
@@ -33,7 +37,7 @@ full research workflow. Scale the answer and evidence reads to the question.
 
 Carry the user goal and authorized actions together with:
 
-- exact Folder, immutable definition, research Run and account/Trading Run identities as applicable;
+- exact Family, immutable definition, research Run and account/Trading Run identities as applicable;
 - actual Factor and Strategy lineage, owner/Official/Publication/Share context and read selectors;
 - observation window, data cutoff, sampling frequency, valuation time and evidence readiness;
 - units, net/gross returns, fees/funding, initial-capital allocation and exposure conventions;

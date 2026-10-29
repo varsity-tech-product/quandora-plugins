@@ -10,7 +10,7 @@ and bounded six-chart numerical evidence. It does not depend on a user-local arc
   Read `get_strategy(strategy_id=...)` for `strategy.specification` and
   `strategy.factor_references`; use retained artifacts for effective execution parameters.
 - `get_strategy_backtest_artifact` and `get_strategy_backtest_analysis_data` must remain correlated to the exact selected `strategy_run_id`.
-- Never substitute a downstream run id, Strategy id, Folder id, name, local filename, or
+- Never substitute a downstream run id, Strategy id, Family id, name, local filename, or
   chart identity for the public Strategy run id.
 
 ## Core Artifacts

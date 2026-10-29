@@ -63,7 +63,7 @@ Use these primary analysis actions:
 - `get_strategy_backtest_analysis_data`
 - `get_community_strategy_research`, `read_community_research_artifact` for authorized Publication context only.
 
-Read-only discovery uses `list_strategy_folders`, `list_strategies`,
+Read-only discovery uses `list_strategy_families`, `list_strategies`,
 `list_strategy_backtests`, `get_strategy_backtest`, and `get_strategy`. They locate one canonical
 Run; they do not authorize a
 continue, rerun, archive, or other Strategy mutation.
@@ -83,10 +83,10 @@ The owner workflow below applies only to owned results.
 
 Prefer an exact `strategy_run_id` supplied by the user or returned in the conversation.
 Pass it as `strategy_run_id` to every canonical Run, artifact, analysis, and export action.
-Internal command IDs, Folder IDs, and immutable Strategy IDs are different selectors.
+Internal command IDs, Family IDs, and immutable Strategy IDs are different selectors.
 
-If no Run is known, resolve the Strategy through `list_strategy_folders` and
-`list_strategies(strategy_folder_id=...)`, then call
+If no Run is known, resolve the Strategy through `list_strategy_families` and
+`list_strategies(strategy_family_id=...)`, then call
 `list_strategy_backtests(strategy_id=..., page_size=...)`. These lists do not accept `query`
 or `filters`. Select using returned names, identities, timestamps, and states. Ask only if more
 than one plausible target remains. Preserve parent selectors/page size and copy `next_page_token`

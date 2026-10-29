@@ -20,7 +20,7 @@ adding confirmation at every handoff. Analysis alone does not authorize an exper
 
 - `get_portfolio_backtest_result`: canonical aggregate result and safe failure.
 - `get_portfolio_backtest`, `get_portfolio`: exact run, actual source lineage and immutable definition.
-- `list_portfolio_folders`, `get_portfolio_folder`, `list_portfolios`, `list_portfolio_backtests`:
+- `list_portfolio_families`, `get_portfolio_family`, `list_portfolios`, `list_portfolio_backtests`:
   bounded discovery only when the exact target is unknown.
 - `get_strategy`, `get_strategy_backtest`, `get_strategy_backtest_artifact`,
   `get_strategy_backtest_analysis_data`: authorized owner member evidence through Strategy Analysis.
@@ -38,7 +38,7 @@ artifact code or require local files, archive extraction or a Python runtime to 
 ## Establish the exact research snapshot
 
 Use the supplied `portfolio_run_id`, or resolve the intended immutable `portfolio_id` and its
-persisted history. Portfolio Folder/Run lists do not accept `query` or `filters`; do not invent
+persisted history. PortfolioFamily/Run lists do not accept `query` or `filters`; do not invent
 them. Preserve parent selectors, page size and continuation tokens byte-for-byte. Ambiguous
 names or multiple plausible immutable versions require disambiguation, not a guess at latest.
 

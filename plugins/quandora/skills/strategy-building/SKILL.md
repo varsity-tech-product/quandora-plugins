@@ -11,7 +11,7 @@ Follow [Research intent and evidence](../../references/research-workflows.md) fo
 scope, capability-aware conclusions and authorization-preserving handoffs.
 
 Use the authenticated `quandora` connection for one canonical lifecycle:
-StrategyFolder → immutable Strategy → StrategyRun. Creating a definition and submitting its Run
+StrategyFamily → immutable Strategy → StrategyRun. Creating a definition and submitting its Run
 are distinct calls within the same authorized task. There is no alternate ad-hoc submission path.
 
 Route one to five exact Strategies to `$portfolio-building`, simulated execution and observation
@@ -25,7 +25,7 @@ For named objects, follow [Name discovery](../../references/object-discovery.md)
 
 - Factor selection: `get_strategy_capabilities`, `list_eligible_strategy_factors`,
   `get_eligible_strategy_factor`.
-- Folders: `create_strategy_folder`, `list_strategy_folders`, `get_strategy_folder`.
+- Families: `create_strategy_family`, `list_strategy_families`, `get_strategy_family`.
 - Immutable definitions: `create_strategy`, `list_strategies`, `get_strategy`.
 - Runs: `submit_strategy_backtest`, `list_strategy_backtests`, `get_strategy_backtest`.
 - Export: `download_result_bundle` with `kind: "strategy"` and the canonical StrategyRun ID.
@@ -44,7 +44,7 @@ appear with `strategy_use.status=needs_optimization` and is not selectable merel
 listed. Report that state without adding local grade thresholds or silently substituting Factors.
 
 For a Strategy request, follow [Canonical Strategy Workflow](references/ordinary-strategy-workflow.md).
-Resolve exact admitted Factors, prepare one named immutable definition, create its Folder if
+Resolve exact admitted Factors, prepare one named immutable definition, create its Family if
 needed, then submit a Run with a fresh `client_request_id` when requested. A request to build and backtest covers both calls;
 do not add a confirmation at each step or Skill handoff. Ask only for unresolved material choices
 or authorization. Never upload a local plugin directly to Strategy: use `$factor-mining`, finish
@@ -63,9 +63,9 @@ For a changed definition or another Run of an existing Strategy, follow
 ## Observe and Deliver
 
 Copy `run.strategy_run_id` from submission and read it with `get_strategy_backtest`.
-For history, `list_strategy_backtests` requires the exact `strategy_id`. Folder and Run lists use
-`page_size`/`page_token`; they do not accept `query` or `filters`. Definitions in a Folder are read
-with `list_strategies(strategy_folder_id=...)`. Preserve the returned identities and states.
+For history, `list_strategy_backtests` requires the exact `strategy_id`. Family and Run lists use
+`page_size`/`page_token`; they do not accept `query` or `filters`. Definitions in a Family are read
+with `list_strategies(strategy_family_id=...)`. Preserve the returned identities and states.
 
 An ambiguous write is not permission to submit a replacement or change its payload. In particular,
 `invalid_backend_response` after submit leaves acceptance uncertain even when `retryable=false`:
@@ -95,7 +95,7 @@ the exact association for `$portfolio-trading-analysis` to read. Do not start an
 
 ## Final Response
 
-State the Strategy name, Folder/definition/Run identities when useful, observed Run/archive state,
+State the Strategy name, Family/definition/Run identities when useful, observed Run/archive state,
 safe diagnostics, and verified export path when saved. Preserve missing evidence as unavailable.
 Use the user's language while preserving tool names, schema fields, and returned identifiers.
 

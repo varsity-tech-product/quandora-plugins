@@ -42,13 +42,13 @@ for custom weighting use `weighting.mode: "custom"` and finite positive `weighti
 totaling 1, aligned in order with the exact selected `factor_references`.
 Never send `portfolio_optimizer`, including null.
 
-For a new Folder, call `create_strategy_folder` with `name`, `specification`, and
-`factor_references`. The response contains `strategy_folder.strategy_folder_id` and the first
+For a new Family, call `create_strategy_family` with `name`, `specification`, and
+`factor_references`. The response contains `strategy_family.strategy_family_id` and the first
 immutable `strategy.strategy_id`. They are different resources; creation does not itself imply
 a Run exists. Preserve the complete returned Strategy definition.
 
-For an existing Folder and a changed definition, read the exact base with `get_strategy`, then
-call `create_strategy` with `strategy_folder_id`, `base_strategy_id`, the complete new
+For an existing Family and a changed definition, read the exact base with `get_strategy`, then
+call `create_strategy` with `strategy_family_id`, `base_strategy_id`, the complete new
 `specification`, and `factor_references`. The base remains unchanged.
 
 ## Submit and Observe

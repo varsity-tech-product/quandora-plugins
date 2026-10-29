@@ -73,7 +73,9 @@ task identity as `filters`; omit them only for a browse request. Show one bounde
 hydrate every row. A failed list is not an empty inventory and does not authorize a history
 fallback.
 
-Ask the user to select one exact returned `factor_id`, then call `get_factor_family_history`.
+Ask the user to select one exact returned `factor_family_id`, then call `get_factor_family_history`
+with it as `factor_family_id`. To narrow the `versions` or `runs` view to one immutable Factor, also
+pass that row's `factor_version_id` as `factor_id`.
 Default to `summary`; request only the needed `branches`, `versions`, or `runs` view. Preserve
 opaque IDs and page tokens exactly. Never substitute a job, run, plugin, session, Strategy
 admission, or cached identifier. History is read-only and does not authorize source editing or
@@ -112,14 +114,14 @@ recovery action. Never silently change the user's task, category, thesis, data, 
 
 ## Reverse An Existing Owned Factor
 
-An explicit reversal request authorizes creating one sibling Factor in the same Folder and
+An explicit reversal request authorizes creating one sibling Factor in the same FactorFamily and
 submitting its independent backtest. Do not ask again when that exact operation is already
 approved. Analysis suggestions alone do not authorize reversal.
 
 Use one exact completed row from `get_factor_family_history` with `view: "runs"`.
 Pass that row's `factor_version_id` as `reverse_factor.factor_id` and its `job_id` as
-`factor_run_id`. The history top-level `factor_id` is the Folder; do not pass it as the immutable
-Factor. Official publication access does not grant reversal permission.
+`factor_run_id`. The history's `factor_family_id` names the FactorFamily; do not pass it as the
+immutable Factor. Official publication access does not grant reversal permission.
 
 Call `get_factor_reversal` with the immutable Factor ID to read an existing relationship. A null
 relation does not prove that no request is in flight. Do not reverse a reversed endpoint or

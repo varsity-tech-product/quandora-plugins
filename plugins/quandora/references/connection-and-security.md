@@ -42,7 +42,7 @@ user's workflow. A current plugin package cannot add permissions to an existing 
 
 Before declaring a workflow unavailable, use the host's supported tool search/discovery
 and complete any discovery pagination. Compare the resulting catalog with the relevant
-Skill's required tools. For Portfolio creation this includes `list_strategy_folders`,
+Skill's required tools. For Portfolio creation this includes `list_strategy_families`,
 `list_strategies`, `create_portfolio` and `submit_portfolio_backtest`. Do not call a mutation
 merely to check availability.
 
@@ -63,8 +63,8 @@ For the requested Strategy/Portfolio workflow, compare only the permissions it n
 
 | Required tool | Required scope |
 | --- | --- |
-| `list_strategy_folders`, `list_strategies` | `strategy:definitions.read` |
-| `create_strategy_folder`, `create_strategy` | `strategy:definitions.write` |
+| `list_strategy_families`, `list_strategies` | `strategy:definitions.read` |
+| `create_strategy_family`, `create_strategy` | `strategy:definitions.write` |
 | `list_strategy_backtests`, `get_strategy_backtest` | `strategy:backtests.read` |
 | `submit_strategy_backtest` | `strategy:backtests.create` |
 | `list_portfolios`, `get_portfolio` | `strategy:portfolios.read` |
@@ -98,7 +98,7 @@ recovery; do not stop at a generic "tools unavailable" message or recommend rein
 After recovery, rediscover the required tools and verify a relevant authorized read
 before resuming the user's task. Do not report Portfolio creation as ready solely because
 the version check or Factor status succeeds. Keep unavailable client checks explicit.
-For Portfolio recovery, verify `list_strategy_folders` before resuming creation, and
+For Portfolio recovery, verify `list_strategy_families` before resuming creation, and
 confirm that `create_portfolio` and `submit_portfolio_backtest` are discoverable without
 invoking them as probes. If status still reports the old grant after the OAuth callback,
 stop the recovery loop and report that the host has not adopted the new authorization.

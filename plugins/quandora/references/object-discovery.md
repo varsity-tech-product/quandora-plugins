@@ -15,8 +15,8 @@ latest version. Use existing context to distinguish candidates; ask a short
 clarification only when the intended target remains ambiguous.
 
 Continue with the returned `read_tool` and `read_arguments`. In particular, owned
-Factor history uses the family as `factor_id` and the immutable object as
-`version_id`; copy the supplied selector pair instead of swapping IDs. Official
+Factor history uses the FactorFamily as `factor_family_id` and the immutable
+Factor as `factor_id`; copy the supplied selector pair instead of swapping IDs. Official
 Factors use their advertised selector. Shared children remain in their root
 Publication/Share read context and are not Mine assets or independently reusable
 Factor/Strategy inputs. Search does not grant source-code access or execution

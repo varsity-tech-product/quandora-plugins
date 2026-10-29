@@ -11,7 +11,7 @@ Follow [Research intent and evidence](../../references/research-workflows.md) fo
 scope, capability-aware conclusions and authorization-preserving handoffs.
 
 Use the authenticated `quandora` MCP connection for
-PortfolioFolder → immutable Portfolio → PortfolioRun. Route Strategy authoring to
+PortfolioFamily → immutable Portfolio → PortfolioRun. Route Strategy authoring to
 `$strategy-building`, single-Strategy diagnosis to `$strategy-analysis`, Portfolio result diagnosis to
 `$portfolio-analysis`, and Trading lifecycle
 and observations to `$portfolio-trading-analysis`. A one-component Portfolio supports one Strategy.
@@ -22,7 +22,7 @@ For named objects, follow [Name discovery](../../references/object-discovery.md)
 
 ## Tools
 
-- Folders: `create_portfolio_folder`, `list_portfolio_folders`, `get_portfolio_folder`.
+- Families: `create_portfolio_family`, `list_portfolio_families`, `get_portfolio_family`.
 - Immutable definitions: `create_portfolio`, `list_portfolios`, `get_portfolio`.
 - Runs: `submit_portfolio_backtest`, `list_portfolio_backtests`, `get_portfolio_backtest`,
   `get_portfolio_backtest_result`.
@@ -56,10 +56,10 @@ After a requested backtest, use `$portfolio-analysis` for an evidence-based hist
 
 ## Discover and Compose
 
-`list_portfolio_folders` accepts `page_size`, `page_token`, and `include_archived`.
+`list_portfolio_families` accepts `page_size`, `page_token`, and `include_archived`.
 It does not accept `query` or `filters`; select from the returned names without inventing search
-arguments. Include archived folders only when requested. Copy continuation tokens byte-for-byte.
-Use `list_portfolios(portfolio_folder_id=...)` for immutable definitions in an exact Folder.
+arguments. Include archived Families only when requested. Copy continuation tokens byte-for-byte.
+Use `list_portfolios(portfolio_family_id=...)` for immutable definitions in an exact Family.
 
 Resolve one to five distinct exact immutable `strategy_id` values. If a needed Strategy does not
 exist, continue its authorized preparation through `$strategy-building`.
@@ -78,12 +78,12 @@ must preserve the retained StrategyRun evidence. Default Paper-ready bucket excl
 research guidance, not permission for Portfolio or Paper to drop symbols with missing required
 history.
 
-For a new Folder call `create_portfolio_folder` with optional `name` and
+For a new Family call `create_portfolio_family` with optional `name` and
 `components: [{"strategy_id": "<exact Strategy ID>"}, ...]`. Copy
-`portfolio_folder.portfolio_folder_id` and `portfolio.portfolio_id` from the response.
-For changed components in an existing Folder, read the exact base with `get_portfolio`, then call
-`create_portfolio` with `portfolio_folder_id`, `base_portfolio_id`, and the complete component list.
-This creates an immutable Portfolio; no Folder ID or Run ID substitutes for its `portfolio_id`.
+`portfolio_family.portfolio_family_id` and `portfolio.portfolio_id` from the response.
+For changed components in an existing Family, read the exact base with `get_portfolio`, then call
+`create_portfolio` with `portfolio_family_id`, `base_portfolio_id`, and the complete component list.
+This creates an immutable Portfolio; no Family ID or Run ID substitutes for its `portfolio_id`.
 
 Present consequential selections and proceed within existing authorization. Do not add approvals
 between definition, backtest, and automatic Paper observation. An ambiguous response requires
@@ -160,6 +160,6 @@ These operations remain here; they do not require a new composition or backtest.
 ## Final Response
 
 For a design, state proposed members, weights, reasons and evidence gaps. For execution, state
-the exact composition, Folder/Portfolio/Run identities, preparation or backtest state,
+the exact composition, Family/Portfolio/Run identities, preparation or backtest state,
 research result, and automatic Paper association when returned. Keep research metrics separate
 from Trading observations. Use the user's language and preserve schema fields and identifiers.

@@ -175,16 +175,16 @@ CANONICAL_TOOL_OWNERS = {
     },
     "strategy-building": {
         "create_strategy",
-        "create_strategy_folder",
+        "create_strategy_family",
         "get_eligible_strategy_factor",
         "get_strategy",
         "get_strategy_backtest",
         "get_strategy_capabilities",
-        "get_strategy_folder",
+        "get_strategy_family",
         "list_eligible_strategy_factors",
         "list_strategies",
         "list_strategy_backtests",
-        "list_strategy_folders",
+        "list_strategy_families",
         "submit_strategy_backtest",
     },
     "strategy-analysis": {
@@ -194,15 +194,15 @@ CANONICAL_TOOL_OWNERS = {
     },
     "portfolio-building": {
         "create_portfolio",
-        "create_portfolio_folder",
+        "create_portfolio_family",
         "create_portfolio_share",
         "get_portfolio",
         "get_portfolio_backtest",
-        "get_portfolio_folder",
+        "get_portfolio_family",
         "get_portfolio_share",
         "get_portfolio_share_research",
         "list_portfolio_backtests",
-        "list_portfolio_folders",
+        "list_portfolio_families",
         "list_portfolio_shares",
         "list_portfolios",
         "list_community_portfolios", "get_community_portfolio", "get_community_portfolio_research",
@@ -234,6 +234,10 @@ CANONICAL_TOOL_OWNERS = {
     },
 }
 RETIRED_TOOL_NAMES = {
+    # Deprecated Folder aliases (quandora-auth-service#310); skills use the Family names.
+    "create_strategy_folder", "get_strategy_folder", "list_strategy_folders",
+    "create_portfolio_folder", "get_portfolio_folder", "list_portfolio_folders",
+    "strategy_folder_id", "portfolio_folder_id", "factor_folder_id",
     "list_shared_strategy_factor_candidates", "admit_shared_strategy_factor",
     "redeem_portfolio_share", "create_live_account", "prepare_live_portfolio_run",
     "estimate_live_portfolio_capital", "start_live_portfolio_run", "stop_live_portfolio_run",
@@ -929,7 +933,7 @@ def _check_connection_policy(errors: list[str], skill_files: dict[str, Path]) ->
             "Respect a security denial; never try another execution path to bypass it",
             "Only the user approves additional access",
             "Do not repeat login when the callback succeeds but the grant remains unchanged",
-            "`list_strategy_folders`", "`list_strategies`", "`list_portfolio_folders`",
+            "`list_strategy_families`", "`list_strategies`", "`list_portfolio_families`",
             "`list_portfolios`", "Do not use a fixed tool count",
             "Do not create a Portfolio or submit a backtest as a recovery probe",
         ):

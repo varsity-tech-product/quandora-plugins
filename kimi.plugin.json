@@ -1,6 +1,6 @@
 {
   "name": "quandora",
-  "version": "4.1.0-preview",
+  "version": "4.2.0-preview",
   "description": "Quandora provides Account Connection, Factor Mining, Factor Analysis, Strategy Building, Strategy Analysis, Portfolio Building, Portfolio Analysis, and Portfolio Trading Analysis for backtest research and forward-test management.",
   "keywords": [
     "quandora",

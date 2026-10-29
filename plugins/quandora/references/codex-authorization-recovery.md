@@ -89,9 +89,9 @@ available host discovery refresh. Only when this host requires a new task or res
 reload the catalog should the user perform that action; preserve completed authorization.
 Never invent a discovery command or report cached old diagnostics as the post-login result.
 
-Verify the requested reads: Strategy discovery uses `list_strategy_folders` then
-`list_strategies` for a returned folder; Portfolio discovery uses `list_portfolio_folders`
-then `list_portfolios` for a returned folder. Empty authorized folders are valid results.
+Verify the requested reads: Strategy discovery uses `list_strategy_families` then
+`list_strategies` for a returned Family; Portfolio discovery uses `list_portfolio_families`
+then `list_portfolios` for a returned Family. Empty authorized Families are valid results.
 For an authorized creation workflow, also verify that its write tools are discoverable.
 Do not use a fixed tool count as acceptance; explicit restricted grants can be valid.
 Do not create a Portfolio or submit a backtest as a recovery probe. Resume the original

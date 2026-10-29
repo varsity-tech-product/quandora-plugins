@@ -72,7 +72,7 @@ Code users should use the direct host command instead.
 ## Search and pagination
 
 Factor discovery actions accept supported `query` and `filters` fields. Canonical Strategy and
-Portfolio Folder/Run lists use parent identities and pagination, without query/filter arguments. Continuation requests
+PortfolioFamily/Run lists use parent identities and pagination, without query/filter arguments. Continuation requests
 must preserve the same query, filters, archive mode, and page size while copying the returned
 opaque page token byte-for-byte.
 
