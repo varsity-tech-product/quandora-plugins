@@ -107,6 +107,16 @@ URL: https://mcp.quandora.ai/quant
 
 Use Settings -> Connectors, click Connect, complete Quandora authorization in the browser, then start a new chat. Local result-folder archiving is guaranteed only in hosts that expose local file writes; Claude Desktop may instead provide downloadable files in its sandbox.
 
+#### Grok Bot
+
+Paste this request into a Grok Bot conversation with connector and skill-library capabilities:
+
+```text
+Read https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/grok-bot.md completely, then install and authenticate Quandora for me. Ask me to approve any required installation permissions; I will complete browser sign-in and consent myself.
+```
+
+The guide checks the host's available operations, reuses an existing production connection, and verifies the installed skills and authenticated read access.
+
 #### Cursor Desktop
 
 In a new Cursor Desktop Agent chat, enter:
