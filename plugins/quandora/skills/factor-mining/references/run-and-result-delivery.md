@@ -38,7 +38,7 @@ run can be continued later, and do not request Result Bundle metadata.
 
 ## Result Bundle
 
-An automatically submitted reversed run follows this same delivery workflow.
+An existing reversed Factor's run follows this same delivery workflow.
 Only a terminal run may enter delivery. Call `download_result_bundle` with `kind: "factor"` and `id` set to the exact
 terminal `job_id`. Treat the returned immutable metadata and manifest as authoritative; readable
 `available` and persisted readable `partial` snapshots can be downloaded.

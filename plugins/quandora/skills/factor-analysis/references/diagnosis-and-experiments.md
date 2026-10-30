@@ -84,8 +84,6 @@ task contract, or convert a missing value to zero.
   maximum acceptable loss in spread or Sharpe.
 - **Tail robustness:** change only the selection breadth; expect the same direction with less tail
   concentration if the mechanism is broad.
-- **Direction test:** invert only the factor direction; expect degradation if the claimed direction
-  is real.
 - **Coverage test:** tighten only the data-validity threshold; expect stability if missingness is not
   driving the result.
 - **Applicability-contract test:** keep the factor formula fixed and propose evaluating Health on a

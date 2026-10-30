@@ -48,7 +48,9 @@ Resolve exact admitted Factors, prepare one named immutable definition, create i
 needed, then submit a Run with a fresh `client_request_id` when requested. A request to build and backtest covers both calls;
 do not add a confirmation at each step or Skill handoff. Ask only for unresolved material choices
 or authorization. Never upload a local plugin directly to Strategy: use `$factor-mining`, finish
-its canonical Factor backtest/admission, then select the admitted Factor here.
+its canonical Factor backtest/admission, then select the admitted Factor here. A new Strategy
+applies each Factor in the direction QuantAI evaluated on its card automatically; do not reverse or
+negate a Factor for it.
 
 The Factor Plugin Contract owns raw input definitions, including `binance_intraday` semantics and
 D/D+1 availability. Strategy construction consumes exact admitted Factor identities; it must not

@@ -30,7 +30,7 @@ Use this skill for deep diagnosis of an existing factor result, including:
 - readiness assessment for handing a factor to Strategy Building.
 
 Use `$factor-mining` for factor ideation, plugin construction, submission, resume, history browsing,
-explicit reversal, Result Bundle export, or a short ordinary result summary. Use `$strategy-analysis` for a
+Result Bundle export, or a short ordinary result summary. Use `$strategy-analysis` for a
 completed multi-factor Strategy result. Hand a requested or already-authorized Strategy experiment to `$strategy-building` without
 repeating approval at the Skill boundary; analysis suggestions alone do not authorize submission.
 
