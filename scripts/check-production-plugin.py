@@ -91,6 +91,13 @@ STRATEGY_SERVER_VALUE_GUIDANCE_MARKERS = (
     "`attribution=true`",
 )
 ROUTING_MARKERS = {
+    "account-connection": (
+        "Do not use for Factor",
+        "Never file a report on your own",
+        "Never include credentials",
+        "never guess one",
+        "do not retry in a loop",
+    ),
     "factor-analysis": ("Do not use for creating", "$factor-mining"),
     "factor-mining": ("Do not use for the Strategy", "$strategy-building", "$factor-analysis"),
     "portfolio-trading-analysis": ("Do not use to create", "$strategy-building", "$portfolio-building"),
@@ -143,7 +150,7 @@ INTRADAY_CONTRACT_MARKERS = {
     ),
 }
 CANONICAL_TOOL_OWNERS = {
-    "account-connection": {"get_quandora_account"},
+    "account-connection": {"get_quandora_account", "submit_feedback_report"},
     "factor-mining": {
         "download_result_bundle",
         "get_factor_mining_status",

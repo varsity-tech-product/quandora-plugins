@@ -17,7 +17,7 @@ Portfolio research, Simulation management and read-only Live analysis.
 
 | Skill | User goal |
 | --- | --- |
-| Quandora Account | Connect, reauthorize, switch accounts, and verify the active identity. |
+| Quandora Account | Connect, reauthorize, switch accounts, verify the active identity, and report problems to the Quandora team. |
 | Factor Mining | Turn a research hypothesis into a validated Factor and backtest. |
 | Factor Analysis | Diagnose exact Factor evidence and propose controlled improvements. |
 | Strategy Building | Select eligible Factors, create or revise a Strategy, and submit requested backtests. |
@@ -195,7 +195,8 @@ In Codex, select **Quandora Account** from the Skill picker or reference
 `$account-connection` and ask to show the current account, open authorization,
 reauthorize, or switch accounts. Explicit authorization requests start a new native
 flow even when already connected. You complete browser sign-in and consent; the
-agent verifies the active account afterward. See the
+agent verifies the active account afterward. Ask it to report a problem and it files a
+text report with the Quandora team after you confirm, then gives you the report reference. See the
 [account workflow](plugins/quandora/skills/account-connection/SKILL.md).
 
 Ask naturally or invoke a Skill explicitly when the host supports Skill commands:

@@ -28,6 +28,9 @@ authorization URLs, callback codes, or personal account emails in public evidenc
 | Host explicitly denies authorization | Stop; no fallback to bypass the denial. |
 | Identity endpoint unavailable / network fails | Verification remains pending; no false success or inferred logout. |
 | Issuer validation fails | Preserve validation; report the failure and versions, not a successful connection or reinstall fix. |
+| User asks to report a problem | One `submit_feedback_report` call with the shown category/note; the returned reference is given to the user. |
+| Report about one Run or Portfolio | Exact `context_type`/`context_id` copied from tool output; no guessed IDs. |
+| Report is rate limited or uncertain | No retry loop or blind resubmission; the user is told the outcome. |
 
 Static package and API tests cover packaging and the identity contract. All browser
 and host scenarios above remain pending until executed on the supported host with

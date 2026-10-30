@@ -57,6 +57,21 @@ class ConnectionPolicyTests(unittest.TestCase):
         )
         self.rejected("account-connection must load before MCP authentication")
 
+    def test_problem_report_keeps_consent_and_secret_boundaries(self):
+        skill = self.plugin / "skills/account-connection/SKILL.md"
+        original = skill.read_text()
+        for boundary in ("Never file a report on your own", "Never include credentials",
+                         "never guess one", "do not retry in a loop"):
+            with self.subTest(boundary=boundary):
+                skill.write_text(original.replace(boundary, "Removed report boundary"))
+                self.rejected("account-connection/SKILL.md: missing routing boundary")
+                skill.write_text(original)
+
+    def test_problem_report_tool_has_one_owner(self):
+        skill = self.plugin / "skills/account-connection/SKILL.md"
+        skill.write_text(skill.read_text().replace("`submit_feedback_report`", "the report tool"))
+        self.rejected("missing primary tool ownership for submit_feedback_report")
+
     def test_missing_portfolio_analysis(self):
         (self.plugin / "skills/portfolio-analysis/SKILL.md").unlink()
         self.rejected("missing required production Skills")
