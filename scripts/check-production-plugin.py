@@ -155,7 +155,6 @@ CANONICAL_TOOL_OWNERS = {
         "get_factor_dedup_context",
         "submit_factor_backtest",
         "continue_factor_backtest",
-        "reverse_factor",
         "get_factor_reversal",
         "list_owned_factor_families",
         "get_factor_family_history",
@@ -234,6 +233,8 @@ CANONICAL_TOOL_OWNERS = {
     },
 }
 RETIRED_TOOL_NAMES = {
+    # Factor reversal is retired: QuantAI evaluates each Factor's direction and Strategies apply it.
+    "reverse_factor",
     "list_shared_strategy_factor_candidates", "admit_shared_strategy_factor",
     "redeem_portfolio_share", "create_live_account", "prepare_live_portfolio_run",
     "estimate_live_portfolio_capital", "start_live_portfolio_run", "stop_live_portfolio_run",

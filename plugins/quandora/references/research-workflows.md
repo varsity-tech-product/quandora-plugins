@@ -17,7 +17,7 @@ rules; a Portfolio allocates initial capital between exact Strategies.
 | Compare a Portfolio backtest with its actual members | `$portfolio-analysis` | Read existing evidence; no automatic ablation or rerun |
 | Manage Simulation accounts/runs or analyze forward evidence | `$portfolio-trading-analysis` | Analysis-only is read-only; explicit Simulation management uses supported writes; real Live is read-only |
 
-An analysis request does not authorize a new backtest, reversal, account, sharing grant or Trading
+An analysis request does not authorize a new backtest, account, sharing grant or Trading
 change. Carry already-authorized experiment scope through a handoff to the relevant builder;
 do not ask again merely because the Skill changes. An optimization request uses a bounded set of
 controlled experiments and does not justify indefinite search. Never silently change supplied

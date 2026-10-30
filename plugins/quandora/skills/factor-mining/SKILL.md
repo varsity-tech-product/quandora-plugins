@@ -1,6 +1,6 @@
 ---
 name: factor-mining
-description: Creates, validates, backtests, continues, retrieves, reverses, or summarizes one Quandora Factor and reads owned Factor families or history. Use when the user asks for Factor Mining authoring or reuse. Do not use for the Strategy eligible-factor pool or deep result diagnosis.
+description: Creates, validates, backtests, continues, retrieves, or summarizes one Quandora Factor and reads owned Factor families or history. Use when the user asks for Factor Mining authoring or reuse. Do not use for the Strategy eligible-factor pool or deep result diagnosis.
 ---
 
 # Quandora Factor Mining
@@ -29,7 +29,7 @@ Use only the minimum relevant subset:
 - Authoring: `get_factor_plugin_contract`, `create_factor_task_session`,
   `create_custom_factor_session`, `validate_factor_plugin`, `get_factor_dedup_context`.
 - Run lifecycle: `submit_factor_backtest`, `continue_factor_backtest`.
-- Exact owned reversal: `reverse_factor`, `get_factor_reversal`.
+- Existing reversal relationships (read only): `get_factor_reversal`.
 - Result delivery: `download_result_bundle` with `kind: "factor"` and the terminal job ID.
 - Approved semantics/diagnostics: `get_quandora_guidance`,
   `check_quandora_plugin_version`.
@@ -110,33 +110,14 @@ After the scoped contract exists:
 A timeout or ambiguous mutation response is not proof of failure. Follow only the returned closed
 recovery action. Never silently change the user's task, category, thesis, data, horizon, or source.
 
-## Reverse An Existing Owned Factor
+## Reversal Requests
 
-An explicit reversal request authorizes creating one sibling Factor in the same Folder and
-submitting its independent backtest. Do not ask again when that exact operation is already
-approved. Analysis suggestions alone do not authorize reversal.
-
-Use one exact completed row from `get_factor_family_history` with `view: "runs"`.
-Pass that row's `factor_version_id` as `reverse_factor.factor_id` and its `job_id` as
-`factor_run_id`. The history top-level `factor_id` is the Folder; do not pass it as the immutable
-Factor. Official publication access does not grant reversal permission.
-
-Call `get_factor_reversal` with the immutable Factor ID to read an existing relationship. A null
-relation does not prove that no request is in flight. Do not reverse a reversed endpoint or
-replace an uncertain request. `reverse_factor` accepts no source and automatically submits the
-new run; do not upload a negated local plugin or submit another backtest afterward.
-
-Follow `recoveryAction`: for `retry_same_request`, repeat the same arguments at most once;
-`reconciliation_required` means stop and report uncertainty; `stop` means report rejection.
-For `read_backtest`, use the returned `reversedFactor.factorRunId` to read its own history/results.
-`submitted` means submission, not backtest completion. Never invent missing target identifiers.
-`materialized` means the target Factor/Run exists but its backtest has not yet been submitted;
-an exact same-request replay may observe or wake its existing durable task; it does not authorize
-another provider submission. If replay errors, preserve the original handles and stop for
-reconciliation rather than replacing the request. `provider_started` and `backtest_submitting`
-replay only durable state, not another provider submission. If the one permitted replay still
-returns either in-flight state, stop and report the retained handles rather than looping.
-Continue and export only the exact reversed run using the ordinary lifecycle below.
+QuantAI evaluates every Factor in the direction that made money in-sample, so a reversed Factor's
+card would match the original apart from the sign of IC, and Strategies use that evaluated direction
+automatically; reversal is retired, so never call a reversal command, even one the server still
+lists or the user authorizes. Submit a hand-negated plugin only as a genuinely new idea through the
+ordinary authoring workflow. `get_factor_reversal` with the immutable Factor ID only reads a
+relationship created earlier.
 
 ## Continue and Deliver
 
@@ -146,7 +127,7 @@ Use the bounded continuation and Result Bundle rules in
 
 The canonical completed local output is
 `Quandora result/factor/<factor_slug>.zip`. For authored factors, derive the slug from
-the exact accepted matching `FACTOR_TYPE` literals. For source-free reversal, use the exact
+the exact accepted matching `FACTOR_TYPE` literals. For an existing reversed Factor, use the exact
 server-returned Factor type from history; if absent, use the safe returned bundle filename.
 When naming the export, never silently fall back to a generic `factor` slug.
 Never save the Factor ZIP in a Strategy directory.
