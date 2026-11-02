@@ -46,6 +46,9 @@ are present.
   deeper drawdown; do not silently convert it to a positive magnitude.
 - Compare Sharpe, return, and drawdown over the same declared window. Do not mix metrics from
   different scopes or windows.
+- Rank two Factor versions only on runs at the same forward horizon (`fwd_period`). When the
+  horizons differ, state the difference instead of ranking them. A horizon test compares runs of
+  one version and names the horizon as the changed condition.
 
 ## Turnover
 

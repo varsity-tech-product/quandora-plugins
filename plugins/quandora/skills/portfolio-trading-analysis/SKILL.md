@@ -8,7 +8,8 @@ description: Manages Simulation accounts and runs and analyzes actual forward-te
 Follow [Connection and Security](../../references/connection-and-security.md) for automatic
 recovery and the once-per-session release check; preserve existing update authority.
 Follow [Research intent and evidence](../../references/research-workflows.md) for backtest/forward
-scope, capability-aware conclusions and authorization-preserving handoffs.
+scope, capability-aware conclusions and authorization-preserving handoffs, and
+[Research notebook](../../references/research-notebook.md) for Simulation decision notes.
 
 Use the authenticated `quandora` MCP connection for Simulation account management,
 monitoring and read-only real Live account inspection. Canonical `monitoring` and `simulation`
@@ -27,8 +28,9 @@ For named objects, follow [Name discovery](../../references/object-discovery.md)
 
 ## Intent and Forward Analysis
 
-For analysis-only requests, remain read-only. For explicit Simulation management, use the
-matching account/run operation; a risk finding alone does not authorize a stop or account edit.
+For analysis-only requests, remain read-only except for the notebook conclusion. For explicit
+Simulation management, use the matching account/run operation; a risk finding alone does not
+authorize a stop or account edit.
 Use [Forward-test analysis](references/forward-test-analysis.md) to evaluate the frozen definition,
 actual observation window, operational quality, net performance and deviation from research.
 A historical OOS backtest is not forward evidence. New definitions start separate validation
@@ -55,6 +57,7 @@ segments. Share/publication management belongs to `$portfolio-building`.
 - `get_portfolio_trading_equity_curve`: bounded return curve and whole-run UTC daily risk.
 - Use `get_quandora_guidance` with `operation.paper_trade.submit` only to resolve a relevant
   schema or workflow uncertainty, not as a required probe before each operation.
+- `get_research_context`, `list_research_notes`, `record_research_conclusion`: Simulation notebook.
 
 Research creation and backtests belong to `$strategy-building` and `$portfolio-building`.
 `get_portfolio_backtest` is a read-only prerequisite for resolving an automatic Paper association.
@@ -116,6 +119,33 @@ authorizations, start or stop a Run. Account creation, credentials, preparation,
 start, stop, closing positions and all other Live changes are frontend-only. Never call cached
 Live write tools or work around their removal. Explain the frontend action when the user asks
 for a Live change, while continuing any authorized read-only inspection.
+
+## Continuing Live Runs and history
+
+A migrated Live execution remains the same Run. Preserve its original `started_at`,
+capital and available `portfolio_source`; `portfolio_run_id` may legitimately be
+null when there is no source research Run. Do not invent lineage or replace the
+Run to read its history.
+
+When the current tool schema supports them, use `get_live_account_facts` sections
+`equity-history`, `position-history` and `cashflows` alongside positions, orders,
+fills, performance and statistics. Copy `next_cursor` exactly with the same Run,
+section, filters and limit. Equity raw pages use exact `next_after` as `after` and
+retain the original `until`; a chart `lookback` cannot be combined with raw bounds.
+A changed-history error requires restarting the read, not appending incompatible
+pages. Preserve missing/partial coverage and decimal strings. Use `statistics`
+for authoritative whole-Run risk and UTC daily PnL; never compute them from one
+page or sampled chart. Missing supported tools follow connection recovery; never
+substitute provider HTTP or another environment.
+
+Live changes are performed by the human in the product frontend. Agent permission
+stays read-only even when that Run has human pause/resume/stop capabilities or the
+user asks the agent to execute a Live change. Explain the specific frontend action
+and continue authorized observations; do not operate browser controls, call cached
+write tools, use Simulation tools with Live IDs, obtain credentials or issue direct
+API commands as a workaround. Pause retains positions; the existing stop cancels
+orders and closes positions, and completion requires the terminal provider state.
+These restrictions do not change supported Simulation management operations.
 
 ## Read Observations
 

@@ -9,7 +9,9 @@ the exact canonical `id` already selected by the user's task:
 | `official_factor` | Active official Factor ID |
 | `strategy` | StrategyRun ID |
 | `portfolio` | Owner PortfolioRun ID |
-| `portfolio_share` | Authorized Portfolio Share ID |
+
+Shared and Community Portfolios are view-only and have no Result Bundle; read them through their
+contextual research tools instead of passing a Share, Publication or shared run ID here.
 
 Preserve the owning Skill's readiness and bounded metadata observation rules. Only
 `available` or readable `partial` metadata with a returned URL is downloadable. Pending,

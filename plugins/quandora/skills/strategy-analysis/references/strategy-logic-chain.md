@@ -20,7 +20,7 @@ the Strategy's actual selection rule. A Strategy's aggregate success does not pr
 works or identify its marginal contribution without a suitable control.
 
 Label consequential statements Observed, Inference, Alternative or Experiment. Propose a bounded
-change with an expected effect, confirmation metric and tradeoff; hand already-authorized
+change with an expected effect, confirmation metric and tradeoff; hand
 execution to `$strategy-building` or input-level repair to `$factor-mining` through the appropriate
 analysis. Do not submit from this read-only workflow.
 

@@ -7,7 +7,7 @@ Use it for production research and Simulation workflows. Real Live evidence is r
 
 | Skill | Owns | Routes elsewhere |
 | --- | --- | --- |
-| `account-connection` | Explicit login, reauthorization, account switching and current identity | Research and Trading operations |
+| `account-connection` | Explicit login, reauthorization, account switching, current identity and problem reports to the Quandora team | Research and Trading operations |
 | `factor-mining` | Hypothesis, Factor source/validation, authorized backtests, history and export | Deep Factor diagnosis |
 | `factor-analysis` | Existing Factor evidence, validity and controlled experiment design | Authoring and submission |
 | `strategy-building` | Eligible Factors, immutable Strategy definitions and requested backtests | Deep diagnosis and multi-Strategy composition |
@@ -21,6 +21,13 @@ Alongside account management, six Skills cover backtests and one covers forward 
 capability-aware analysis and handoffs. Design-only requests do not create resources. Exact supplied
 members/weights are not silently optimized. Analysis suggestions do not authorize experiments;
 already-authorized work continues through the owning builder without repeated confirmation.
+
+The [research notebook](references/research-notebook.md) carries research across conversations:
+each research task reads `get_research_context` first, each decision carries a `research_note`
+(relation, parent, hypothesis, expected effect), each interpreted result is recorded with
+`record_research_conclusion`, and `wait_for_runs` replaces polling. Factor Mining submits new
+research with `submit_factor_research` and tests an existing Factor version at another horizon with
+`run_factor_version`. Notes belong to versions; a note about one run records it in `run_id`.
 
 Each Skill uses only relevant tools and preserves opaque identities and pagination. Portfolio
 research accepts one to five distinct immutable Strategies with equal or explicit positive initial
@@ -72,7 +79,7 @@ Code users should use the direct host command instead.
 ## Search and pagination
 
 Factor discovery actions accept supported `query` and `filters` fields. Canonical Strategy and
-Portfolio Folder/Run lists use parent identities and pagination, without query/filter arguments. Continuation requests
+PortfolioFamily/Run lists use parent identities and pagination, without query/filter arguments. Continuation requests
 must preserve the same query, filters, archive mode, and page size while copying the returned
 opaque page token byte-for-byte.
 
@@ -99,8 +106,8 @@ metadata and manifests are authoritative for readiness, contents, omissions, and
 ## Safety boundary
 
 - OAuth and credentials are host-managed and must never be requested, printed, copied, or stored.
-- Carry explicit authorization across ordinary calls and Skill handoffs; ask only for missing
-  consequential choices or authority.
+- Choose research settings from context and returned candidates, record why in the decision note,
+  and carry them through Skill handoffs. Simulation, sharing and account operations remain request-only.
 - An ambiguous response is not proof of failure and does not authorize a changed replacement.
 - Simulation lifecycle and real Live read-only inspection are separate; all Live changes are frontend-only.
 - User-facing answers follow the user's language while preserving tool names and schema fields

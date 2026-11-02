@@ -8,6 +8,12 @@ on:
 permissions:
   contents: read
 
+# A newer push to the same PR supersedes the older run; every main commit runs to completion.
+# No paths filter: the package is mostly Markdown, and that Markdown is what the checks validate.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   package-contract:
     runs-on: ubuntu-latest

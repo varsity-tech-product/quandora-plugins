@@ -91,6 +91,13 @@ STRATEGY_SERVER_VALUE_GUIDANCE_MARKERS = (
     "`attribution=true`",
 )
 ROUTING_MARKERS = {
+    "account-connection": (
+        "Do not use for Factor",
+        "Never file a report on your own",
+        "Never include credentials",
+        "never guess one",
+        "do not retry in a loop",
+    ),
     "factor-analysis": ("Do not use for creating", "$factor-mining"),
     "factor-mining": ("Do not use for the Strategy", "$strategy-building", "$factor-analysis"),
     "portfolio-trading-analysis": ("Do not use to create", "$strategy-building", "$portfolio-building"),
@@ -143,7 +150,7 @@ INTRADAY_CONTRACT_MARKERS = {
     ),
 }
 CANONICAL_TOOL_OWNERS = {
-    "account-connection": {"get_quandora_account"},
+    "account-connection": {"get_quandora_account", "submit_feedback_report"},
     "factor-mining": {
         "download_result_bundle",
         "get_factor_mining_status",
@@ -154,7 +161,9 @@ CANONICAL_TOOL_OWNERS = {
         "validate_factor_plugin",
         "get_factor_dedup_context",
         "submit_factor_backtest",
+        "submit_factor_research",
         "continue_factor_backtest",
+        "run_factor_version",
         "get_factor_reversal",
         "list_owned_factor_families",
         "get_factor_family_history",
@@ -171,19 +180,24 @@ CANONICAL_TOOL_OWNERS = {
         "get_official_factor_window_cards",
         "get_official_factor_chart_data",
         "get_official_factor_source",
+        "compare_factor_runs",
+        "rank_similar_factors",
+        "cluster_owned_factors",
+        "list_library_corrections",
+        "replace_factor_library_classification",
     },
     "strategy-building": {
         "create_strategy",
-        "create_strategy_folder",
+        "create_strategy_family",
         "get_eligible_strategy_factor",
         "get_strategy",
         "get_strategy_backtest",
         "get_strategy_capabilities",
-        "get_strategy_folder",
+        "get_strategy_family",
         "list_eligible_strategy_factors",
         "list_strategies",
         "list_strategy_backtests",
-        "list_strategy_folders",
+        "list_strategy_families",
         "submit_strategy_backtest",
     },
     "strategy-analysis": {
@@ -193,18 +207,21 @@ CANONICAL_TOOL_OWNERS = {
     },
     "portfolio-building": {
         "create_portfolio",
-        "create_portfolio_folder",
+        "create_portfolio_family",
         "create_portfolio_share",
         "get_portfolio",
         "get_portfolio_backtest",
-        "get_portfolio_folder",
+        "get_portfolio_family",
         "get_portfolio_share",
         "get_portfolio_share_research",
+        "list_portfolio_share_runs", "get_portfolio_share_strategy_research",
+        "get_portfolio_share_factor_research", "read_portfolio_share_research_artifact",
         "list_portfolio_backtests",
-        "list_portfolio_folders",
+        "list_portfolio_families",
         "list_portfolio_shares",
         "list_portfolios",
-        "list_community_portfolios", "get_community_portfolio", "get_community_portfolio_research",
+        "list_community_portfolios", "get_community_portfolio", "list_community_portfolio_runs",
+        "get_community_portfolio_research",
         "get_community_strategy_research", "get_community_factor_research", "read_community_research_artifact",
         "publish_portfolio_to_community", "get_portfolio_sharing", "share_portfolio_with_user",
         "extend_portfolio_share", "update_portfolio_share_intro", "set_portfolio_favorite", "list_favorite_portfolios",
@@ -235,6 +252,14 @@ CANONICAL_TOOL_OWNERS = {
 RETIRED_TOOL_NAMES = {
     # Factor reversal is retired: QuantAI evaluates each Factor's direction and Strategies apply it.
     "reverse_factor",
+    # Deprecated Folder aliases (quandora-auth-service#310); skills use the Family names.
+    "create_strategy_folder", "get_strategy_folder", "list_strategy_folders",
+    "create_portfolio_folder", "get_portfolio_folder", "list_portfolio_folders",
+    "strategy_folder_id", "portfolio_folder_id", "factor_folder_id",
+    # Pre-canonical Factor identifiers (quandora-auth-service#325): factor_id is always the
+    # immutable Factor, factor_family_id the Family and factor_run_id the run.
+    "factor_version_id", "parent_version_id", "base_factor_version_id",
+    "source_factor_backtest_run_id", "include_factor_ids", "unresolved_factor_ids", "factor_ids",
     "list_shared_strategy_factor_candidates", "admit_shared_strategy_factor",
     "redeem_portfolio_share", "create_live_account", "prepare_live_portfolio_run",
     "estimate_live_portfolio_capital", "start_live_portfolio_run", "stop_live_portfolio_run",
@@ -291,6 +316,9 @@ RETIRED_TOOL_NAMES = {
     "submit_adhoc_strategy_backtest",
     "submit_strategy_portfolio_evaluation",
 }
+# Shared Portfolio pages are view-only; the Share Bundle kind was removed from
+# download_result_bundle (quandora-auth-service#337).
+RETIRED_RESULT_BUNDLE_KINDS = {"portfolio_share"}
 DIRECT_VERSION_MANIFESTS = (
     REPOSITORY_ROOT / "kimi.plugin.json",
     PLUGIN_ROOT / ".claude-plugin" / "plugin.json",
@@ -560,6 +588,15 @@ def _skill_files(errors: list[str]) -> dict[str, Path]:
     return files
 
 
+def _mentions_tool(text: str, name: str) -> bool:
+    """Whether `name` appears in `text` as a whole tool identifier."""
+    # The plain substring test runs first: most files never mention most retired names, and
+    # running the boundary regex for every (file, name) pair dominated this script's runtime.
+    return name in text and bool(
+        re.search(rf"(?<![A-Za-z0-9_]){re.escape(name)}(?![A-Za-z0-9_])", text)
+    )
+
+
 def _check_skills(
     errors: list[str],
     skill_files: dict[str, Path],
@@ -676,7 +713,7 @@ def _check_skills(
         for retired in sorted(RETIRED_TOOL_NAMES):
             if retired == "qd_plugin_ver" and path == PLUGIN_ROOT / "references/plugin-update.md":
                 continue
-            if re.search(rf"(?<![A-Za-z0-9_]){re.escape(retired)}(?![A-Za-z0-9_])", text):
+            if _mentions_tool(text, retired):
                 errors.append(f"{skill_name}/SKILL.md: retired tool name remains: {retired}")
 
         support_text = text
@@ -786,9 +823,14 @@ def _check_runtime_markdown(errors: list[str], skill_files: dict[str, Path]) -> 
         for retired in sorted(RETIRED_TOOL_NAMES):
             if retired == "qd_plugin_ver" and path == PLUGIN_ROOT / "references/plugin-update.md":
                 continue
-            if re.search(rf"(?<![A-Za-z0-9_]){re.escape(retired)}(?![A-Za-z0-9_])", text):
+            if _mentions_tool(text, retired):
                 errors.append(
                     f"{path.relative_to(REPOSITORY_ROOT)}: retired tool name remains: {retired}"
+                )
+        for kind in sorted(RETIRED_RESULT_BUNDLE_KINDS):
+            if _mentions_tool(text, kind):
+                errors.append(
+                    f"{path.relative_to(REPOSITORY_ROOT)}: retired Result Bundle kind remains: {kind}"
                 )
 
     for path, required_fragments in REQUIRED_RESULT_DESTINATIONS.items():
@@ -802,6 +844,45 @@ def _check_runtime_markdown(errors: list[str], skill_files: dict[str, Path]) -> 
 
 
 SHARED_CONNECTION_POLICY = "../../references/connection-and-security.md"
+
+
+NOTEBOOK_TOOLS = (
+    "get_research_context",
+    "list_research_notes",
+    "get_research_note",
+    "record_research_conclusion",
+    "wait_for_runs",
+)
+NOTEBOOK_BOUNDARIES = (
+    "never add a separate note call",
+    "Write one note per decision",
+    "A note grants no authority",
+    "Never conclude on a non-terminal run",
+    "Waiting never re-drives work",
+    "which becomes the thread topic",
+    "still ends with its conclusion",
+)
+
+
+def _check_research_notebook(errors: list[str], skill_files: dict[str, Path]) -> None:
+    """Every research Skill shares one notebook policy that owns the notebook tools."""
+    notebook = PLUGIN_ROOT / "references/research-notebook.md"
+    if not notebook.is_file():
+        errors.append("missing shared research notebook reference")
+        return
+    text = notebook.read_text(encoding="utf-8")
+    for tool in NOTEBOOK_TOOLS:
+        if f"`{tool}`" not in text:
+            errors.append(f"references/research-notebook.md: missing notebook tool {tool}")
+    normalized = " ".join(text.split())
+    for marker in NOTEBOOK_BOUNDARIES:
+        if marker not in normalized:
+            errors.append(f"references/research-notebook.md: missing notebook boundary {marker!r}")
+    for name, path in sorted(skill_files.items()):
+        if name == "account-connection":
+            continue
+        if "](../../references/research-notebook.md)" not in path.read_text(encoding="utf-8"):
+            errors.append(f"{name}: missing research notebook link")
 
 
 def _check_research_workflows(errors: list[str], skill_files: dict[str, Path]) -> None:
@@ -843,7 +924,7 @@ def _check_research_workflows(errors: list[str], skill_files: dict[str, Path]) -
             "Do not substitute a better or newer member run",
             "Historical evidence supports improvement",
             "Insufficient evidence",
-            "Analysis alone does not authorize an experiment or write",
+            "unless the user asked for that exact operation",
         ),
         SKILLS_ROOT / "portfolio-analysis/references/evidence-contract.md": (
             "Without a supported same-window projection",
@@ -930,7 +1011,7 @@ def _check_connection_policy(errors: list[str], skill_files: dict[str, Path]) ->
             "Respect a security denial; never try another execution path to bypass it",
             "Only the user approves additional access",
             "Do not repeat login when the callback succeeds but the grant remains unchanged",
-            "`list_strategy_folders`", "`list_strategies`", "`list_portfolio_folders`",
+            "`list_strategy_families`", "`list_strategies`", "`list_portfolio_families`",
             "`list_portfolios`", "Do not use a fixed tool count",
             "Do not create a Portfolio or submit a backtest as a recovery probe",
         ):
@@ -969,6 +1050,16 @@ def _check_connection_policy(errors: list[str], skill_files: dict[str, Path]) ->
             ):
                 errors.append(f"{path.relative_to(REPOSITORY_ROOT)}: hardcoded release label")
 
+
+# Production Auth lists run_factor_version only behind REMOTE_MCP_RUN_FACTOR_VERSION_ENABLED;
+# every action path that names it must say what to do when it is not listed.
+RUN_FACTOR_VERSION_FALLBACK = "`run_factor_version` is not in the tool list"
+RUN_FACTOR_VERSION_ACTION_PATHS = (
+    SKILLS_ROOT / "factor-mining/SKILL.md",
+    SKILLS_ROOT / "factor-mining/references/run-and-result-delivery.md",
+    SKILLS_ROOT / "factor-analysis/references/diagnosis-and-experiments.md",
+    PLUGIN_ROOT / "references/research-playbooks.md",
+)
 
 
 def _check_production_delivery(errors: list[str]) -> None:
@@ -1009,6 +1100,12 @@ def _check_production_delivery(errors: list[str]) -> None:
     for filename in ("workbuddy-cn-install-macos.js", "workbuddy-cn-oauth-macos.js"):
         if "get_factor_mining_status" not in (scripts / filename).read_text(encoding="utf-8"):
             errors.append("WorkBuddy protected probe must use canonical status tool")
+    for path in RUN_FACTOR_VERSION_ACTION_PATHS:
+        if RUN_FACTOR_VERSION_FALLBACK not in " ".join(path.read_text(encoding="utf-8").split()):
+            errors.append(
+                f"{path.relative_to(REPOSITORY_ROOT)}: missing production fallback for an "
+                "unlisted run_factor_version"
+            )
 
 
 def main() -> int:
@@ -1022,6 +1119,7 @@ def main() -> int:
         _check_runtime_markdown(errors, skills)
         _check_connection_policy(errors, skills)
         _check_research_workflows(errors, skills)
+        _check_research_notebook(errors, skills)
     except ValueError as exc:
         errors.append(str(exc))
 

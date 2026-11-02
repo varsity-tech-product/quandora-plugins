@@ -26,6 +26,6 @@ A factor is a reasonable candidate for a controlled Strategy test when:
 - major style or liquidity alternatives are named;
 - the experiment has a falsifiable expected effect.
 
-This is a readiness assessment, not an automatic promotion. After explicit user confirmation, hand
+This is a readiness assessment, not an automatic promotion. Hand
 the exact factor identity and proposed experiment to `$strategy-building`. That skill owns factor
 selection, composition, Strategy submission, resume, and result retrieval.

@@ -5,6 +5,12 @@ read-only and does not authorize creating, pausing, stopping or retuning a run.
 
 ## Create, Start and Manage Simulation
 
+Read `get_research_context` with `stage: "simulation"` before a start. Start, pause, resume and
+stop calls carry a `research_note` whose hypothesis states why the action is taken now, in the
+user's language and starting with a one-sentence topic of at most 60 characters. Forward
+analysis of an owned Simulation run ends with a conclusion on that `simulation_run`; the server
+stores the observed snapshot with it. Real Live has no notebook entry.
+
 For an explicit Simulation request, resolve exactly one owned immutable `portfolio_id`, currently
 visible Community `publication_id`, or authorized `share_id`. Owned definitions return
 `portfolio.portfolio_id`. Internal command IDs are not public selectors. Publication discovery belongs to

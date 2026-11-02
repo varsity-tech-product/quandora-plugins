@@ -8,7 +8,8 @@ description: Analyzes existing Quandora cross-sectional Strategy results from ow
 Follow [Connection and Security](../../references/connection-and-security.md) for automatic
 recovery and the once-per-session release check; preserve existing update authority.
 Follow [Research intent and evidence](../../references/research-workflows.md) for backtest/forward
-scope, capability-aware conclusions and authorization-preserving handoffs.
+scope, capability-aware conclusions and authorization-preserving handoffs, and
+[Research notebook](../../references/research-notebook.md) for the tested hypothesis and conclusion.
 
 Analyze one exact cross-sectional Strategy run as a non-submitting research workflow. Pair the
 canonical owned run snapshot with retained artifacts and bounded six-chart data, or use the
@@ -63,7 +64,7 @@ Use these primary analysis actions:
 - `get_strategy_backtest_analysis_data`
 - `get_community_strategy_research`, `read_community_research_artifact` for authorized Publication context only.
 
-Read-only discovery uses `list_strategy_folders`, `list_strategies`,
+Read-only discovery uses `list_strategy_families`, `list_strategies`,
 `list_strategy_backtests`, `get_strategy_backtest`, and `get_strategy`. They locate one canonical
 Run; they do not authorize a
 continue, rerun, archive, or other Strategy mutation.
@@ -83,15 +84,16 @@ The owner workflow below applies only to owned results.
 
 Prefer an exact `strategy_run_id` supplied by the user or returned in the conversation.
 Pass it as `strategy_run_id` to every canonical Run, artifact, analysis, and export action.
-Internal command IDs, Folder IDs, and immutable Strategy IDs are different selectors.
+Internal command IDs, Family IDs, and immutable Strategy IDs are different selectors.
 
-If no Run is known, resolve the Strategy through `list_strategy_folders` and
-`list_strategies(strategy_folder_id=...)`, then call
+If no Run is known, resolve the Strategy through `list_strategy_families` and
+`list_strategies(strategy_family_id=...)`, then call
 `list_strategy_backtests(strategy_id=..., page_size=...)`. These lists do not accept `query`
 or `filters`. Select using returned names, identities, timestamps, and states. Ask only if more
 than one plausible target remains. Preserve parent selectors/page size and copy `next_page_token`
 byte-for-byte for needed continuation; do not auto-page or invent a global Run search.
-Skip discovery when the exact Run is supplied.
+Skip discovery when the exact Run is supplied. Before diagnosing an owned Run, read the tested
+hypothesis and targets with `list_research_notes` on its `strategy_version`; notes on this Run carry its `run_id`.
 
 ### 2. Read Definition and Execution Evidence
 
@@ -183,8 +185,9 @@ possible. Examples include factor removal or reweighting, ranking breadth, rebal
 exposure, and one suspected style control.
 
 Do not claim an automatic ablation or correlation matrix: retained evidence does not guarantee
-per-factor correlations or precomputed ablations. Hand an explicitly requested or already-authorized
-test to `$strategy-building`; ask only for missing experiment choices or authorization.
+per-factor correlations or precomputed ablations. Hand the chosen test to `$strategy-building`.
+Choose missing settings from the research context and returned evidence, and record why in its
+`research_note` (`hypothesis` for a new direction, `change_summary` otherwise).
 
 ### 8. Assess Paper Readiness Without Paper Mutation
 
@@ -195,7 +198,8 @@ Do not start Paper Trading. For authorized Paper preparation, hand off through
 
 ## Output Contract
 
-Answer in chat by default. Create a report file only when explicitly requested. Use this order:
+Answer in chat; make a report file only when asked. For an owned Run, record the decision in item 7
+as the notebook conclusion in the user's language, also for analysis-only requests. Use this order:
 
 1. exact run identity, effective composition and parameters, and evidence quality;
 2. concise performance and risk summary;
@@ -203,12 +207,13 @@ Answer in chat by default. Create a report file only when explicitly requested. 
 4. factor-combination and style mechanism with alternatives;
 5. risks and evidence gaps;
 6. prioritized controlled experiments;
-7. decision and optional user-confirmed handoff.
+7. decision and optional handoff.
 
 Use the user's language for the answer even though this skill package is written in English.
 
-## References
+Use [Research playbooks](../../references/research-playbooks.md) for goal-based call orders and similarity decisions.
 
+## References
 - [Server evidence contract and trust rules](references/evidence-contract.md)
 - [Strategy artifacts and metric semantics](references/artifacts-and-metrics.md)
 - [Six-chart diagnostics](references/six-chart-diagnostics.md)

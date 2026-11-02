@@ -34,6 +34,13 @@ Never inspect, print, copy, store, or request credential values, token stores, a
 PKCE verifiers, or pasted secrets. Never bypass MCP with private service APIs, raw internal HTTP,
 or an improvised credential-refresh script.
 
+## Rejected arguments
+
+`backend_validation_error` naming `details.path` or `details.field` means nothing was written.
+Fix only that argument against the current tool schema and retry; if the schema lacks the named
+field, refresh tool discovery first. After two rejections at the same path, stop and report the
+returned error. It is never an account or permission block.
+
 ## Connected, but workflow tools are missing
 
 A successful version check or `get_factor_mining_status` proves only that particular
@@ -42,7 +49,7 @@ user's workflow. A current plugin package cannot add permissions to an existing 
 
 Before declaring a workflow unavailable, use the host's supported tool search/discovery
 and complete any discovery pagination. Compare the resulting catalog with the relevant
-Skill's required tools. For Portfolio creation this includes `list_strategy_folders`,
+Skill's required tools. For Portfolio creation this includes `list_strategy_families`,
 `list_strategies`, `create_portfolio` and `submit_portfolio_backtest`. Do not call a mutation
 merely to check availability.
 
@@ -63,8 +70,8 @@ For the requested Strategy/Portfolio workflow, compare only the permissions it n
 
 | Required tool | Required scope |
 | --- | --- |
-| `list_strategy_folders`, `list_strategies` | `strategy:definitions.read` |
-| `create_strategy_folder`, `create_strategy` | `strategy:definitions.write` |
+| `list_strategy_families`, `list_strategies` | `strategy:definitions.read` |
+| `create_strategy_family`, `create_strategy` | `strategy:definitions.write` |
 | `list_strategy_backtests`, `get_strategy_backtest` | `strategy:backtests.read` |
 | `submit_strategy_backtest` | `strategy:backtests.create` |
 | `list_portfolios`, `get_portfolio` | `strategy:portfolios.read` |
@@ -98,7 +105,7 @@ recovery; do not stop at a generic "tools unavailable" message or recommend rein
 After recovery, rediscover the required tools and verify a relevant authorized read
 before resuming the user's task. Do not report Portfolio creation as ready solely because
 the version check or Factor status succeeds. Keep unavailable client checks explicit.
-For Portfolio recovery, verify `list_strategy_folders` before resuming creation, and
+For Portfolio recovery, verify `list_strategy_families` before resuming creation, and
 confirm that `create_portfolio` and `submit_portfolio_backtest` are discoverable without
 invoking them as probes. If status still reports the old grant after the OAuth callback,
 stop the recovery loop and report that the host has not adopted the new authorization.

@@ -39,6 +39,18 @@ class ConnectionPolicyTests(unittest.TestCase):
         code, output = self.check()
         self.assertEqual(code, 0, output)
 
+    def test_research_skill_must_link_the_notebook(self):
+        skill = self.plugin / "skills/strategy-analysis/SKILL.md"
+        skill.write_text(skill.read_text().replace("](../../references/research-notebook.md)", "](#)"))
+        self.rejected("strategy-analysis: missing research notebook link")
+
+    def test_notebook_reference_owns_its_tools_and_boundaries(self):
+        notebook = self.plugin / "references/research-notebook.md"
+        text = notebook.read_text().replace("`wait_for_runs`", "waiting")
+        notebook.write_text(text.replace("Never conclude on a non-terminal run", "Conclude"))
+        self.rejected("missing notebook tool wait_for_runs")
+        self.rejected("missing notebook boundary 'Never conclude on a non-terminal run'")
+
     def test_old_bundle_fallback_is_not_taught_in_references(self):
         self.append(self.policy, "Use `read_strategy_result_bundle_chunk` after HTTP fails.")
         self.rejected("unified Result Bundle export tool")
@@ -56,6 +68,21 @@ class ConnectionPolicyTests(unittest.TestCase):
             'dependencies:\n  tools:\n    - type: "mcp"\n      value: "quandora"',
         )
         self.rejected("account-connection must load before MCP authentication")
+
+    def test_problem_report_keeps_consent_and_secret_boundaries(self):
+        skill = self.plugin / "skills/account-connection/SKILL.md"
+        original = skill.read_text()
+        for boundary in ("Never file a report on your own", "Never include credentials",
+                         "never guess one", "do not retry in a loop"):
+            with self.subTest(boundary=boundary):
+                skill.write_text(original.replace(boundary, "Removed report boundary"))
+                self.rejected("account-connection/SKILL.md: missing routing boundary")
+                skill.write_text(original)
+
+    def test_problem_report_tool_has_one_owner(self):
+        skill = self.plugin / "skills/account-connection/SKILL.md"
+        skill.write_text(skill.read_text().replace("`submit_feedback_report`", "the report tool"))
+        self.rejected("missing primary tool ownership for submit_feedback_report")
 
     def test_missing_portfolio_analysis(self):
         (self.plugin / "skills/portfolio-analysis/SKILL.md").unlink()
@@ -126,12 +153,23 @@ class ConnectionPolicyTests(unittest.TestCase):
                     self.rejected(f"retired tool name remains: {tool}")
                     path.write_text(original)
 
+    def test_retired_share_bundle_kind_is_rejected(self):
+        for relative in ("references/result-bundle-download.md",
+                         "skills/portfolio-building/references/community-and-sharing.md"):
+            with self.subTest(file=relative):
+                path = self.plugin / relative
+                original = path.read_text()
+                self.append(path, 'Call `download_result_bundle` with `kind: "portfolio_share"`.')
+                self.rejected("retired Result Bundle kind remains: portfolio_share")
+                path.write_text(original)
+
     def test_required_management_tools_stay_with_their_owner(self):
         cases = (
             ("portfolio-building", "share_portfolio_with_user"),
             ("portfolio-trading-analysis", "pause_portfolio_trading_run"),
             ("portfolio-trading-analysis", "rename_simulation_account"),
             ("portfolio-analysis", "get_portfolio_backtest_result"),
+            ("factor-mining", "run_factor_version"),
         )
         for name, tool in cases:
             with self.subTest(owner=name, tool=tool):
@@ -261,6 +299,17 @@ class ConnectionPolicyTests(unittest.TestCase):
     def test_stale_installer_hash_is_rejected(self):
         self.append(self.plugin / "scripts/workbuddy-cn-install-macos.js", "// changed component")
         self.rejected("WorkBuddy component integrity mismatch")
+
+    def test_run_factor_version_paths_keep_the_unlisted_fallback(self):
+        for relative in ("skills/factor-mining/SKILL.md", "references/research-playbooks.md"):
+            with self.subTest(file=relative):
+                path = self.plugin / relative
+                original = path.read_text()
+                phrase = "`run_factor_version` is not in the tool list"
+                self.assertIn(phrase, original)
+                path.write_text(original.replace(phrase, "`run_factor_version` fails"))
+                self.rejected("missing production fallback for an unlisted run_factor_version")
+                path.write_text(original)
 
     def test_stale_bootstrap_guide_hash_is_rejected(self):
         self.append(self.plugin / "scripts/workbuddy-cn-bootstrap-macos.sh", "# changed bootstrap")
