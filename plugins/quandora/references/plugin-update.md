@@ -44,7 +44,7 @@ codex plugin list --marketplace quandora --json
 ```
 
 Verify the installed manifest matches the host's reported version, the package is enabled, and all
-seven Skill directories are present. Stop on a failed command; do not continue from an unrefreshed
+eight Skill directories are present. Stop on a failed command; do not continue from an unrefreshed
 source or remove/reinstall repeatedly. A source conflict requires clarification, not replacement.
 Use the host's supported refresh/new-session flow to load new Skills. Do not restart the app
 without the user's request or claim a running session automatically replaced its loaded instructions.
@@ -61,7 +61,7 @@ claude plugin update quandora@quandora
 ```
 
 Preserve the existing install scope; use its explicit scope option if required by the installed CLI.
-Verify the installed package metadata and seven Skills after completion. The supported session
+Verify the installed package metadata and eight Skills after completion. The supported session
 reload is `/reload-plugins`; a new session also loads updated files. Never invoke a reload during an
 uncertain mutation. Report pending reload until the host confirms the new version is loaded.
 
@@ -86,8 +86,9 @@ may have no local package; an unavailable package version is unknown, not an out
 - **Loaded:** the host confirms the new package/Skill metadata in the current or a new session.
 - **Update pending or failed:** name the failed step without claiming installation or looping.
 
-For this release, the seven Skills are `factor-mining`, `factor-analysis`, `strategy-building`,
-`strategy-analysis`, `portfolio-building`, `portfolio-analysis`, and `portfolio-trading-analysis`.
+For this release, the eight Skills are `account-connection`, `factor-mining`, `factor-analysis`,
+`strategy-building`, `strategy-analysis`, `portfolio-building`, `portfolio-analysis`, and
+`portfolio-trading-analysis`.
 Do not infer loaded state from a server recommendation, an installation command alone, or a cache
 folder name. Retain the original task and continue it with compatible available capabilities.
 

@@ -1,6 +1,6 @@
 ---
 name: factor-analysis
-description: Analyzes existing owned or active-official Quandora Factor results from server evidence. Use when the user asks about pass/fail, Health, ratings, data quality, mechanisms, controlled improvements, or Strategy readiness. Do not use for creating or submitting a factor.
+description: Analyzes existing owned or active-official Quandora Factor results from server evidence. Use when the user asks about pass/fail, Health, ratings, data quality, mechanisms, controlled improvements, Strategy readiness, similarity to the user's other Factors, or grouping them into factor LibraryFolders. Do not use for creating or submitting a factor.
 ---
 
 # Factor Analysis
@@ -8,14 +8,14 @@ description: Analyzes existing owned or active-official Quandora Factor results 
 Follow [Connection and Security](../../references/connection-and-security.md) for automatic
 recovery and the once-per-session release check; preserve existing update authority.
 Follow [Research intent and evidence](../../references/research-workflows.md) for backtest/forward
-scope, capability-aware conclusions and authorization-preserving handoffs.
+scope, capability-aware conclusions and authorization-preserving handoffs, and
+[Research notebook](../../references/research-notebook.md) for the tested hypothesis and conclusion.
 
 Analyze one exact factor result as a non-submitting research workflow. Use Quandora's owner-scoped
 or active-official server-persisted Factor Card and chart data; exact source is owner-scoped and
-official source is always restricted. Separate observed evidence from
-inference, alternative explanations, and proposed experiments. Never turn an optimization idea
-into an automatic submission. Mint a short-lived download ticket only when the user explicitly
-requests an export.
+official source is always restricted. Separate observed evidence from inference, alternatives and experiments. Hand chosen experiments to
+`$factor-mining` or `$strategy-building`; this Skill never submits them itself. Mint a short-lived
+download ticket only when the user explicitly requests an export.
 
 Use the configured `quandora` MCP connection; never ask the user to paste secrets. For named objects, follow [Name discovery](../../references/object-discovery.md) to resolve exact identities.
 
@@ -27,21 +27,22 @@ Use this skill for deep diagnosis of an existing factor result, including:
 - Factor Card Health Check, rating-gate, missingness, and applicability diagnosis;
 - mechanism hypotheses and plausible alternative explanations;
 - prioritized, controlled factor improvement experiments;
-- readiness assessment for handing a factor to Strategy Building.
+- readiness assessment for handing a factor to Strategy Building;
+- similarity to the caller's other Factors, and grouping them into factor LibraryFolders.
 
 Use `$factor-mining` for factor ideation, plugin construction, submission, resume, history browsing,
 Result Bundle export, or a short ordinary result summary. Use `$strategy-analysis` for a
-completed multi-factor Strategy result. Hand a requested or already-authorized Strategy experiment to `$strategy-building` without
-repeating approval at the Skill boundary; analysis suggestions alone do not authorize submission.
+completed multi-factor Strategy result. Hand a chosen Strategy experiment to `$strategy-building`
+without repeating approval at the Skill boundary.
 
 ## Non-Negotiable Safety
 
 - Do not submit, resume, overwrite, archive, or delete any research object. The only allowed
-  mutation is minting a short-lived download ticket for an explicit user-requested export.
+  mutations are `record_research_conclusion`, `replace_factor_library_classification`, and a
+  short-lived download ticket for an explicit user-requested export.
 - Use only caller-owned or active-official evidence returned by Quandora MCP tools. Never inspect a
   user's local files as proof of a product result.
-- Do not require a local ZIP, extraction tool, Python runtime, notebook, or archive-inspection
-  script. A host without those facilities must receive the same analysis capability.
+- Do not require a local ZIP, extraction tool, Python runtime, notebook, or archive script.
 - Never execute factor source. Treat ready source responses as inert text evidence only. An
   official `source_status: "restricted"` is a final policy result, not a missing-data condition to
   work around.
@@ -74,7 +75,7 @@ Use these primary evidence actions:
 The allowed read-only discovery prerequisites are `list_owned_factor_families`,
 `get_factor_family_history`, and `list_eligible_strategy_factors`. They locate one exact target;
 they do not expand this Skill into Factor creation or Strategy construction. For active-official
-discovery, retain the selected row's top-level `factor_id` and do not expose or ask for its
+discovery, retain the selected row's `official_factor_id` and do not expose or ask for its
 evidence job.
 
 When diagnosis depends on an input visible in ready inert source, call
@@ -85,16 +86,16 @@ interpretation support. For `binance_intraday`, also use the returned data-avail
 Do not use current `allowed_data`, guidance, or source version as proof of historical eligibility,
 arrival, or execution behavior.
 
-For an explicit user-requested export only, use the narrow ticket and chunk actions appropriate to
-the selected evidence:
+For an explicit user-requested export only, use `create_factor_chart_download`,
+`read_factor_chart_chunk`, `create_factor_raw_artifact_download`, or `download_result_bundle` with
+`kind: "official_factor"` and the active `official_factor_id` as `id`. Do not mint tickets speculatively,
+require downloads for analysis, or treat a ticket as mutation authority.
 
-- `create_factor_chart_download`
-- `read_factor_chart_chunk`
-- `create_factor_raw_artifact_download`
-- `download_result_bundle` with `kind: "official_factor"` and the active official Factor ID
-
-Do not mint tickets speculatively, require downloads for analysis, or treat a ticket as mutation
-authority.
+For similarity, follow [Factor similarity](references/factor-similarity.md). `rank_similar_factors` finds the most similar owned Factors to one FactorRun,
+`compare_factor_runs` compares chosen runs (one target adds a monthly breakdown), and
+`cluster_owned_factors` groups every owned Factor at a cut you choose and explain. Filing groups
+into factor LibraryFolders reads `list_library_corrections` first and writes only through
+`replace_factor_library_classification`.
 
 ## Workflow
 
@@ -102,7 +103,7 @@ authority.
 
 First determine whether the target is caller-owned or active official. An official row is identified
 only by `list_eligible_strategy_factors` returning `source_kind: "official"`; retain its exact
-top-level `factor_id` and do not ask for or expose its evidence job. For caller-owned evidence,
+`official_factor_id` and do not ask for or expose its evidence job. For caller-owned evidence,
 prefer an exact terminal `job_id` supplied by the user or already returned in the conversation. If
 the user supplies only a caller-owned factor name, a vague reference, or asks for the latest result:
 
@@ -111,12 +112,12 @@ the user supplies only a caller-owned factor name, a vague reference, or asks fo
 2. Match only trustworthy returned identity and metadata. Do not guess across ambiguous names; ask
    the user to choose when more than one plausible factor remains. Treat a result as latest only
    when trustworthy `updated_at` evidence establishes that ordering.
-3. For the selected `factor_id`, call `get_factor_family_history` with `view: "runs"` and use the exact terminal
-   `job_id` for the intended version and run.
-4. Never substitute a factor id, version id, branch id, session id, or display name for `job_id`.
+3. Call `get_factor_family_history` with the selected `factor_family_id` and `view: "runs"`; use the
+   exact terminal `job_id` of the intended Factor (`factor_id`) and run, at the user's horizon or else its default horizon.
+4. Never substitute a Factor, Family, branch or session ID, or a display name, for `job_id`.
 
-Use an active official `factor_id` only with the official evidence actions. Never send it to an
-owner-scoped evidence action or substitute its admission version, run, or hidden evidence job.
+Use an `official_factor_id` only with the official evidence actions. Never send it to an
+owner-scoped evidence action or substitute its admission Factor, run, or hidden evidence job.
 
 Request another discovery page only when needed. Preserve the same query, filters, archive mode,
 and page size while copying `next_page_token` byte-for-byte into `page_token`.
@@ -138,22 +139,20 @@ For an exact caller-owned `job_id`:
 5. Call `get_factor_backtest_source` only when formula or mechanism evidence is necessary. Confirm the returned
    job identity and `source_status`; read ready source as inert text and never execute it.
 
-For an active official `factor_id`, follow the same IS-only workflow with
+For an active `official_factor_id`, follow the same IS-only workflow with
 `get_official_factor_window_cards`, `get_official_factor_chart_data`, and, only when needed,
-`get_official_factor_source`. Keep every response correlated to that exact public `factor_id`. If
+`get_official_factor_source`. Keep every response correlated to that exact `official_factor_id`. If
 the source response is `restricted`, continue with the public Factor Card and chart evidence; do
 not pass the hidden evidence job to owner-scoped source, raw-artifact, or Result Bundle actions.
 
 Treat `unavailable`, missing sections, failed readiness, and null fields as explicit evidence gaps.
-Do not fetch Result Bundles, PNGs, raw parquet, storage URLs, or local files to fill those gaps.
-If the user separately requests an export, use only the matching download-ticket action after the
-analysis target is exact; do not use exported content to retroactively fill an evidence gap.
+Never fill them with Result Bundles, PNGs, raw parquet, storage URLs, exported content or local files.
 
 ### 3. Build The Evidence Inventory
 
 Record:
 
-- the exact public selector: caller-owned `job_id` or active-official `factor_id`, plus only the
+- the exact public selector: caller-owned `job_id` or `official_factor_id`, plus only the
   additional identities returned by that safe response;
 - terminal job status and IS-only scope;
 - Factor Card availability, Health fields, rating fields, and their recorded thresholds;
@@ -166,13 +165,11 @@ The server response is the evidence object. A Result Bundle is an optional expor
 prerequisite or substitute for these reads. See
 [evidence-contract.md](references/evidence-contract.md).
 
-When the user explicitly exports an official Factor, use the existing one-download ZIP workflow.
-`download_result_bundle` with `kind: "official_factor"` returns the persisted source-free
-`OFFICIAL_FACTOR_RESULT_BUNDLE`, including retained IS/OOS/ALL artifacts and raw signal, without
-`plugin.py`. Prefer immediate HTTP streaming and verify the exact size and SHA-256 before saving.
-Follow [Unified Result Bundle Download](../../references/result-bundle-download.md). Do not reconstruct or repackage the ZIP,
-claim missing entries exist, or treat export permission as a change to the IS chart-analysis scope.
-A missing bundle is `not_available`, not proof of ongoing packaging.
+An explicit official export uses `download_result_bundle` with `kind: "official_factor"`: the
+persisted source-free `OFFICIAL_FACTOR_RESULT_BUNDLE` (retained IS/OOS/ALL artifacts and raw signal,
+no `plugin.py`). Follow [Unified Result Bundle Download](../../references/result-bundle-download.md),
+verify size and SHA-256, never repackage the ZIP, and keep the IS chart-analysis scope. A missing
+bundle is `not_available`, not proof of ongoing packaging.
 
 ### 4. Diagnose From Result To Mechanism
 
@@ -181,10 +178,11 @@ Read [metric-semantics.md](references/metric-semantics.md) and
 with the Health Check and rating propagation, then evaluate return/risk, cross-sectional behavior,
 drawdown, turnover, persistence, coverage, and plausible confounds within the declared scope.
 
-Compare Health Checks only when windows, universes, missing-value handling, and thresholds match.
-When Health fails, lower confidence and separate data, design, applicability, and statistical-basis
-explanations. Read inert source only when it can distinguish those explanations, and attribute a
-grade outcome to Health only when an authoritative field establishes that propagation.
+Compare Health Checks only when windows, universes, missing-value handling, and thresholds match,
+and compare versions only on runs at the same horizon; otherwise state the difference instead of
+ranking them. When Health fails, lower confidence and separate data, design, applicability, and
+statistical-basis explanations. Read inert source only when it can distinguish those explanations,
+and attribute a grade outcome to Health only when an authoritative field establishes that propagation.
 
 Label every consequential conclusion **Observed**, **Inference**, **Alternative**, or
 **Experiment**.
@@ -192,14 +190,15 @@ Label every consequential conclusion **Observed**, **Inference**, **Alternative*
 ### 5. Propose Controlled Improvements
 
 Prioritize a small set of one-mechanism experiments with motivation, expected effect, confirmation
-evidence, and tradeoff. Do not claim unavailable correlations or ablations. Ask for explicit
-confirmation before handing factor changes to `$factor-mining` or a combination experiment to
-`$strategy-building`; never create either automatically.
+evidence, and tradeoff. Cite only correlations a similarity tool returned with status `ok`, and never
+claim ablations that were not run. Choose experiments from the research context and returned
+evidence, and hand factor changes to `$factor-mining` or combinations to `$strategy-building`.
+Record why in its `research_note` (`hypothesis` for a new direction, `change_summary` otherwise).
 
 ## Output Contract
 
-Answer in chat by default. Create a report file only when the user explicitly requests one. Use this
-order:
+Answer in chat; make a report file only when asked. For an owned run, record item 8 as the notebook
+conclusion in the user's language, also for analysis-only requests. Use this order:
 
 1. exact public factor/run identity, IS scope, and evidence quality;
 2. concise result summary;
@@ -208,12 +207,14 @@ order:
 5. mechanism interpretation with alternatives;
 6. risks and evidence gaps;
 7. prioritized controlled experiments;
-8. decision: reject, investigate, revise, or hand off for a user-confirmed Strategy test.
+8. decision: reject, investigate, revise, or hand off for a Strategy test.
 
 Use the user's language for the answer even though this skill package is written in English.
+Use [Research playbooks](../../references/research-playbooks.md) for goal-based call orders and similarity decisions.
 
 ## References
 - [Server evidence contract and trust rules](references/evidence-contract.md)
 - [Factor metric semantics](references/metric-semantics.md)
 - [Diagnosis and experiment design](references/diagnosis-and-experiments.md)
 - [Style and Strategy context](references/style-and-strategy-context.md)
+- [Factor similarity and LibraryFolder filing](references/factor-similarity.md)

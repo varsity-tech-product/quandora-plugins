@@ -96,6 +96,10 @@ task contract, or convert a missing value to zero.
   has incremental content.
 - **Window stability:** rerun the same definition on a distinct declared window when the product
   workflow supports it. Do not call the available external-agent evidence OOS.
+- **Horizon test:** keep the version fixed and propose one run at another `fwd_period`, which
+  `$factor-mining` makes with `run_factor_version`. It is a new run of the same version, not an
+  improvement; compare it with the version's run at its default horizon and name the horizon as
+  the only changed condition.
 
 For each proposal, state the independent variable, expected change, confirmation metric, and
 tradeoff. Prefer two or three high-information tests over a long optimization list.
@@ -105,5 +109,5 @@ tradeoff. Prefer two or three high-information tests over a long optimization li
 - **Reject:** evidence contradicts the mechanism or integrity is unreliable.
 - **Investigate:** important evidence is missing or alternatives remain unresolved.
 - **Revise:** a specific mechanism-level change is justified.
-- **Hand off:** evidence is adequate for a user-confirmed Strategy experiment, not for automatic
+- **Hand off:** evidence is adequate for a Strategy experiment, not for automatic
   promotion.

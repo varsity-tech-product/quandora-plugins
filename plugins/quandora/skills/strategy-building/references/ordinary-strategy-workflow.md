@@ -6,6 +6,10 @@ A bare available-factor request calls only `list_eligible_strategy_factors` with
 Use `query` and `filters` only as accepted by this eligible-factor tool. Preserve every selection
 constraint and copy `next_page_token` byte-for-byte on requested continuation.
 
+Before selecting members for a multi-factor Strategy, follow the grouping and pairwise-comparison
+order in [Research playbooks](../../../references/research-playbooks.md). Preserve exact supplied
+Factors; report their redundancy instead of silently substituting members.
+
 For composition, read `get_strategy_capabilities` when needed to establish supported choices.
 The current tool input schema is the sole request boundary; `caller_supplied_fields` describes
 caller choices when returned. Do not copy server-managed values into Skill guidance or proposed
@@ -13,17 +17,18 @@ inputs, and do not add any field absent from the live submit schema. Do not disp
 confirmation of server-managed fields.
 
 Resolve exact Factors through `list_eligible_strategy_factors`; use `get_eligible_strategy_factor`
-for eligible detail when needed. Use `include_factor_ids` for supplied exact selectors and preserve
-`unresolved_factor_ids` as unresolved; do not replace them with similarly named Factors.
+for eligible detail with the row's `eligible_factor_id`. Use `include_eligible_factor_ids` for
+supplied exact selectors and preserve `unresolved_eligible_factor_ids` as unresolved; do not replace
+them with similarly named Factors.
 Included rows can carry `strategy_use.status=needs_optimization`. Report the exact Factor and
 returned `reasonCode`, `phase`, `runtimeError`, and `observedAt`; preserve nullable support and
 admission evidence, and do not select that row or retry detail to override its state. Continue
 Factor repair only within the user's authorized scope through `$factor-mining`.
 Source and eligibility come from returned data. Grade F or a negative grade score remains
 selectable when returned as eligible; do not derive another eligibility rule from metrics.
-Copy each selected row's exact `admission.factor_id`,
-`admission.factor_version_id`, and `admission.job_id` into `factor_references`. These are the
-current Factor input field names; do not infer them from a display name or an admission-row ID.
+Copy each selected row's exact `admission.factor_family_id`, `admission.factor_id` (the immutable
+Factor) and `admission.factor_run_id` into `factor_references`. These are the current Factor input
+field names; do not infer them from a display name or the row's `eligible_factor_id`.
 
 Sharing or Publication visibility does not establish Strategy eligibility. Resolve a requested
 shared Factor through the eligible-factor tools above and select it only when the server returns
@@ -42,14 +47,20 @@ for custom weighting use `weighting.mode: "custom"` and finite positive `weighti
 totaling 1, aligned in order with the exact selected `factor_references`.
 Never send `portfolio_optimizer`, including null.
 
-For a new Folder, call `create_strategy_folder` with `name`, `specification`, and
-`factor_references`. The response contains `strategy_folder.strategy_folder_id` and the first
-immutable `strategy.strategy_id`. They are different resources; creation does not itself imply
-a Run exists. Preserve the complete returned Strategy definition.
+For a new Family, call `create_strategy_family` with `name`, `specification`, `factor_references`,
+and a `new_direction` `research_note`. The response contains `strategy_family.strategy_family_id`
+and the first immutable `strategy.strategy_id`. They are different resources; creation does not
+itself imply a Run exists. Preserve the complete returned Strategy definition.
+Minimal arguments; omit unrequested optional fields and never send null:
 
-For an existing Folder and a changed definition, read the exact base with `get_strategy`, then
-call `create_strategy` with `strategy_folder_id`, `base_strategy_id`, the complete new
-`specification`, and `factor_references`. The base remains unchanged.
+```json
+{"name":"…","specification":{"strategy_kind":"cs","ranking":{"mode":"percent","value":20}},"factor_references":[{"factor_family_id":"…","factor_id":"…","factor_run_id":"…"}],"research_note":{"relation":"new_direction","hypothesis":"…","references":[{"type":"factor_run","id":"…"}]}}
+```
+
+For an existing Family and a changed definition, read the exact base with `get_strategy`, then
+call `create_strategy` with `strategy_family_id`, `base_strategy_id`, the complete new
+`specification`, `factor_references`, and an `improvement` or `control` `research_note`. The base
+remains unchanged.
 
 ## Submit and Observe
 

@@ -32,7 +32,9 @@ Static policy tests do not prove client OAuth recovery: record the actual host s
 
 Account Connection intentionally has no authenticated MCP dependency so it loads before
 login, and no research-workflow prerequisite. Deploy Auth's additive `get_quandora_account`
-tool before recommending this package. Follow
+tool before recommending this package; its problem reports also need Auth's
+`submit_feedback_report` (contract revision `2026-10-23.feedback-reports`) in the same
+environment before publication. Follow
 `plugins/quandora/references/account-connection-verification.md` for current-account,
 explicit reauthorization, two-account switching, cancellation and host-adoption checks.
 

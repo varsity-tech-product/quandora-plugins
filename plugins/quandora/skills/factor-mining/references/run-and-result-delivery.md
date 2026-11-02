@@ -5,6 +5,10 @@ continued, or when the user requests the Result Bundle.
 
 ## Mutation Recovery
 
+`submit_factor_research` reports a rejected step as `failed_step` with that step's error; repair
+only that step as described in [Factor Plugin Authoring](plugin-authoring.md). Its accepted run
+follows the rules below.
+
 `retryable` describes availability; `recovery_action` controls mutation behavior:
 
 - `repair_and_revalidate`: repair allowlisted diagnostics and validate the complete source again.
@@ -20,6 +24,15 @@ continued, or when the user requests the Result Bundle.
 Never infer mutation authority from a generic retry flag. Never upload again when a known run says
 resume.
 
+`run_factor_version` uses the same recovery actions. `retry_same_pending_request` means call it
+again once with identical arguments, which returns the same run. `resume_known_run` names the run
+FM already accepted in `run_id`: continue it with `continue_factor_backtest` or `wait_for_runs`,
+and never call `run_factor_version` again for it. The hypothesis is saved only on a successful response. A `conflict` with
+`field: fwd_period` and `reason: horizon_not_applied` means FM ran another horizon than requested:
+report it and do not retry. An upload rejected with `error_code: factor_horizon_only_change`
+differs from its parent only by `fwd_period`: do not upload again; call `run_factor_version` with
+the parent `factor_id` and that `fwd_period`.
+
 ## Provider Acceptance Is A Separate Axis
 
 FM durable acceptance is not proof that the provider accepted or executed the backtest.
@@ -32,9 +45,11 @@ Absent provider state is unavailable evidence, not inferred acceptance.
 
 ## Bounded Observation
 
-Use `continue_factor_backtest` only for an exact known non-terminal run and at most four times in one
-request. It re-drives backend work; it is not a status read. If still running, stop, report that the
-run can be continued later, and do not request Result Bundle metadata.
+Use `continue_factor_backtest` only for an exact known non-terminal run and at most four times in
+one request. It re-drives backend work; it is not a status read. `wait_for_runs` waits without
+re-driving, including for several runs at once; follow a returned `next_action` first. If still
+running, stop, report that the run can be continued later, and do not request Result Bundle
+metadata.
 
 ## Result Bundle
 

@@ -13,9 +13,22 @@ Apply each artifact's declared schema and window. Missing or null values remain 
 - Attribution and signal-return curves can support mechanism claims only when actually included.
 - Orders and trades are execution evidence, not substitutes for the canonical run snapshot.
 
+Artifacts and analysis data return weekly level curves by default (monthly beyond two years);
+returns, turnover and other per-period series stay daily. Request `resolution: "daily"` only when a
+daily detail decides a claim, and `format: "columnar"` for tables. Request analysis-data pages of
+at most 200 points; a 500-point daily decile page is about 70,000 characters.
+
+For an owned Run, read the tested hypothesis and targets with `list_research_notes` using the
+Run's `strategy_version` (its `strategy_id`) as `subject`. It returns the version's own notes and
+the notes about each of its Runs, which carry `run_id`; use the version-level notes and those whose
+`run_id` is the analyzed Run. End with `record_research_conclusion` on that `strategy_run`; the
+server files it under the version with `run_id`. Publication evidence has no notebook entry.
+
 ## Return And Drawdown
 
 - Compare return, Sharpe, Sortino, drawdown, and fees over the same declared period.
+- Rank two Strategy versions only on Runs with the same exchange and window. When they differ,
+  state the difference instead of ranking them.
 - Treat a signed negative drawdown as a loss from peak; name the sign convention when reporting it.
 - A high return with concentrated time contribution or slow drawdown recovery is less robust than
   an evenly distributed path with the same headline return.
@@ -31,7 +44,8 @@ Apply each artifact's declared schema and window. Missing or null values remain 
 
 ## Composition
 
-- Read selected Factors from `strategy.factor_references` returned by `get_strategy`.
+- Read selected Factors from `strategy.factor_references` returned by `get_strategy`: each names the
+  Family `factor_family_id`, the immutable Factor `factor_id` and its evidence run `factor_run_id`.
 - Read weighting from `strategy.specification.weighting`: `mode: equal` means equal Factor
   weighting; `mode: custom` uses the returned `weights` in Factor-reference order.
 - Read actual Top/Bottom selection from `strategy.specification.ranking`, and direction and

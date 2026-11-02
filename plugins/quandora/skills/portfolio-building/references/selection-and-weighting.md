@@ -8,7 +8,8 @@ Load for delegated selection or design, not for every exact composition request.
 
 Translate the objective into an assessable comparison: improve net risk-adjusted return, reduce
 drawdown/recovery time, reduce a named concentration, or improve behavior in specified states.
-Use supplied constraints; ask only for a material missing preference that changes the choice.
+Use supplied constraints; choose missing settings from the research context and returned candidates.
+Record why in `research_note.hypothesis` for a new direction or `change_summary` otherwise.
 Predeclare the core Strategy and a same-member equal-initial-capital baseline. A retrospective
 best member can be an additional labeled reference, not a replacement chosen to make results win.
 

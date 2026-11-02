@@ -8,6 +8,8 @@ readable aggregate. Preserve nullable evidence and safe returned error fields.
 Canonical summary fields include `net_profit_pct`, `annual_return_pct`, `annual_std`, `sharpe`,
 `sortino`, `max_drawdown_pct`, `start_equity`, `end_equity`, and available fees/funding. The curve
 uses `equity_curve.points[].t` and `equity_curve.points[].value` for time and normalized equity.
+Curves arrive as weekly points (monthly beyond two years) with `max_drawdown_interval` from the
+original curve; request `resolution: "daily"` only when a daily detail decides a claim.
 Percentage-suffixed metrics use percentage units; `annual_std` is annualized standard deviation.
 Apply each declared convention, including drawdown sign, rather than copying Trading conventions.
 Portfolio normalized research capital is not an executed account balance.
@@ -23,10 +25,10 @@ Runs and their initial-cash normalization are authoritative. Do not average memb
 drawdown to construct Portfolio metrics, infer joint statistics from headline numbers, or use
 theoretical fixed-weight arithmetic as the realized Portfolio result.
 
-Only compare full-run member metrics when their interval, frequency, valuation, units, cost and
-exposure assumptions are actually comparable with the Portfolio interval. A source can extend
-beyond the Portfolio's aligned interval. Without a supported same-window projection, do not use
-its full-run summary as a like-for-like control. State that the comparison is unavailable.
+Only compare full-run member metrics when their exchange, interval, frequency, valuation, units,
+cost and exposure assumptions are actually comparable with the Portfolio interval. A source can
+extend beyond the Portfolio's aligned interval. Without a supported same-window projection, do not
+use its full-run summary as a like-for-like control. State that the comparison is unavailable.
 Clipped curves alone do not establish clipped fees or funding, and missing costs remain missing.
 
 For owner member evidence follow the exact `components[].strategy_run_id` returned by the

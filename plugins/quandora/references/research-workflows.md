@@ -5,6 +5,10 @@ Portfolio Analysis work on backtests. Portfolio Trading Analysis owns forward-te
 and analysis. A Factor supplies a prediction; a Strategy turns admitted Factors into trading
 rules; a Portfolio allocates initial capital between exact Strategies.
 
+A Family (FactorFamily, StrategyFamily, PortfolioFamily) is the immutable lineage tree that holds
+each version of one idea. A LibraryFolder is only the user's classification of finished works;
+moving a work between LibraryFolders never changes its Family.
+
 ## Select the workflow by intent
 
 | User intent | Owner | Action boundary |
@@ -14,15 +18,24 @@ rules; a Portfolio allocates initial capital between exact Strategies.
 | Select eligible Factors, create or backtest a Strategy | `$strategy-building` | Preserve immutable definitions and explicit backtest intent |
 | Diagnose a Strategy or produce its research card | `$strategy-analysis` | Read exact evidence; distinguish signal and implementation issues |
 | Select Strategies, allocate capital, build, share or favorite a Portfolio | `$portfolio-building` | Separate design-only, composition, backtest and sharing intent |
-| Compare a Portfolio backtest with its actual members | `$portfolio-analysis` | Read existing evidence; no automatic ablation or rerun |
+| Compare a Portfolio backtest with its actual members | `$portfolio-analysis` | Read exact evidence; hand chosen controls to the builder |
 | Manage Simulation accounts/runs or analyze forward evidence | `$portfolio-trading-analysis` | Analysis-only is read-only; explicit Simulation management uses supported writes; real Live is read-only |
 
-An analysis request does not authorize a new backtest, account, sharing grant or Trading
-change. Carry already-authorized experiment scope through a handoff to the relevant builder;
-do not ask again merely because the Skill changes. An optimization request uses a bounded set of
-controlled experiments and does not justify indefinite search. Never silently change supplied
-members, weights, data, dates or objectives. Explain a real admission failure without replacing
-the rejected inputs.
+An analysis may hand a controlled experiment (a new Factor version, Strategy or Portfolio backtest)
+to its builder; it never creates accounts, sharing grants or Trading changes. Choose research
+settings from the goal, context and returned candidates, and record the reason in the decision's
+`research_note` (`hypothesis` for a new direction, `change_summary` otherwise). Carry that choice
+through handoffs without waiting for confirmation. Explicit analysis-only or design-only requests
+retain their scope. An optimization uses a bounded set of controlled experiments, not indefinite
+search. Never silently change supplied members, weights, data, dates or objectives. Explain a real
+admission failure without replacing the rejected inputs. Record conclusions in the
+[Research notebook](research-notebook.md).
+
+Never create, start, pause, resume or stop a Simulation account or run unless the user asked for
+that exact operation. When research suggests one, list the exact Portfolio or run, proposed
+operation and reason in the final report for a person to decide.
+PB's automatic Paper provisioning after a Portfolio backtest is separate; observe its association
+without starting another run. Sharing, publishing and account operations retain their request rules.
 
 For design-only requests, stop at the proposed definition and validation plan. For exact supplied
 members and weights, preserve that intent; an incomplete research card narrows conclusions but
@@ -33,7 +46,7 @@ full research workflow. Scale the answer and evidence reads to the question.
 
 Carry the user goal and authorized actions together with:
 
-- exact Folder, immutable definition, research Run and account/Trading Run identities as applicable;
+- exact Family, immutable definition, research Run and account/Trading Run identities as applicable;
 - actual Factor and Strategy lineage, owner/Official/Publication/Share context and read selectors;
 - observation window, data cutoff, sampling frequency, valuation time and evidence readiness;
 - units, net/gross returns, fees/funding, initial-capital allocation and exposure conventions;
