@@ -64,7 +64,8 @@ establish novelty; resolve it or report the unresolved comparison and stop the b
    exact parent and `references` to the parent run/version and motivating evidence. Change the
    object and keep the parent's horizon. State the expected metric change before submitting. To
    test only another horizon, rerun the parent with `run_factor_version` instead; it is not an
-   improvement.
+   improvement. If `run_factor_version` is not in the tool list, report the horizon test as
+   unavailable.
 3. Call `wait_for_runs` and read the new card with `get_factor_backtest_window_cards`, then call
    `compare_factor_runs` against the parent run only to obtain the monthly breakdown. Compare
    headline metrics only when both runs use the same horizon; otherwise state the difference

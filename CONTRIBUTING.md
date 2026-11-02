@@ -38,6 +38,10 @@ environment before publication. Follow
 `plugins/quandora/references/account-connection-verification.md` for current-account,
 explicit reauthorization, two-account switching, cancellation and host-adoption checks.
 
+The Factor Skills name `run_factor_version`, which production Auth lists only when
+`REMOTE_MCP_RUN_FACTOR_VERSION_ENABLED` is on. When it is not listed, the Skills tell the user
+that testing an existing version at another horizon is unavailable and never upload source instead.
+
 Production publication promotes the reviewed eight-Skill payload from the staging repository while
 preserving the production package identity, MCP/OAuth endpoint, and supported host installation
 guides. Update every manifest version together. Publish and verify the package before advancing

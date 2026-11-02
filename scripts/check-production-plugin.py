@@ -1051,6 +1051,17 @@ def _check_connection_policy(errors: list[str], skill_files: dict[str, Path]) ->
                 errors.append(f"{path.relative_to(REPOSITORY_ROOT)}: hardcoded release label")
 
 
+# Production Auth lists run_factor_version only behind REMOTE_MCP_RUN_FACTOR_VERSION_ENABLED;
+# every action path that names it must say what to do when it is not listed.
+RUN_FACTOR_VERSION_FALLBACK = "`run_factor_version` is not in the tool list"
+RUN_FACTOR_VERSION_ACTION_PATHS = (
+    SKILLS_ROOT / "factor-mining/SKILL.md",
+    SKILLS_ROOT / "factor-mining/references/run-and-result-delivery.md",
+    SKILLS_ROOT / "factor-analysis/references/diagnosis-and-experiments.md",
+    PLUGIN_ROOT / "references/research-playbooks.md",
+)
+
+
 def _check_production_delivery(errors: list[str]) -> None:
     expected_url = "https://mcp.quandora.ai/quant"
     for filename in (".mcp.json", "mcp.json"):
@@ -1089,6 +1100,12 @@ def _check_production_delivery(errors: list[str]) -> None:
     for filename in ("workbuddy-cn-install-macos.js", "workbuddy-cn-oauth-macos.js"):
         if "get_factor_mining_status" not in (scripts / filename).read_text(encoding="utf-8"):
             errors.append("WorkBuddy protected probe must use canonical status tool")
+    for path in RUN_FACTOR_VERSION_ACTION_PATHS:
+        if RUN_FACTOR_VERSION_FALLBACK not in " ".join(path.read_text(encoding="utf-8").split()):
+            errors.append(
+                f"{path.relative_to(REPOSITORY_ROOT)}: missing production fallback for an "
+                "unlisted run_factor_version"
+            )
 
 
 def main() -> int:

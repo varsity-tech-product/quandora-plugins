@@ -31,7 +31,8 @@ and never call `run_factor_version` again for it. The hypothesis is saved only o
 `field: fwd_period` and `reason: horizon_not_applied` means FM ran another horizon than requested:
 report it and do not retry. An upload rejected with `error_code: factor_horizon_only_change`
 differs from its parent only by `fwd_period`: do not upload again; call `run_factor_version` with
-the parent `factor_id` and that `fwd_period`.
+the parent `factor_id` and that `fwd_period`. If `run_factor_version` is not in the tool list,
+tell the user that another horizon of an existing version cannot be tested yet and stop.
 
 ## Provider Acceptance Is A Separate Axis
 

@@ -146,7 +146,9 @@ version's run being compared. It creates a new run of the same version. On an er
 ambiguous response without one, retry the identical request, which returns the same run. Wait for
 `run.factor_run_id` and read it like any Factor run. Never upload the same source as an `improvement` to change only the
 horizon: the server rejects that upload and tells you to rerun the version. If
-`run_factor_version` is absent or rejects the horizon, report that instead of uploading source.
+`run_factor_version` is not in the tool list, tell the user that testing an existing version at
+another horizon is not available yet and stop; never upload source or submit another backtest
+instead. If it rejects the horizon, report that rejection.
 
 ## Reversal Requests
 

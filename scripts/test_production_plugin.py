@@ -300,6 +300,17 @@ class ConnectionPolicyTests(unittest.TestCase):
         self.append(self.plugin / "scripts/workbuddy-cn-install-macos.js", "// changed component")
         self.rejected("WorkBuddy component integrity mismatch")
 
+    def test_run_factor_version_paths_keep_the_unlisted_fallback(self):
+        for relative in ("skills/factor-mining/SKILL.md", "references/research-playbooks.md"):
+            with self.subTest(file=relative):
+                path = self.plugin / relative
+                original = path.read_text()
+                phrase = "`run_factor_version` is not in the tool list"
+                self.assertIn(phrase, original)
+                path.write_text(original.replace(phrase, "`run_factor_version` fails"))
+                self.rejected("missing production fallback for an unlisted run_factor_version")
+                path.write_text(original)
+
     def test_stale_bootstrap_guide_hash_is_rejected(self):
         self.append(self.plugin / "scripts/workbuddy-cn-bootstrap-macos.sh", "# changed bootstrap")
         self.rejected("WorkBuddy bootstrap guide integrity mismatch")

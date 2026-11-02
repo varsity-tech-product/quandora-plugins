@@ -99,7 +99,8 @@ task contract, or convert a missing value to zero.
 - **Horizon test:** keep the version fixed and propose one run at another `fwd_period`, which
   `$factor-mining` makes with `run_factor_version`. It is a new run of the same version, not an
   improvement; compare it with the version's run at its default horizon and name the horizon as
-  the only changed condition.
+  the only changed condition. If `run_factor_version` is not in the tool list, report this test
+  as unavailable instead of proposing an upload.
 
 For each proposal, state the independent variable, expected change, confirmation metric, and
 tradeoff. Prefer two or three high-information tests over a long optimization list.
