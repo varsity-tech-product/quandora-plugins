@@ -134,7 +134,7 @@ claude plugin update quandora@quandora --scope user
 claude plugin enable quandora@quandora --scope user
 ```
 
-Confirm that the plugin is enabled and exposes all seven expected skills and the plugin-managed MCP server.
+Confirm that the plugin is enabled and exposes all eight expected skills and the plugin-managed MCP server.
 Record the installed entry's absolute `installPath` and `version` from `claude plugin list --available --json`; the entry appears in the `installed` array with id `quandora@quandora`. Require the installed version to equal the version the refreshed marketplace currently declares for the plugin, as shown by `claude plugin details quandora@quandora`. Do not compare against a version hardcoded in this document. If the versions differ, run `claude plugin update quandora@quandora --scope user` once and re-check; if they still differ, stop and report both versions.
 
 ## 4. Start OAuth authorization

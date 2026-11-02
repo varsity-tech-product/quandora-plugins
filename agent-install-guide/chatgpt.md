@@ -106,7 +106,7 @@ codex plugin remove quandora@quandora --json
 codex plugin add quandora@quandora --json
 ```
 
-Confirm that it is installed and enabled and that it exposes all seven expected skills. Compare the installed version with the version advertised by the refreshed marketplace, not a hardcoded version in this guide. If they still differ after the scoped update above, stop and report both versions; do not repeat removal and installation in a loop.
+Confirm that it is installed and enabled and that it exposes all eight expected skills. Compare the installed version with the version advertised by the refreshed marketplace, not a hardcoded version in this guide. If they still differ after the scoped update above, stop and report both versions; do not repeat removal and installation in a loop.
 
 ## 4. Start OAuth authorization
 
