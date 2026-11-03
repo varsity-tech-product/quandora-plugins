@@ -37,9 +37,9 @@ joint-risk evidence limits conclusions rather than generating invented correlati
 
 Portfolio backtests use `submit_portfolio_backtest` on the exact immutable definition, following
 its current exchange/schema contract. FM prepares missing or stale sources; PB returns persisted
-state and authoritative research. Preserve the automatic association returned by
-`get_portfolio_backtest` in `run.automatic_paper`; pending/absent association does not authorize
-an extra start. Portfolio Trading Analysis observes that exact association and owns explicitly
+state and authoritative research. PB runs automatic Monitoring only for a shared
+Portfolio; `get_portfolio_backtest` returns its association in `run.automatic_paper`, null when
+the Portfolio has never been shared. A pending or absent association does not authorize an extra start. Portfolio Trading Analysis observes that exact association and owns explicitly
 requested Simulation operations. Legacy simulated `live` aliases do not describe real Live accounts.
 Real Live uses separate account-oriented read tools; its writes remain frontend-only.
 

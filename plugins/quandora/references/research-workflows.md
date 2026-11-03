@@ -34,7 +34,7 @@ admission failure without replacing the rejected inputs. Record conclusions in t
 Never create, start, pause, resume or stop a Simulation account or run unless the user asked for
 that exact operation. When research suggests one, list the exact Portfolio or run, proposed
 operation and reason in the final report for a person to decide.
-PB's automatic Paper provisioning after a Portfolio backtest is separate; observe its association
+PB's automatic Monitoring follows sharing, not backtests; observe its association when present
 without starting another run. Sharing, publishing and account operations retain their request rules.
 
 For design-only requests, stop at the proposed definition and validation plan. For exact supplied

@@ -44,6 +44,10 @@ with the original `share_id`, its `expected_expires_at`, and a later valid-throu
 that same active grant. Expired grants cannot be revived by extension. Use
 `update_portfolio_share_intro` with the aggregate `expected_updated_at` to edit the introduction.
 A conflict requires rereading current sharing; do not overwrite or create a substitute grant.
+A committed public or direct share also makes PB start automatic Monitoring asynchronously; the
+share stays successful while Monitoring prepares, retries or fails. When the last grant expires or
+the Publication is withdrawn, PB stops that Monitoring and keeps its history, and a later share
+starts a new run. Never share a Portfolio only to obtain Monitoring; sharing needs its own request.
 These edits do not create a research version or rerun a backtest.
 
 For retained authorized Shares use `list_portfolio_shares` and `get_portfolio_share` with the

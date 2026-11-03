@@ -353,6 +353,8 @@ FORBIDDEN_RUNTIME_MARKDOWN = {
     "PortfolioVersion": "removed Portfolio identity layer",
     "strategy_version_id": "removed Strategy selector",
     "portfolio_version_id": "removed Portfolio selector",
+    "automatically provisions Paper": "backtest-driven automatic Paper claim",
+    "Paper provisioning after a Portfolio backtest": "backtest-driven automatic Paper claim",
 }
 SEARCH_DISCOVERY_SKILLS = {
     "factor-analysis",

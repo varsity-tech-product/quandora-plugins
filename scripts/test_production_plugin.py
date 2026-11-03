@@ -163,6 +163,15 @@ class ConnectionPolicyTests(unittest.TestCase):
                 self.rejected("retired Result Bundle kind remains: portfolio_share")
                 path.write_text(original)
 
+    def test_backtest_driven_automatic_paper_claim_is_rejected(self):
+        for relative in ("skills/portfolio-building/SKILL.md", "skills/strategy-building/SKILL.md"):
+            with self.subTest(file=relative):
+                path = self.plugin / relative
+                original = path.read_text()
+                self.append(path, "PB automatically provisions Paper after the Portfolio backtest.")
+                self.rejected("backtest-driven automatic Paper claim")
+                path.write_text(original)
+
     def test_required_management_tools_stay_with_their_owner(self):
         cases = (
             ("portfolio-building", "share_portfolio_with_user"),

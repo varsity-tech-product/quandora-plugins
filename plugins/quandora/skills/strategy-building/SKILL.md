@@ -107,8 +107,9 @@ The default completed local path is `Quandora result/strategy/<strategy_slug>.zi
 Analysis uses server artifacts through `$strategy-analysis`; a local ZIP is not a prerequisite.
 
 For Trading preparation, hand the exact Strategy to `$portfolio-building` for a one-component
-Portfolio. After its backtest, PB automatically provisions Paper; the Portfolio workflow returns
-the exact association for `$portfolio-trading-analysis` to read. Do not start an extra TradingRun here.
+Portfolio. A backtest does not start Monitoring: PB runs it only for a shared Portfolio, and a private
+forward test is an explicit Simulation request for `$portfolio-trading-analysis`. Do not start a
+TradingRun here.
 
 ## Final Response
 

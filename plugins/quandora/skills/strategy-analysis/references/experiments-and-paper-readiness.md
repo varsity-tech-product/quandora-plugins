@@ -45,8 +45,8 @@ ablations. Propose them as future controlled runs rather than reporting nonexist
 - **Reject:** integrity or results contradict the intended mechanism.
 - **Research:** important alternatives or evidence gaps remain.
 - **Controlled rerun:** one or more falsifiable changes should be tested through `$strategy-building`.
-- **Consider Paper:** evidence is sufficient for user review, but Portfolio preparation can proceed within an existing authorized task; read PB automatic Paper
-  after its backtest, and reserve an additional start for an explicit separate request.
+- **Consider Paper:** evidence is sufficient for user review, but Portfolio preparation can proceed within an existing authorized task; PB starts automatic
+  Monitoring only for a shared Portfolio, so propose an explicit Simulation for a person to decide.
 
 Never start, stop, or monitor Paper Trading from this skill. Never present Paper readiness as a
 guarantee of live performance.

@@ -97,7 +97,7 @@ For changed components in an existing Family, read the exact base with `get_port
 This creates an immutable Portfolio; no Family ID or Run ID substitutes for its `portfolio_id`.
 
 Present consequential selections and proceed within existing authorization. Do not add approvals
-between definition, backtest, and automatic Paper observation. An ambiguous response requires
+between definition, backtest, and automatic Monitoring observation. An ambiguous response requires
 reconciliation with exact returned identities, not a replacement definition or submission.
 
 ## Backtest and Read Results
@@ -151,16 +151,23 @@ Keep pending/unavailable benchmark evidence and nullable metrics explicit even w
 result is ready. Do not fetch substitute prices, fill missing points, average component risk,
 or assemble authoritative metrics or benchmark results locally. Never supply demo values.
 
-## Read Automatic Paper First
+## Read Automatic Monitoring First
 
-PB automatically provisions Paper after the Portfolio backtest. Read
-`get_portfolio_backtest` → `run.automatic_paper` and preserve its `status`,
-`source_portfolio_run_id`, and exact nullable `portfolio_trading_run_id`.
+PB runs automatic Monitoring only for a shared Portfolio: while it has an unexpired public or direct
+share, or an active Community Publication. A backtest alone never starts it, and a private
+Portfolio's forward test is an explicit Simulation request for `$portfolio-trading-analysis`.
+Read `get_portfolio_backtest` → `run.automatic_paper`. Null means the Portfolio has no automatic
+Monitoring association, normally because it has never been shared; report that, not a pending start.
+When present, preserve its `status`, `source_portfolio_run_id`, and exact nullable
+`portfolio_trading_run_id`. `status` (`pending`, `retrying`, `active`, `failed`) describes
+provisioning, not the run: after the last share ends PB stops the run and keeps its history while
+the association can still read `active`, so read the run before calling it running.
 The association belongs to the immutable Portfolio and may refer to an earlier backtest of that
 same Portfolio. It is authoritative even when other TradingRuns exist for that Portfolio.
 
 Hand the exact non-null `portfolio_trading_run_id` to `$portfolio-trading-analysis` for existing-run reads.
-A null association or pending/retrying/failed provisioning is not an instruction to call start.
+A null association or pending/retrying/failed provisioning is not an instruction to call start or
+to share the Portfolio.
 Observe within the task's bounded wait and report unresolved provisioning with its canonical
 Portfolio/Run identity. Starting an additional run requires an explicit separate Trading request.
 Do not select a nearby run by date or replace the automatic run with a new start.
@@ -179,7 +186,7 @@ operation and reason in the final report for a person to decide.
 
 For a design, state proposed members, weights, reasons and evidence gaps. For execution, state the
 exact composition, Family/Portfolio/Run identities, preparation or backtest state, research result,
-and automatic Paper association when returned. After a terminal Run, record a one- or two-sentence
+and the automatic Monitoring association, or that none exists. After a terminal Run, record a one- or two-sentence
 conclusion on that `portfolio_run` before answering; the server files it under the Portfolio
 version with `run_id`. Keep research metrics separate from Trading observations.
 Use the user's language and preserve schema fields and identifiers.
