@@ -60,7 +60,7 @@ segments. Share/publication management belongs to `$portfolio-building`.
 - `get_research_context`, `list_research_notes`, `record_research_conclusion`: Simulation notebook.
 
 Research creation and backtests belong to `$strategy-building` and `$portfolio-building`.
-`get_portfolio_backtest` is a read-only prerequisite for resolving an automatic Paper association.
+`get_portfolio_backtest` is a read-only prerequisite for resolving an automatic Monitoring association.
 
 ## Account ROI and individual Run performance
 
@@ -73,12 +73,13 @@ The old Live `get_live_account_facts(section="performance")` is still Run-scoped
 If a new tool is unavailable, follow connection recovery; report unavailable performance rather
 than substituting legacy ROI, summing Runs or calculating from a first observed snapshot.
 
-## Automatic Paper from a Backtest
+## Automatic Monitoring of a Shared Portfolio
 
 When the task follows Portfolio research, read the exact `portfolio_run_id` with
-`get_portfolio_backtest`. Use `run.automatic_paper.portfolio_trading_run_id` to read the existing
-run with `get_portfolio_trading_run`; the Portfolio association is authoritative even if other
-Paper runs exist for that Portfolio. Preserve provisioning `status` and `source_portfolio_run_id`.
+`get_portfolio_backtest`. A null `run.automatic_paper` means no automatic Monitoring exists: PB runs it only while the Portfolio is shared, and a private Portfolio's forward test is an explicit Simulation request.
+Otherwise use `run.automatic_paper.portfolio_trading_run_id` to read the existing run with `get_portfolio_trading_run`;
+the Portfolio association is authoritative even if other Paper runs exist for that Portfolio.
+Preserve provisioning `status` and `source_portfolio_run_id`, and take running or stopped from the run itself: a run stopped after its last share ended keeps its history, and a later share starts a new run.
 Do not require a new capital choice or call start merely to observe this automatic run.
 
 Raw Factor inputs remain governed by the Factor Plugin Contract before they reach Portfolio
