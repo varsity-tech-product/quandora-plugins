@@ -77,12 +77,29 @@ PORTFOLIO_SOURCE_EVIDENCE_MARKERS = (
     "run.automatic_paper", "source_portfolio_run_id", "portfolio_trading_run_id",
     "base_portfolio_id",
 )
+PORTFOLIO_WINDOW_GUIDANCE_MARKERS = (
+    "`2022-01-01` through the last complete UTC month end",
+    "frozen at first acceptance",
+    "recovery retain that accepted cutoff even when the month changes",
+    "Leave dates omitted",
+    "do not insert a remembered month-end or pre-submit component Runs locally",
+    "Preserve historical Run dates as returned",
+    "never shorten the interval or report a result as ready without sufficient evidence",
+)
 STRATEGY_CALLER_BOUNDARY_GUIDANCE_MARKERS = (
     "`caller_supplied_fields`",
     "the sole request boundary",
-    "Do not copy server-managed values into Skill guidance",
+    "Do not copy server-managed values into proposed inputs",
     "do not add any field absent from the live submit schema",
-    "Do not display or ask for confirmation of server-managed fields",
+    "Do not ask for confirmation of server-managed fields",
+)
+STRATEGY_WINDOW_GUIDANCE_MARKERS = (
+    "Omit both `start_date` and `end_date`",
+    "including when an older tool schema still exposes them",
+    "`2022-01-01` through the last complete UTC month end",
+    "do not silently submit a different period",
+    "Do not remove the rejected dates and resubmit unless the user accepts",
+    "Preserve historical Run dates as returned",
 )
 STRATEGY_SERVER_VALUE_GUIDANCE_MARKERS = (
     "`initial_cash=100000`",
@@ -747,6 +764,17 @@ def _check_skills(
                     "portfolio-building/SKILL.md: missing source-evidence workflow marker "
                     f"{marker!r}"
                 )
+        normalized_portfolio_text = " ".join(portfolio_text.split())
+        for marker in PORTFOLIO_WINDOW_GUIDANCE_MARKERS:
+            if marker not in normalized_portfolio_text:
+                errors.append(
+                    "portfolio-building/SKILL.md: missing fixed-window boundary "
+                    f"{marker!r}"
+                )
+        if "resolves the actual latest data endpoint" in normalized_portfolio_text:
+            errors.append(
+                "portfolio-building/SKILL.md: retired provider-watermark guidance remains"
+            )
 
     strategy_path = skill_files.get("strategy-building")
     if strategy_path is not None:
@@ -766,6 +794,16 @@ def _check_skills(
                     "strategy-building ordinary workflow: server-managed value leaked into "
                     f"Agent guidance via {marker!r}"
                 )
+        for marker in STRATEGY_WINDOW_GUIDANCE_MARKERS:
+            if marker not in ordinary_text:
+                errors.append(
+                    "strategy-building ordinary workflow: missing fixed-window boundary "
+                    f"{marker!r}"
+                )
+        if "are optional run choices" in ordinary_text:
+            errors.append(
+                "strategy-building ordinary workflow: dates remain documented as caller choices"
+            )
         if "dates, cash, fee rates" in ordinary_text:
             errors.append(
                 "strategy-building ordinary workflow: server-managed fields remain "

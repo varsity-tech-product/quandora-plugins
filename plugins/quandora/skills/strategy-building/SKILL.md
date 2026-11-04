@@ -52,7 +52,9 @@ listed. Report that state without adding local grade thresholds or silently subs
 For a Strategy request, follow [Canonical Strategy Workflow](references/ordinary-strategy-workflow.md).
 Read `get_research_context` with `stage: "strategy"` first. Resolve exact admitted Factors, prepare
 one named immutable definition, create its Family if needed, then submit a Run with a fresh
-`client_request_id` when requested. A brand-new idea starts a new Family: `create_strategy_family`
+`client_request_id` when requested. Omit `start_date` and `end_date`; the server owns the fixed
+research interval. Preserve historical dates and explicit custom-period requests as described in
+the Canonical Strategy Workflow. A brand-new idea starts a new Family: `create_strategy_family`
 with a `research_note` whose `relation` is `new_direction`. A revision of an existing idea calls
 `create_strategy` in its Family with the exact base and `relation` `improvement`, or `control` when
 it removes or changes one Factor or rule to measure its contribution; create each control with its
@@ -99,7 +101,7 @@ Continue Factor repair only within the user's authorized scope, then use newly a
 A failed Run remains historical evidence. A requested rerun calls `submit_strategy_backtest`
 for the same immutable Strategy with a fresh `client_request_id`; a changed definition must first
 create a new Strategy. Generate the ID before submitting, preserve it across retries, and never
-reuse it with different dates or a different Strategy.
+reuse it with different parameters or a different Strategy.
 
 After a terminal Run and a readable archive, use
 [Strategy Result Bundle Delivery](references/result-bundle-delivery.md) for requested export.

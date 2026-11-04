@@ -104,11 +104,15 @@ reconciliation with exact returned identities, not a replacement definition or s
 
 Call `submit_portfolio_backtest` with the immutable `portfolio_id` for the requested backtest or
 rerun. Follow the current schema for any user-selected `exchange`; otherwise preserve the server
-default. Do not add fields absent from that schema. PB requests the latest available closed monthly
-data. FM prepares sources starting on 2022-01-01, resolves the actual latest data endpoint, and
-reruns missing or stale StrategyRuns before aggregating their actual aligned interval. Leave dates
-omitted; do not insert a remembered month-end or pre-submit component Runs locally. This source
-preparation is part of the requested backtest. Preserve returned `command_kind`,
+default. Do not add fields absent from that schema. The server fixes each new Portfolio Run to
+`2022-01-01` through the last complete UTC month end, frozen at first acceptance. Retries and
+recovery retain that accepted cutoff even when the month changes. FM reuses matching source
+evidence and reruns missing or stale StrategyRuns before aggregating the required aligned interval.
+Leave dates omitted; do not insert a remembered month-end or pre-submit component Runs locally.
+This source preparation is part of the requested backtest. Preserve historical Run dates as
+returned. If actual source evidence is incomplete or too short, preserve the returned pending,
+unavailable, or failed state; never shorten the interval or report a result as ready without
+sufficient evidence. Preserve returned `command_kind`,
 `target_data_through`, `start_date`, and `end_date` without inventing unresolved dates. The returned
 `run.portfolio_run_id` identifies a durable accepted Run, including when its status is
 `preparing_sources` and component StrategyRun identities are not yet resolved. Read that exact Run
@@ -126,7 +130,7 @@ A definitive `factor_needs_optimization` rejection identifies affected source Fa
 `error.details.factor_family_ids`. Report those Families and the reason; do not retry unchanged inputs,
 silently replace components, or infer that the rejected submission created a Run. Continue
 authorized Factor/Strategy repair through the corresponding Skill, preserving immutable identities.
-The same submit tool covers latest-data reruns; there is no separate latest-data tool,
+The same submit tool covers reruns at the current server cutoff; there is no separate latest-data tool,
 public explicit-source selection, or compatibility-list step.
 
 Read `get_portfolio_backtest_result(portfolio_run_id=...)` after a terminal Run, including a
