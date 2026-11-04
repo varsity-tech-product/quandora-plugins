@@ -67,7 +67,7 @@ note call. Write one note per decision:
 - definitions carry it on the call that creates them: `submit_factor_research`,
   `create_strategy_family`, `create_strategy`, `create_portfolio_family`, `create_portfolio`;
 - `submit_strategy_backtest` and `submit_portfolio_backtest` carry a note only when an existing
-  definition is run again for a new purpose, such as another date range; a build-and-backtest
+  definition is run again for a new purpose, such as evaluating newly available history; a build-and-backtest
   request writes its note once, on the create call;
 - `run_factor_version` carries the note for a run of an existing Factor version at another horizon;
   it has no `relation` or `parent`, because the version does not change;

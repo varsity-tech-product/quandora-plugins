@@ -12,9 +12,9 @@ Factors; report their redundancy instead of silently substituting members.
 
 For composition, read `get_strategy_capabilities` when needed to establish supported choices.
 The current tool input schema is the sole request boundary; `caller_supplied_fields` describes
-caller choices when returned. Do not copy server-managed values into Skill guidance or proposed
-inputs, and do not add any field absent from the live submit schema. Do not display or ask for
-confirmation of server-managed fields.
+caller choices when returned. Do not copy server-managed values into proposed inputs, and do not
+add any field absent from the live submit schema. Do not ask for confirmation of server-managed
+fields; explain the effective research period from server evidence when relevant.
 
 Resolve exact Factors through `list_eligible_strategy_factors`; use `get_eligible_strategy_factor`
 for eligible detail with the row's `eligible_factor_id`. Use `include_eligible_factor_ids` for
@@ -65,9 +65,16 @@ remains unchanged.
 ## Submit and Observe
 
 Call `submit_strategy_backtest` with the exact immutable `strategy_id` and a fresh
-`client_request_id` UUID generated before the first submission. Only `start_date` and
-`end_date` are optional run choices; omit unspecified dates. Cash, fees, attribution, universe,
-provider settings, and execution controls are not caller inputs.
+`client_request_id` UUID generated before the first submission. Omit both `start_date` and
+`end_date`, including when an older tool schema still exposes them. The server fixes each new
+Strategy Run to `2022-01-01` through the last complete UTC month end. Do not compute or send a
+replacement interval. Cash, fees, attribution, universe, provider settings, and execution controls
+are not caller inputs.
+
+If the user explicitly requests a custom interval, explain that new Strategy Runs use the fixed
+server interval; do not silently submit a different period. A definitive date rejection creates
+no Run. Do not remove the rejected dates and resubmit unless the user accepts the supported
+interval. Preserve historical Run dates as returned; do not rewrite them to today's interval.
 
 A request to build and backtest authorizes both definition creation and Run submission. Present
 consequential choices, but do not require fresh approval merely because another tool is needed.
@@ -90,7 +97,7 @@ omitted the ID, retain read-only reconciliation and report remaining uncertainty
 merely similar Run as proof.
 
 Preserve safe failure details and retryability. A rejected request is not a completed backtest.
-A requested rerun uses a fresh `client_request_id`, even for identical dates and a completed
+A requested rerun uses a fresh `client_request_id`, even for the same server interval and a completed
 or still-running previous Run (normal quota/concurrency limits still apply). The same ID is
 reserved for retries, including after reconnection or more than ten minutes. A response with
 `idempotency_key_reused` means that ID was used with different parameters; report the conflict

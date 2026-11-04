@@ -39,6 +39,51 @@ class ConnectionPolicyTests(unittest.TestCase):
         code, output = self.check()
         self.assertEqual(code, 0, output)
 
+    def test_strategy_fixed_window_boundaries_are_required(self):
+        workflow = self.plugin / "skills/strategy-building/references/ordinary-strategy-workflow.md"
+        original = workflow.read_text()
+        for boundary in (
+            "Omit both `start_date` and\n`end_date`",
+            "including when an older tool schema still exposes them",
+            "`2022-01-01` through the last complete UTC month end",
+            "do not silently submit a different period",
+            "Do not remove the rejected dates and resubmit unless the user accepts",
+            "Preserve historical Run dates as returned",
+        ):
+            with self.subTest(boundary=boundary):
+                self.assertIn(boundary, original)
+                workflow.write_text(original.replace(boundary, "Removed date boundary"))
+                self.rejected("missing fixed-window boundary")
+                workflow.write_text(original)
+
+    def test_strategy_optional_date_guidance_is_rejected(self):
+        workflow = self.plugin / "skills/strategy-building/references/ordinary-strategy-workflow.md"
+        self.append(workflow, "Only `start_date` and `end_date` are optional run choices.")
+        self.rejected("dates remain documented as caller choices")
+
+    def test_portfolio_fixed_window_boundaries_are_required(self):
+        skill = self.plugin / "skills/portfolio-building/SKILL.md"
+        original = skill.read_text()
+        for boundary in (
+            "`2022-01-01` through the last complete UTC month end",
+            "frozen at first acceptance",
+            "recovery retain that accepted cutoff even when the month changes",
+            "Leave dates omitted",
+            "do not insert a remembered month-end or pre-submit component Runs locally",
+            "Preserve historical Run dates as\nreturned",
+            "never shorten the interval or report a result as ready without\nsufficient evidence",
+        ):
+            with self.subTest(boundary=boundary):
+                self.assertIn(boundary, original)
+                skill.write_text(original.replace(boundary, "Removed date boundary"))
+                self.rejected("portfolio-building/SKILL.md: missing fixed-window boundary")
+                skill.write_text(original)
+
+    def test_portfolio_provider_watermark_guidance_is_rejected(self):
+        self.append(self.plugin / "skills/portfolio-building/SKILL.md",
+                    "FM resolves the actual latest data endpoint before accepting the Run.")
+        self.rejected("retired provider-watermark guidance remains")
+
     def test_research_skill_must_link_the_notebook(self):
         skill = self.plugin / "skills/strategy-analysis/SKILL.md"
         skill.write_text(skill.read_text().replace("](../../references/research-notebook.md)", "](#)"))

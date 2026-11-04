@@ -14,13 +14,15 @@ For a changed specification, call `create_strategy` with the exact `strategy_fam
 (the immutable Factor) and `factor_run_id`; copy those three, never a display name.
 This creates a new immutable Strategy in that Family. It never edits the base or previous Runs.
 A plain rerun uses `submit_strategy_backtest` on the existing Strategy with a fresh
-`client_request_id`. Identical Strategy and dates can have multiple Runs. Only a retry of the
+`client_request_id`, omitting dates so the server applies its fixed interval. The same Strategy
+and server interval can have multiple Runs. Only a retry of the
 same operation reuses its ID and parameters; a timeout does not authorize a new operation.
 
 Carry the research goal through definition and Run calls. Make missing choices from the research
 context and returned candidates; record why in the decision's `research_note` (`hypothesis` for a
-new direction, `change_summary` otherwise). Run-level dates do not override weighting, ranking,
-direction, or rebalance frozen in the definition. Read failures as evidence; do not add a compatibility path when a tool
+new direction, `change_summary` otherwise). The server-owned interval does not override weighting,
+ranking, direction, or rebalance frozen in the definition. Preserve each historical Run's actual
+dates. Read failures as evidence; do not add a compatibility path when a tool
 or old identifier is unavailable.
 
 For the full selection and submission procedure, use the primary Skill's Canonical Strategy
