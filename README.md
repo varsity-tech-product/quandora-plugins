@@ -119,6 +119,16 @@ Read https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/mai
 
 The guide checks the host's available operations, reuses an existing production connection, and verifies the installed skills and authenticated read access.
 
+#### Muse
+
+Paste this request into a Muse conversation with Custom Connector capabilities:
+
+```text
+Read https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/muse.md completely, then install and authenticate Quandora for me. Ask me to approve any required installation permissions; I will complete browser sign-in and consent myself.
+```
+
+The [Muse guide](agent-install-guide/muse.md) supplies the production MCP endpoint, discovers current OAuth permissions and tools, loads current skills from the official repository, and requires an authenticated read before reporting completion. Muse must expose the connector, OAuth, and skill-loading capabilities described in the guide.
+
 #### Cursor Desktop
 
 In a new Cursor Desktop Agent chat, enter:

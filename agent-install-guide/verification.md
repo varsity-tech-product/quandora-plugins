@@ -60,6 +60,33 @@ Record the host/CLI versions, package revision, available recovery capability, w
 login actually started/completed, and post-recovery read results. Never record credentials or
 authorization URLs. Discover write tools without invoking them as acceptance probes.
 
+## Muse Custom Connector acceptance
+
+Run these cases in Muse using the [Muse guide](muse.md). Record the host version,
+guide commit, installed manifest version, actual connector/skill mechanisms,
+stages completed, and redacted failures. Do not copy snapshot tool/scope/skill
+counts into the installation contract.
+
+| Scenario | Expected outcome |
+| --- | --- |
+| Clean profile, README entry prompt only | Muse reads the canonical guide, establishes the exact production connector using supported host capabilities, completes browser OAuth, loads current repository skills, and passes the protected read |
+| Existing working connector | Reuse connection, grant, and skills; no duplicate connector or needless reauthorization |
+| Conflicting source or modified checkout | Preserve the existing state and report the conflict |
+| Missing connector, OAuth, or skill-loading capability | Name the incomplete stage; no invented host command or false completion |
+| Restricted grant or newly advertised scope | Preserve intended restrictions; request a supported consent update only for requested capabilities that need it |
+| Paginated or changed tool catalog | Read every page, reconcile supported registration/allowlists, and review new/ambiguous tools without executing mutations |
+| Repository skill update | Read the current manifest and skills, preserve references, and verify access through the host after a clean fast-forward update |
+| Claimed session synchronization | Verify that a real supported hook/instruction mechanism is registered and runs; otherwise report explicit refresh as required |
+| Installation probe | Fresh `get_quandora_account({})` verifies the active identity and authenticated `get_factor_mining_status` succeeds; no research submission, backtest, or trade |
+| Refresh lifecycle | Exercise the connector's supported refresh flow and verify a protected read afterward; never inspect or expose token values |
+| Revocation lifecycle | Revoke the disposable connection through the supported host flow, verify access is rejected, then verify explicit reconnection |
+
+The supplied Muse integration report describes successful OAuth and protected
+reads on an existing custom connector. It does not establish clean-profile
+installation from this guide, token refresh, or revocation acceptance. Those
+host scenarios remain **not executed** by this repository change; static checks
+and frontend browser tests do not substitute for them.
+
 ## Publishing and rollback
 
 These guides are fetched from `main`. A guide-only change takes effect when
