@@ -94,13 +94,17 @@ STRATEGY_CALLER_BOUNDARY_GUIDANCE_MARKERS = (
     "Do not ask for confirmation of server-managed fields",
 )
 STRATEGY_WINDOW_GUIDANCE_MARKERS = (
-    "Omit both `start_date` and `end_date`",
-    "including when an older tool schema still exposes them",
-    "`2022-01-01` through the last complete UTC month end",
+    "Optional `start_date` and `end_date`",
+    "Preserve explicit dates unchanged",
+    "dates belong to the Run, not the Strategy definition",
+    "Omitted dates default to `2022-01-01` through the last complete UTC month end",
     "do not silently submit a different period",
-    "Do not remove the rejected dates and resubmit unless the user accepts",
+    "Do not remove rejected dates and resubmit unless the user accepts",
+    "A changed period requires a new request identity",
+    "even across UTC month boundaries",
     "Preserve historical Run dates as returned",
 )
+
 STRATEGY_SERVER_VALUE_GUIDANCE_MARKERS = (
     "`initial_cash=100000`",
     "`taker_fee_rate=0.0004`",
@@ -797,12 +801,12 @@ def _check_skills(
         for marker in STRATEGY_WINDOW_GUIDANCE_MARKERS:
             if marker not in ordinary_text:
                 errors.append(
-                    "strategy-building ordinary workflow: missing fixed-window boundary "
+                    "strategy-building ordinary workflow: missing optional-window boundary "
                     f"{marker!r}"
                 )
-        if "are optional run choices" in ordinary_text:
+        if "Omit both `start_date` and `end_date`" in ordinary_text or "including when an older tool schema still exposes them" in ordinary_text:
             errors.append(
-                "strategy-building ordinary workflow: dates remain documented as caller choices"
+                "strategy-building ordinary workflow: retired fixed-only date guidance remains"
             )
         if "dates, cash, fee rates" in ordinary_text:
             errors.append(

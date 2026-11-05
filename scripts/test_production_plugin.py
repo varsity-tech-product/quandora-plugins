@@ -39,27 +39,30 @@ class ConnectionPolicyTests(unittest.TestCase):
         code, output = self.check()
         self.assertEqual(code, 0, output)
 
-    def test_strategy_fixed_window_boundaries_are_required(self):
+    def test_strategy_optional_window_boundaries_are_required(self):
         workflow = self.plugin / "skills/strategy-building/references/ordinary-strategy-workflow.md"
         original = workflow.read_text()
         for boundary in (
-            "Omit both `start_date` and\n`end_date`",
-            "including when an older tool schema still exposes them",
-            "`2022-01-01` through the last complete UTC month end",
+            "Optional `start_date` and\n`end_date`",
+            "Preserve explicit dates unchanged",
+            "dates belong to the Run, not the\nStrategy definition",
+            "Omitted dates default to `2022-01-01` through the last complete UTC month end",
             "do not silently submit a different period",
-            "Do not remove the rejected dates and resubmit unless the user accepts",
+            "Do not remove rejected dates and resubmit unless the user accepts",
+            "A changed period requires a new request identity",
+            "even across UTC month boundaries",
             "Preserve historical Run dates as returned",
         ):
             with self.subTest(boundary=boundary):
                 self.assertIn(boundary, original)
                 workflow.write_text(original.replace(boundary, "Removed date boundary"))
-                self.rejected("missing fixed-window boundary")
+                self.rejected("missing optional-window boundary")
                 workflow.write_text(original)
 
-    def test_strategy_optional_date_guidance_is_rejected(self):
+    def test_strategy_fixed_only_date_guidance_is_rejected(self):
         workflow = self.plugin / "skills/strategy-building/references/ordinary-strategy-workflow.md"
-        self.append(workflow, "Only `start_date` and `end_date` are optional run choices.")
-        self.rejected("dates remain documented as caller choices")
+        self.append(workflow, "Omit both `start_date` and `end_date`, including when an older tool schema still exposes them.")
+        self.rejected("retired fixed-only date guidance remains")
 
     def test_portfolio_fixed_window_boundaries_are_required(self):
         skill = self.plugin / "skills/portfolio-building/SKILL.md"
