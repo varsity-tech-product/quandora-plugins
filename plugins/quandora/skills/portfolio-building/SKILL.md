@@ -107,7 +107,10 @@ rerun. Follow the current schema for any user-selected `exchange`; otherwise pre
 default. Do not add fields absent from that schema. The server fixes each new Portfolio Run to
 `2022-01-01` through the last complete UTC month end, frozen at first acceptance. Retries and
 recovery retain that accepted cutoff even when the month changes. FM reuses matching source
-evidence and reruns missing or stale StrategyRuns before aggregating the required aligned interval.
+evidence only when the exact Strategy, window, exchange, execution assumptions and retained result
+coverage match. It prepares only missing components for that standard interval and waits for
+compatible in-flight source work rather than duplicating it. Ordinary Strategy research may use
+custom dates; those dates never change the Portfolio target or mutate Strategy definitions.
 Leave dates omitted; do not insert a remembered month-end or pre-submit component Runs locally.
 This source preparation is part of the requested backtest. Preserve historical Run dates as
 returned. If actual source evidence is incomplete or too short, preserve the returned pending,

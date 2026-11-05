@@ -29,11 +29,13 @@ a Strategy or Portfolio, the latest completed binance run, else the latest compl
 exchange. Read `shown_run` before using a card's results; never assume it is the run you analyzed.
 
 Compare versions only on runs with the same conditions: exchange, window and horizon. When the
-conditions differ, state the difference instead of ranking the versions. The server follows the
-same rule: a version shown through a fallback run (another horizon for a Factor, another exchange
-for a Strategy or Portfolio) is not ranked for its thread's `best_version_id`, and a card has
-`delta_vs_parent` only when its run and the parent's representative run share exchange and
-horizon. A thread can therefore have no `best_version_id`.
+conditions differ, state the difference instead of ranking the versions. On the server, a card's
+`delta_vs_parent` compares its run with the parent's latest completed run under the same
+conditions: the same exchange, plus the same horizon for a Factor or the same window for a
+Strategy or Portfolio. The field is absent while the card's run is unfinished or when the parent
+has no such run. A version shown through a fallback run (another horizon for a Factor, another
+exchange for a Strategy or Portfolio) is not ranked for its thread's `best_version_id`, so a thread
+can have none. That ranking does not compare windows; check them before calling a version the best.
 
 ## Read before deciding
 

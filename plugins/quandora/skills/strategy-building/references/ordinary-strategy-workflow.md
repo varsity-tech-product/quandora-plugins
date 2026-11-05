@@ -65,16 +65,19 @@ remains unchanged.
 ## Submit and Observe
 
 Call `submit_strategy_backtest` with the exact immutable `strategy_id` and a fresh
-`client_request_id` UUID generated before the first submission. Omit both `start_date` and
-`end_date`, including when an older tool schema still exposes them. The server fixes each new
-Strategy Run to `2022-01-01` through the last complete UTC month end. Do not compute or send a
-replacement interval. Cash, fees, attribution, universe, provider settings, and execution controls
-are not caller inputs.
+`client_request_id` UUID generated before the first submission. Optional `start_date` and
+`end_date` select an ordinary StrategyRun's research period when the live submit schema and
+capabilities allow them. Preserve explicit dates unchanged; dates belong to the Run, not the
+Strategy definition. Omitted dates default to `2022-01-01` through the last complete UTC month end,
+frozen by FM at first acceptance. Do not calculate a replacement cutoff on retry. Cash, fees,
+attribution, universe, provider settings, and execution controls are not caller inputs.
 
-If the user explicitly requests a custom interval, explain that new Strategy Runs use the fixed
-server interval; do not silently submit a different period. A definitive date rejection creates
-no Run. Do not remove the rejected dates and resubmit unless the user accepts the supported
-interval. Preserve historical Run dates as returned; do not rewrite them to today's interval.
+If the connected schema or capabilities still exclude a requested date, report that limitation;
+do not silently submit a different period or invent unsupported fields. Gateway date-validation
+rejection creates no Run. Do not remove rejected dates and resubmit unless the user accepts the
+changed research intent. Preserve historical Run dates as returned; do not rewrite them to today's
+interval. A changed period requires a new request identity; the same ID and original parameters
+recover the accepted Run even across UTC month boundaries.
 
 A request to build and backtest authorizes both definition creation and Run submission. Present
 consequential choices, but do not require fresh approval merely because another tool is needed.
@@ -97,7 +100,7 @@ omitted the ID, retain read-only reconciliation and report remaining uncertainty
 merely similar Run as proof.
 
 Preserve safe failure details and retryability. A rejected request is not a completed backtest.
-A requested rerun uses a fresh `client_request_id`, even for the same server interval and a completed
+A requested rerun uses a fresh `client_request_id`, even for the same requested interval and a completed
 or still-running previous Run (normal quota/concurrency limits still apply). The same ID is
 reserved for retries, including after reconnection or more than ten minutes. A response with
 `idempotency_key_reused` means that ID was used with different parameters; report the conflict

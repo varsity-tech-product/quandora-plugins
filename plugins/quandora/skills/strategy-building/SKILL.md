@@ -52,8 +52,9 @@ listed. Report that state without adding local grade thresholds or silently subs
 For a Strategy request, follow [Canonical Strategy Workflow](references/ordinary-strategy-workflow.md).
 Read `get_research_context` with `stage: "strategy"` first. Resolve exact admitted Factors, prepare
 one named immutable definition, create its Family if needed, then submit a Run with a fresh
-`client_request_id` when requested. Omit `start_date` and `end_date`; the server owns the fixed
-research interval. Preserve historical dates and explicit custom-period requests as described in
+`client_request_id` when requested. Optional `start_date` and `end_date` select ordinary research
+periods; omissions use server-owned standard defaults. Keep dates out of Strategy definitions and
+preserve accepted retry identity as described in
 the Canonical Strategy Workflow. A brand-new idea starts a new Family: `create_strategy_family`
 with a `research_note` whose `relation` is `new_direction`. A revision of an existing idea calls
 `create_strategy` in its Family with the exact base and `relation` `improvement`, or `control` when
