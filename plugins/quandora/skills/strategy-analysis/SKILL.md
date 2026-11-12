@@ -6,7 +6,7 @@ description: Analyzes existing Quandora cross-sectional Strategy results from ow
 # Strategy Analysis
 
 Follow [Connection and Security](../../references/connection-and-security.md) for automatic
-recovery and the once-per-session release check; preserve existing update authority.
+recovery and the once-per-session release check, and [Failed mutations](../../references/failed-mutations.md) after a failed mutating call; preserve existing update authority.
 Follow [Research intent and evidence](../../references/research-workflows.md) for backtest/forward
 scope, capability-aware conclusions and authorization-preserving handoffs, and
 [Research notebook](../../references/research-notebook.md) for the tested hypothesis and conclusion.

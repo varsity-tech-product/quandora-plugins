@@ -51,6 +51,8 @@ ALLOWED_PLUGIN_ROOT_ENTRIES = {
     "README.md",
     "assets",
     "mcp.json",
+    "mcp_config.json",
+    "plugin.json",
     "scripts",
     "skills",
     "references",
@@ -73,7 +75,7 @@ PORTFOLIO_RESULT_METRIC_MARKERS = (
 PORTFOLIO_SOURCE_EVIDENCE_MARKERS = (
     "operation.portfolio.manage", "preparing_sources", "one to five", "100000", "summary",
     "equity_curve.points[].t", "equity_curve.points[].value",
-    "source_result_evidence_unavailable", "invalid_backend_response",
+    "source_result_evidence_unavailable",
     "run.automatic_paper", "source_portfolio_run_id", "portfolio_trading_run_id",
     "base_portfolio_id",
 )
@@ -346,6 +348,7 @@ DIRECT_VERSION_MANIFESTS = (
     PLUGIN_ROOT / ".codebuddy-plugin" / "plugin.json",
     PLUGIN_ROOT / ".codex-plugin" / "plugin.json",
     PLUGIN_ROOT / ".cursor-plugin" / "plugin.json",
+    PLUGIN_ROOT / "plugin.json",
 )
 MARKETPLACE_MANIFESTS = (
     REPOSITORY_ROOT / ".claude-plugin" / "marketplace.json",
@@ -360,7 +363,18 @@ PORTFOLIO_METADATA_MANIFESTS = (
     PLUGIN_ROOT / ".codebuddy-plugin" / "plugin.json",
     PLUGIN_ROOT / ".codex-plugin" / "plugin.json",
     PLUGIN_ROOT / ".cursor-plugin" / "plugin.json",
+    PLUGIN_ROOT / "plugin.json",
 )
+# Antigravity reads the plugin-root plugin.json and mcp_config.json and silently drops unknown keys.
+PRODUCTION_MCP_SERVER = "quandora"
+PRODUCTION_MCP_URL = "https://mcp.quandora.ai/quant"
+ANTIGRAVITY_MANIFEST_KEYS = {
+    "name", "displayName", "description", "logo", "suggestedPrompts", "version",
+    "author", "homepage", "repository", "disabled",
+}
+ANTIGRAVITY_MCP_SERVER_KEYS = {
+    "command", "args", "env", "cwd", "url", "headers", "disabled", "variables",
+}
 FORBIDDEN_RUNTIME_MARKDOWN = {
     "/Users/": "workstation-specific POSIX path",
     "C:\\Users\\": "workstation-specific Windows path",
@@ -507,6 +521,40 @@ def _check_manifests(errors: list[str]) -> str | None:
                 )
 
     return next(iter(distinct), None)
+
+
+def _check_antigravity_manifest(errors: list[str]) -> None:
+    manifest_path = PLUGIN_ROOT / "plugin.json"
+    manifest = _load_json(manifest_path)
+    label = "plugins/quandora/plugin.json"
+    if not isinstance(manifest, dict):
+        errors.append(f"{label}: Antigravity manifest must be a JSON object")
+    else:
+        if manifest.get("name") != "quandora":
+            errors.append(f"{label}: Antigravity plugin name must be quandora")
+        unknown = sorted(set(manifest) - ANTIGRAVITY_MANIFEST_KEYS)
+        if unknown:
+            errors.append(f"{label}: unsupported Antigravity manifest keys {unknown}")
+        logo = manifest.get("logo")
+        if not isinstance(logo, str) or not (PLUGIN_ROOT / logo).is_file():
+            errors.append(f"{label}: Antigravity logo must be a bundled relative path")
+        prompts = manifest.get("suggestedPrompts")
+        if not isinstance(prompts, list) or not 1 <= len(prompts) <= 3:
+            errors.append(f"{label}: suggestedPrompts must contain 1-3 entries")
+
+    config = _load_json(PLUGIN_ROOT / "mcp_config.json")
+    label = "plugins/quandora/mcp_config.json"
+    servers = config.get("mcpServers") if isinstance(config, dict) else None
+    if not isinstance(servers, dict) or set(servers) != {PRODUCTION_MCP_SERVER}:
+        errors.append(f"{label}: must declare exactly the {PRODUCTION_MCP_SERVER} MCP server")
+        return
+    server = servers[PRODUCTION_MCP_SERVER]
+    if not isinstance(server, dict) or server.get("url") != PRODUCTION_MCP_URL:
+        errors.append(f"{label}: {PRODUCTION_MCP_SERVER} must use {PRODUCTION_MCP_URL}")
+        return
+    unknown = sorted(set(server) - ANTIGRAVITY_MCP_SERVER_KEYS)
+    if unknown:
+        errors.append(f"{label}: unsupported Antigravity MCP server keys {unknown}")
 
 
 def _check_package_shape(errors: list[str]) -> None:
@@ -888,6 +936,27 @@ def _check_runtime_markdown(errors: list[str], skill_files: dict[str, Path]) -> 
 
 
 SHARED_CONNECTION_POLICY = "../../references/connection-and-security.md"
+SHARED_FAILED_MUTATIONS = "../../references/failed-mutations.md"
+# The three cases use the gateway's field names and values (`error.details.mutation_outcome`,
+# `error.details.confirm_with`); see "Failed mutations: committed or unknown" in the gateway docs.
+FAILED_MUTATION_MARKERS = (
+    "`error.details`",
+    "`mutation_outcome`: `committed` or `unknown`",
+    "The list in the error is the authority",
+    "`mutation_outcome: committed`: do not repeat the call. Read with `confirm_with`",
+    "`mutation_outcome: unknown`: read with `confirm_with` first. Only if the read shows no effect, "
+    "repeat the identical call (same arguments) once, within ten minutes of the first attempt",
+    "Neither field: the request was refused. Follow `retryable`",
+    "cannot create a duplicate",
+    "are safe to repeat",
+    "No tool accepts an idempotency key",
+)
+# No tool takes an idempotency key from the agent, so no text may tell it to reuse or supply one.
+AGENT_IDEMPOTENCY_KEY_PATTERN = re.compile(
+    r"\b(?:reuse|reusing|supply|send|pass|persisted|original|new|same)\b[^.]{0,60}"
+    r"\bidempotency (?:key|identity)",
+    re.IGNORECASE,
+)
 
 
 NOTEBOOK_TOOLS = (
@@ -1029,7 +1098,8 @@ def _check_connection_policy(errors: list[str], skill_files: dict[str, Path]) ->
     text = " ".join(policy.read_text(encoding="utf-8").split())
     for marker in (
         "automatic token refresh first", "retry an affected read once",
-        "first inspect the existing operation/status", "original idempotency key",
+        "follow [Failed mutations](failed-mutations.md)",
+        "Never create a replacement backtest or Trading run",
         "terminal authorization failure", "Respect cancellation and security denials",
         "Do not display token lifetimes", "same installed package",
         "A failed check is nonblocking", "without guessing",
@@ -1037,6 +1107,25 @@ def _check_connection_policy(errors: list[str], skill_files: dict[str, Path]) ->
     ):
         if marker not in text.replace("**", ""):
             errors.append(f"shared connection policy: missing recovery boundary {marker!r}")
+    failed_mutations = PLUGIN_ROOT / "references/failed-mutations.md"
+    if not failed_mutations.is_file():
+        errors.append("missing shared failed-mutation rule")
+    else:
+        rule_text = " ".join(failed_mutations.read_text(encoding="utf-8").split())
+        for marker in FAILED_MUTATION_MARKERS:
+            if marker not in rule_text:
+                errors.append(f"shared failed-mutation rule: missing {marker!r}")
+        for name, path in skill_files.items():
+            if f"]({SHARED_FAILED_MUTATIONS})" not in path.read_text(encoding="utf-8"):
+                errors.append(f"{name}: missing shared failed-mutation rule link")
+    for path in [REPOSITORY_ROOT / "README.md", *PLUGIN_ROOT.rglob("*.md")]:
+        if path == failed_mutations:
+            continue
+        if AGENT_IDEMPOTENCY_KEY_PATTERN.search(" ".join(path.read_text(encoding="utf-8").split())):
+            errors.append(
+                f"{path.relative_to(REPOSITORY_ROOT)}: tells the Agent to reuse or supply an "
+                "idempotency key"
+            )
     codex_recovery = PLUGIN_ROOT / "references/codex-authorization-recovery.md"
     if "](codex-authorization-recovery.md)" not in policy.read_text(encoding="utf-8"):
         errors.append("shared connection policy: missing Codex authorization recovery link")
@@ -1158,6 +1247,7 @@ def main() -> int:
         package_version = _check_manifests(errors)
         _check_production_delivery(errors)
         _check_package_shape(errors)
+        _check_antigravity_manifest(errors)
         skills = _skill_files(errors)
         _check_skills(errors, skills)
         _check_runtime_markdown(errors, skills)

@@ -9,13 +9,15 @@ continued, or when the user requests the Result Bundle.
 only that step as described in [Factor Plugin Authoring](plugin-authoring.md). Its accepted run
 follows the rules below.
 
-`retryable` describes availability; `recovery_action` controls mutation behavior:
+`retryable` describes availability; `recovery_action` controls mutation behavior. It is more
+specific than the shared [Failed mutations](../../../references/failed-mutations.md) rule and comes
+first when present; without it, follow the shared rule:
 
 - `repair_and_revalidate`: repair allowlisted diagnostics and validate the complete source again.
 - `create_same_kind_session_after_input_change`: create a new public/custom session of the same
   kind with a new invocation identity.
-- `retry_same_pending_request`: replay at most once with the exact pending handle, bound request,
-  persisted idempotency identity, and unchanged validated source.
+- `retry_same_pending_request`: replay at most once with the exact pending handle, bound request
+  and unchanged validated source. "Once" is an agent-side limit; the gateway does not count replays.
 - `resume_known_run`: use only `continue_factor_backtest` on the exact returned run.
 - `stop_and_report_trace`: stop and report only the safe trace.
 - `repair_then_create_same_kind_session`: repair, revalidate, then create the same kind of session
@@ -47,7 +49,7 @@ Absent provider state is unavailable evidence, not inferred acceptance.
 ## Bounded Observation
 
 Use `continue_factor_backtest` only for an exact known non-terminal run and at most four times in
-one request. It re-drives backend work; it is not a status read. `wait_for_runs` waits without
+one request (an agent-side limit; the gateway does not enforce it). It re-drives backend work; it is not a status read. `wait_for_runs` waits without
 re-driving, including for several runs at once; follow a returned `next_action` first. If still
 running, stop, report that the run can be continued later, and do not request Result Bundle
 metadata.

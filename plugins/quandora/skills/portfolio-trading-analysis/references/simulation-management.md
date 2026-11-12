@@ -24,6 +24,8 @@ If the response is lost, call `get_simulation_account_operation(client_request_i
 works before an account or Run ID is known. Once known, use `operation_id` for subsequent reads
 and `continue_simulation_account_operation` to resume the same operation when recovery is offered.
 Do not create a fresh request ID, account or Run to recover a timeout or ambiguous response.
+For every other failed account or run call, follow
+[Failed mutations](../../../references/failed-mutations.md).
 
 `preparing` and `outcome_unknown` remain unresolved. `accepted` means a Run was attached, not
 that it is running. Read the exact returned `run_id` with `get_portfolio_trading_run` before

@@ -6,7 +6,8 @@ description: Creates, validates, backtests, continues, retrieves, or summarizes 
 # Quandora Factor Mining
 
 Follow [Connection and Security](../../references/connection-and-security.md) for automatic
-recovery and the once-per-session release check; preserve existing update authority.
+recovery and the once-per-session release check; preserve existing update authority. After a
+failed mutating call, follow [Failed mutations](../../references/failed-mutations.md).
 Follow [Research intent and evidence](../../references/research-workflows.md) for backtest/forward
 scope, capability-aware conclusions and authorization-preserving handoffs.
 Follow [Research notebook](../../references/research-notebook.md) to read prior research before
@@ -130,8 +131,9 @@ After the contract exists:
    the corrected source again; report its returned duplicate evidence instead of resubmitting a
    near variant.
 
-A timeout or ambiguous mutation response is not proof of failure. Retry the same request or follow
-only the returned closed recovery action. Never silently change the user's task, category, thesis,
+A timeout or ambiguous mutation response is not proof of failure. Follow the returned
+`recovery_action` when present, otherwise [Failed mutations](../../references/failed-mutations.md).
+Never silently change the user's task, category, thesis,
 data, horizon, or source. A different horizon is a deliberate, recorded run of the same version.
 
 ## Test Another Horizon
@@ -142,8 +144,8 @@ another horizon, read `get_research_context` with `stage: "factor"`, resolve the
 that `factor_id`, the positive integer `fwd_period` and a `research_note` (no `relation` or
 `parent`): `hypothesis` says why that horizon should change the result, and `references` name the
 version's run being compared. It creates a new run of the same version. On an error follow its
-`recovery_action` ([Run and Result Delivery](references/run-and-result-delivery.md)); after an
-ambiguous response without one, retry the identical request, which returns the same run. Wait for
+`recovery_action` ([Run and Result Delivery](references/run-and-result-delivery.md)); without one,
+follow Failed mutations: an identical call inside ten minutes returns the same run. Wait for
 `run.factor_run_id` and read it like any Factor run. Never upload the same source as an `improvement` to change only the
 horizon: the server rejects that upload and tells you to rerun the version. If
 `run_factor_version` is not in the tool list, tell the user that testing an existing version at

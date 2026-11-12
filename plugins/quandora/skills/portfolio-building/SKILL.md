@@ -6,7 +6,8 @@ description: Selects complementary Strategies and builds, revises or backtests a
 # Portfolio Building
 
 Follow [Connection and Security](../../references/connection-and-security.md) for automatic
-recovery and the once-per-session release check; preserve existing update authority.
+recovery and the once-per-session release check; preserve existing update authority. After a
+failed mutating call, follow [Failed mutations](../../references/failed-mutations.md).
 Follow [Research intent and evidence](../../references/research-workflows.md) for backtest/forward
 scope, capability-aware conclusions and authorization-preserving handoffs.
 Follow [Research notebook](../../references/research-notebook.md) to read prior research before
@@ -125,9 +126,10 @@ carries no second note. FM resumes accepted preparation; do not submit again to 
 `list_portfolio_backtests(portfolio_id=...)` for persisted history, with bounded page size and
 unchanged continuation tokens.
 
-A timeout, malformed response, or `invalid_backend_response` leaves acceptance uncertain even
-when `retryable=false`. Recover through the exact Portfolio's persisted history and any returned
-Run identity; do not choose a merely similar Run or submit a replacement. Do not resubmit
+When a create or submit fails or its response is lost, follow
+[Failed mutations](../../references/failed-mutations.md). Confirm through the exact Portfolio's
+persisted history and any returned Run identity; do not choose a merely similar Run or submit a
+changed replacement. Do not resubmit
 automatically for `source_result_evidence_unavailable`; preserve the bounded failure evidence.
 A definitive `factor_needs_optimization` rejection identifies affected source Factors in
 `error.details.factor_family_ids`. Report those Families and the reason; do not retry unchanged inputs,

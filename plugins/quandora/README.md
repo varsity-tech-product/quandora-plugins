@@ -45,7 +45,8 @@ Real Live uses separate account-oriented read tools; its writes remain frontend-
 
 ## Connection
 
-Supported hosts load the plugin's `quandora` remote HTTP MCP declaration. Complete the
+Supported hosts load the plugin's `quandora` remote HTTP MCP declaration. Antigravity reads
+it from `mcp_config.json` with `plugin.json` as its manifest. Complete the
 host-native browser authorization flow for initial setup; reload tools only when the host requires it.
 Do not create a local MCP server or paste credentials.
 
@@ -57,8 +58,9 @@ for these requests; verify the active identity after login. Do not
 reinstall a working plugin, display token lifetimes, or ask users to run refresh commands.
 Check the release once per session using actual installed package metadata, then follow the
 [host update guide](references/plugin-update.md) within existing update authority.
-See [Connection and Security](references/connection-and-security.md) for bounded retries, uncertain
-mutation recovery, and host-native fallbacks. Never request secrets or bypass MCP with internal HTTP.
+See [Connection and Security](references/connection-and-security.md) for bounded retries and
+host-native fallbacks, and [Failed mutations](references/failed-mutations.md) for what to do after a
+failed or unanswered mutating call. Never request secrets or bypass MCP with internal HTTP.
 
 ### Claude Desktop Code authorization bridge
 
