@@ -6,7 +6,7 @@ description: Manages Simulation accounts and runs and analyzes actual forward-te
 # Portfolio Trading Analysis
 
 Follow [Connection and Security](../../references/connection-and-security.md) for automatic
-recovery and the once-per-session release check; preserve existing update authority.
+recovery and the once-per-session release check, and [Failed mutations](../../references/failed-mutations.md) after a failed mutating call; preserve existing update authority.
 Follow [Research intent and evidence](../../references/research-workflows.md) for backtest/forward
 scope, capability-aware conclusions and authorization-preserving handoffs, and
 [Research notebook](../../references/research-notebook.md) for Simulation decision notes.
@@ -200,8 +200,8 @@ It does not imply frozen historical versions of mutable observations.
 ## Stop
 
 For an authorized stop, show the exact run and that stopping is terminal, then call
-`stop_portfolio_trading_run`. A repeated stop is idempotent. Reconcile with
-`get_portfolio_trading_run` if needed. Pause/resume are separate Simulation operations.
+`stop_portfolio_trading_run`. After a failed stop, follow [Failed mutations](../../references/failed-mutations.md);
+a repeated stop is safe. Pause/resume are separate Simulation operations.
 This stop tool never authorizes stopping a real Live account.
 Ask for approval only when the user has not already authorized stopping that run.
 

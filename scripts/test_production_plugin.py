@@ -319,8 +319,41 @@ class ConnectionPolicyTests(unittest.TestCase):
         self.rejected("host-managed refresh/update command")
 
     def test_unsafe_mutation_recovery(self):
-        self.policy.write_text(self.policy.read_text().replace("original idempotency key", "new idempotency key"))
+        self.policy.write_text(self.policy.read_text().replace(
+            "follow [Failed mutations](failed-mutations.md)", "retry it"))
         self.rejected("missing recovery boundary")
+
+    def test_missing_failed_mutation_rule(self):
+        (self.plugin / "references/failed-mutations.md").unlink()
+        self.rejected("missing shared failed-mutation rule")
+
+    def test_failed_mutation_cases_are_required(self):
+        rule = self.plugin / "references/failed-mutations.md"
+        original = rule.read_text()
+        for case in (
+            "`mutation_outcome: committed`: do not repeat the call",
+            "Only if the read shows no effect",
+            "within ten minutes of the first attempt",
+            "Neither field: the request was refused",
+            "The list in the\n  error is the authority",
+        ):
+            with self.subTest(case=case):
+                self.assertIn(case, original)
+                rule.write_text(original.replace(case, "Removed case"))
+                self.rejected("shared failed-mutation rule: missing")
+                rule.write_text(original)
+
+    def test_each_skill_routes_to_failed_mutation_rule(self):
+        for skill in (self.plugin / "skills").glob("*/SKILL.md"):
+            with self.subTest(skill=skill.parent.name):
+                original = skill.read_text()
+                skill.write_text(original.replace("../../references/failed-mutations.md", "../../README.md"))
+                self.rejected("missing shared failed-mutation rule link")
+                skill.write_text(original)
+
+    def test_agent_supplied_idempotency_key(self):
+        self.append(self.policy, "After a lost response, reuse the original idempotency key.")
+        self.rejected("idempotency key")
 
     def test_manifest_skew(self):
         path = self.plugin / ".codex-plugin/plugin.json"
@@ -328,9 +361,35 @@ class ConnectionPolicyTests(unittest.TestCase):
         path.write_text(json.dumps(data))
         self.rejected("version")
 
+    def test_antigravity_manifest_version_skew(self):
+        path = self.plugin / "plugin.json"
+        data = json.loads(path.read_text()); data["version"] = "wrong-release"
+        path.write_text(json.dumps(data))
+        self.rejected("Plugin version drift")
+
+    def test_antigravity_manifest_rejects_unknown_keys(self):
+        path = self.plugin / "plugin.json"
+        data = json.loads(path.read_text()); data["mcpServers"] = "./mcp.json"
+        path.write_text(json.dumps(data))
+        self.rejected("unsupported Antigravity manifest keys")
+
+    def test_antigravity_mcp_must_target_production(self):
+        path = self.plugin / "mcp_config.json"
+        data = json.loads(path.read_text())
+        data["mcpServers"]["quandora"]["url"] = "https://mcp-staging.varsity.lol/quant"
+        path.write_text(json.dumps(data))
+        self.rejected("must use https://mcp.quandora.ai/quant")
+
+    def test_antigravity_mcp_rejects_unsupported_server_keys(self):
+        path = self.plugin / "mcp_config.json"
+        data = json.loads(path.read_text())
+        data["mcpServers"]["quandora"]["type"] = "http"
+        path.write_text(json.dumps(data))
+        self.rejected("unsupported Antigravity MCP server keys")
+
     def test_future_version_needs_no_instruction_change(self):
         paths = [self.root / "kimi.plugin.json", *self.root.glob(".*-plugin/marketplace.json"),
-                 *self.plugin.glob(".*-plugin/plugin.json")]
+                 *self.plugin.glob(".*-plugin/plugin.json"), self.plugin / "plugin.json"]
         for path in paths:
             data = json.loads(path.read_text())
             if "version" in data:

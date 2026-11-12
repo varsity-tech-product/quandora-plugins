@@ -127,7 +127,8 @@ direction does not work and why; `next_steps` names the next controlled experime
 `references` is required and lists the exact runs and versions relied on, including the analyzed
 subject and any comparisons. Write the conclusion in the user's language.
 Never conclude on a non-terminal run, unread evidence, or an Official, shared or real Live subject.
-After an uncertain response, retry the same request; it returns the same note.
+After a failed call, follow [Failed mutations](failed-mutations.md); an identical call inside ten
+minutes returns the same note.
 
 ## Wait for runs
 

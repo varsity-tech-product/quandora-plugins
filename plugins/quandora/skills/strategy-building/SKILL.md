@@ -6,7 +6,8 @@ description: Builds one non-optimizer Quandora Strategy and lists available, eli
 # Quandora Strategy Building
 
 Follow [Connection and Security](../../references/connection-and-security.md) for automatic
-recovery and the once-per-session release check; preserve existing update authority.
+recovery and the once-per-session release check; preserve existing update authority. After a
+failed mutating call, follow [Failed mutations](../../references/failed-mutations.md).
 Follow [Research intent and evidence](../../references/research-workflows.md) for backtest/forward
 scope, capability-aware conclusions and authorization-preserving handoffs.
 Follow [Research notebook](../../references/research-notebook.md) to read prior research before
@@ -87,14 +88,13 @@ For history, `list_strategy_backtests` requires the exact `strategy_id`. Family 
 `page_size`/`page_token`; they do not accept `query` or `filters`. Definitions in a Family are read
 with `list_strategies(strategy_family_id=...)`. Preserve the returned identities and states.
 
-An ambiguous write is not permission to submit a replacement or change its payload. In particular,
-`invalid_backend_response` after submit leaves acceptance uncertain even when `retryable=false`:
-the Run may already exist. Read `list_strategy_backtests` for the original immutable `strategy_id`
+An ambiguous write is not permission to submit a replacement or change its payload. After a failed
+create or submit, follow [Failed mutations](../../references/failed-mutations.md): the Run may
+already exist. For a submit, read `list_strategy_backtests` for the original immutable `strategy_id`
 and reconcile any exact returned Run with `get_strategy_backtest`; do not use an internal command
 ID or treat a merely similar Run as proof. Allow bounded reads for delayed visibility, then report
-remaining uncertainty. When the original submission included `client_request_id`, a bounded retry
-with that same ID and identical parameters recovers the same operation; never replace an uncertain
-submission with a fresh ID. Without the original ID, keep reconciliation read-only.
+remaining uncertainty. A repeat with the same `client_request_id` and identical parameters recovers
+the same operation, also after ten minutes; never replace an uncertain submission with a fresh ID.
 A definitive `factor_needs_optimization` rejection identifies the affected Factors in
 `error.details.factor_family_ids`. Report those returned Families and the reason. Do not retry the same
 rejected input, silently remove or substitute Factors, or infer that the rejection created a Run.

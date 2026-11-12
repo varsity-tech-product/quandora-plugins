@@ -21,7 +21,9 @@ the installation guide must be updated together when their contents change.
 
 The check is database-free and must remain suitable for pull-request CI.
 
-All eight Skills share `plugins/quandora/references/connection-and-security.md`.
+All eight Skills share `plugins/quandora/references/connection-and-security.md` and
+`plugins/quandora/references/failed-mutations.md`, the single rule for failed mutating
+calls; its `mutation_outcome` and `confirm_with` fields follow the gateway's contract.
 The checks enforce automatic recovery first for incidental failures, bounded read retries, uncertain-mutation safety,
 once-per-session installed-metadata release checks, and no user-facing token refresh boilerplate.
 Regression tests mutate disposable package copies and require no database or credentials.
@@ -41,6 +43,10 @@ explicit reauthorization, two-account switching, cancellation and host-adoption 
 The Factor Skills name `run_factor_version`, which production Auth lists only when
 `REMOTE_MCP_RUN_FACTOR_VERSION_ENABLED` is on. When it is not listed, the Skills tell the user
 that testing an existing version at another horizon is unavailable and never upload source instead.
+
+Antigravity reads the plugin-root `plugin.json` manifest and `mcp_config.json`. The checks keep
+their version in step with the other manifests, pin the production MCP URL, and reject keys
+Antigravity would silently drop.
 
 Production publication promotes the reviewed eight-Skill payload from the staging repository while
 preserving the production package identity, MCP/OAuth endpoint, and supported host installation

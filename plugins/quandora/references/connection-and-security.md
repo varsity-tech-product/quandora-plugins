@@ -16,10 +16,9 @@ reconnect or tool-discovery recovery within existing permissions. The Agent hand
 recovery and resumes the original task without asking the user to interpret tokens or run commands.
 Do not start concurrent authorization flows or repeat failed recovery indefinitely.
 
-After successful recovery, retry an affected read once. If a mutation's outcome is uncertain,
-first inspect the existing operation/status and reuse the original idempotency key only when the
-canonical action supports retry. Never create a replacement backtest or Trading run, or repeat a
-start/stop with a new key, merely because a response was lost.
+After successful recovery, retry an affected read once. When a mutating call fails or its response
+is lost, follow [Failed mutations](failed-mutations.md). Never create a replacement backtest or
+Trading run, or change the arguments, merely because a response was lost.
 
 For incidental failures, when the host reports terminal authorization failure or authenticated diagnostics
 require fresh consent, the Agent initiates the supported host-native OAuth flow. Explicit account
@@ -126,6 +125,9 @@ in the current host, and involve the user only for unavoidable interaction:
   `https://mcp.quandora.ai/quant`; do not create a duplicate connector.
 - CodeBuddy/WorkBuddy: reconnect the existing plugin-managed Remote MCP server and finish
   host-native browser authorization if required.
+- Antigravity: ask the user to sign in to the `quandora` plugin from its sign-in card or
+  plugin page. If the callback page shows an authorization code, the user enters it only in
+  Antigravity's own authorization field; never accept or relay it in chat.
 
 Use a new chat or host restart only if the host requires it to reload authorized tools; do not
 claim a reload is necessary for every failure. The package's two documented Claude Desktop Code

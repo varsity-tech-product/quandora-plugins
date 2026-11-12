@@ -106,8 +106,8 @@ category and note in their language; an explicit request to report is already co
 The result is `{report_id, reference, duplicate, idempotent_replay}`. Give the user the
 `reference` to quote. `duplicate: true` means it was added to the user's report about the
 same object from the last day; `idempotent_replay: true` means this invocation was already filed.
-Report one problem once: do not resubmit after an uncertain result, follow the shared
-uncertain-mutation rule instead. `feedback_rate_limited` means the report limit is reached;
+Report one problem once: after a failed call follow [Failed mutations](../../references/failed-mutations.md) and
+never file a reworded second report. `feedback_rate_limited` means the report limit is reached;
 tell the user to try later and do not retry in a loop. `invalid_feedback_report` names a
 field to correct once. `idempotency_conflict` means changed content reused one invocation;
 send a new call only if the user still wants the changed report.

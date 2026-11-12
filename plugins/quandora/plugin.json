@@ -1,0 +1,18 @@
+{
+  "name": "quandora",
+  "displayName": "Quandora",
+  "version": "4.3.4-preview",
+  "description": "Quandora provides Account Connection, Factor Mining, Factor Analysis, Strategy Building, Strategy Analysis, Portfolio Building, Portfolio Analysis, and Portfolio Trading Analysis for backtest research and forward-test management.",
+  "logo": "assets/quandora.png",
+  "author": {
+    "name": "Varsity Tech Product",
+    "url": "https://github.com/varsity-tech-product"
+  },
+  "homepage": "https://github.com/varsity-tech-product/quandora-plugins",
+  "repository": "https://github.com/varsity-tech-product/quandora-plugins",
+  "suggestedPrompts": [
+    "Use Quandora to mine a factor",
+    "Analyze my Quandora strategy",
+    "Check my Quandora account connection"
+  ]
+}

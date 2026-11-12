@@ -199,6 +199,27 @@ Start a new session, authorize the plugin-provided MCP server, and verify the co
 /mcp
 ```
 
+#### Antigravity
+
+Antigravity loads `plugins/quandora/` as a local plugin through its plugin-root
+`plugin.json` and `mcp_config.json`. Copy that directory into the Antigravity plugin root:
+
+```sh
+git clone --depth 1 https://github.com/varsity-tech-product/quandora-plugins.git
+mkdir -p ~/.gemini/config/plugins
+cp -R quandora-plugins/plugins/quandora ~/.gemini/config/plugins/quandora
+```
+
+On Windows, copy it to `%USERPROFILE%\.gemini\config\plugins\quandora`. Antigravity loads
+the plugin without a restart and namespaces its MCP server as `quandora_quandora`.
+Do not also add a global `quandora` MCP entry.
+
+Sign in from the plugin card that Antigravity shows in chat, or from the plugin page under
+**Skills & Customizations**. Complete Quandora sign-in and consent in the browser. If the
+Antigravity callback page then shows an authorization code, copy it into Antigravity's own
+**Enter authorization code** field; never paste it into a chat. Start a new conversation if the
+Quandora tools are not yet listed.
+
 Complete authorization in the browser, then start a new session before invoking Factor Mining, Factor Analysis, Strategy Building, Strategy Analysis, or Paper Trading.
 
 ## Use
@@ -247,8 +268,9 @@ or tool discovery and resumes the task. User interaction is limited to unavoidab
 consent after terminal authorization failure or an explicit host consent requirement. Do not
 reinstall a working plugin, display token lifetimes, or ask users to run refresh commands.
 Version diagnostics remain on demand and use the actual installed package metadata.
-See [Connection and Security](plugins/quandora/references/connection-and-security.md) for bounded retries, uncertain
-mutation recovery, and host-native fallbacks. Never request secrets or bypass MCP with internal HTTP.
+See [Connection and Security](plugins/quandora/references/connection-and-security.md) for bounded retries and
+host-native fallbacks, and [Failed mutations](plugins/quandora/references/failed-mutations.md) for what to do
+after a failed or unanswered mutating call. Never request secrets or bypass MCP with internal HTTP.
 
 For missing workflow permissions in Codex Desktop, the Agent selects an available native
 authorization action or the verified same-host official CLI. A plugin-management lookup failure

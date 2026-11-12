@@ -29,7 +29,8 @@ The canonical `update_action` is advice, not installation authority:
 Reuse the result across Skill handoffs. Do not repeat a notice for the same recommended version in
 this session. A failed or unavailable check is nonblocking; continue the original task without an
 update retry loop. A release notice is not evidence of expired OAuth or incompatible business data.
-Never replay an uncertain backtest, account creation, start or stop because the plugin changed.
+Never replay an uncertain backtest, account creation, start or stop because the plugin changed;
+resolve it through [Failed mutations](failed-mutations.md).
 
 ## Codex desktop and CLI
 
@@ -72,7 +73,9 @@ required host action. Do not invent a CLI switch or edit host settings behind th
 
 ## Other hosts
 
-Cursor, Kimi, CodeBuddy and WorkBuddy must use their installed host's documented update controls.
+Cursor, Kimi, CodeBuddy, WorkBuddy and Antigravity must use their installed host's documented update controls.
+An Antigravity local plugin is updated by replacing its plugin directory with the current release
+under the same directory name, so the host keeps the same MCP server identity.
 Inspect available capabilities; do not translate Codex or Claude commands to another host. If no
 supported update operation is accessible, provide the host's update action once and record that
 installation is pending. OAuth reuse and update authority are separate. Browser-only connectors

@@ -6,7 +6,8 @@ description: Analyzes an existing Quandora Portfolio backtest against its actual
 # Portfolio Analysis
 
 Follow [Connection and Security](../../references/connection-and-security.md) for automatic
-recovery and the once-per-session release check; preserve existing update authority.
+recovery and the once-per-session release check; preserve existing update authority. After a
+failed mutating call, follow [Failed mutations](../../references/failed-mutations.md).
 Use [Research intent and evidence](../../references/research-workflows.md) for scope, evidence
 availability and handoffs, and [Name discovery](../../references/object-discovery.md) for names.
 Follow [Research notebook](../../references/research-notebook.md) to read the hypothesis being

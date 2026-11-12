@@ -87,17 +87,16 @@ Use the response as the first snapshot. Copy `run.strategy_run_id` to
 no continue command or internal command receipt belongs to this lifecycle. For history call
 `list_strategy_backtests(strategy_id=..., page_size=...)`; it accepts no search query or filters.
 
-For a timeout, malformed response, or `invalid_backend_response`, acceptance is uncertain even
-when the error says `retryable=false`; the backend may already have created and started the Run.
-Reconcile any exact returned identity. If none was returned, inspect
+When the submission fails or its response is lost, follow
+[Failed mutations](../../../references/failed-mutations.md); the backend may already have created
+and started the Run. Reconcile any exact returned identity. If none was returned, inspect
 `list_strategy_backtests(strategy_id=...)` for the original immutable Strategy and read an exact
 candidate with `get_strategy_backtest`. Compare retained creation time and execution choices with
 the original request. Use bounded repeated reads when the first page has not yet exposed the Run.
-If attribution remains uncertain and the original call carried `client_request_id`, a bounded
-retry with the exact same ID and parameters safely recovers the original operation. Never
-use a fresh ID or change parameters to recover an uncertain submission. If the original call
-omitted the ID, retain read-only reconciliation and report remaining uncertainty; do not pick a
-merely similar Run as proof.
+If the reads show no Run and the original call carried `client_request_id`, one repeat with the
+exact same ID and parameters recovers the original operation. Never use a fresh ID or change
+parameters to recover an uncertain submission. If the original call omitted the ID, the shared
+ten-minute rule applies; do not pick a merely similar Run as proof.
 
 Preserve safe failure details and retryability. A rejected request is not a completed backtest.
 A requested rerun uses a fresh `client_request_id`, even for the same requested interval and a completed
