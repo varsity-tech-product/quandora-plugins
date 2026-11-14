@@ -28,8 +28,14 @@ least 0.8 (63 at least 0.9). Among the last 63, absolute IC-curve correlation ha
 minimum 0.83. These are research defaults, not server admission rules. If another threshold fits
 the goal better, state its value and reason in the decision's note.
 
+The same reference values apply to a comparison with an official Factor. They were measured on
+owned pairs only, so say so when an official comparison decides something.
+
+A submission's nearest correlation is the larger of its nearest owned and its nearest official
+absolute value correlation.
 Within one task, after three consecutive Factor submissions whose nearest correlation meets the
-same-signal cut, stop that direction. Change direction or end the Factor search and report the
+same-signal cut, stop that direction. When an official Factor meets the cut, tell the user that
+the official library already offers this signal and name that official Factor. Change direction or end the Factor search and report the
 three runs and their nearest evidence. Missing or incomplete evidence cannot reset the count or
 establish novelty; resolve it or report the unresolved comparison and stop the bounded search.
 
@@ -49,9 +55,13 @@ establish novelty; resolve it or report the unresolved comparison and stop the b
    When the card or snapshot is absent, `pending` or `incomplete`, call
    `rank_similar_factors` with `order_by: "value_abs"` and page with the same selectors and returned
    token until `complete`; retain coverage. If it remains unavailable, report that gap.
+   Then call `rank_similar_official_factors` for the same run with `order_by: "value_abs"` and
+   page with the same candidate and returned token until `complete`; retain its coverage too.
 5. Call `record_research_conclusion` with the nearest Factor and its absolute value correlation,
-   or the measured empty-neighbor result or evidence gap. Its `references` include the analyzed
-   run and exact neighbor runs/versions used; never invent a neighbor for an empty result.
+   or the measured empty-neighbor result or evidence gap, and the nearest official Factor
+   (`official_factor_id`, name and absolute value correlation) or its gap. Its `references`
+   include the analyzed run and exact neighbor runs/versions used; never invent a neighbor for
+   an empty result.
 6. Improve a novel, promising Factor or change direction, applying the consecutive-repeat stop
    rule above. Carry the comparison evidence into the next decision's `references`.
 
@@ -69,8 +79,8 @@ establish novelty; resolve it or report the unresolved comparison and stop the b
 3. Call `wait_for_runs` and read the new card with `get_factor_backtest_window_cards`, then call
    `compare_factor_runs` against the parent run only to obtain the monthly breakdown. Compare
    headline metrics only when both runs use the same horizon; otherwise state the difference
-   instead of ranking them. Also apply the new-direction order's notebook-card and
-   nearest-neighbor reads so the task's repeat count uses the nearest.
+   instead of ranking them. Also apply the new-direction order's notebook-card,
+   nearest-neighbor and official-Factor reads so the task's repeat count uses the nearest.
 4. Call `record_research_conclusion` with both runs in `references`. If value correlation meets
    the same-signal cut and headline metrics barely moved against the stated expected effect,
    say the change did not alter the signal. Apply the repeat stop rule before another submission.
@@ -81,14 +91,20 @@ establish novelty; resolve it or report the unresolved comparison and stop the b
    `metric: "value_abs"` and the Strategy grouping cut. Retain coverage and truncation evidence.
 2. Call `list_eligible_strategy_factors` and, when needed, `get_eligible_strategy_factor`. Select
    at most one eligible Factor per cluster using its IS card evidence. Each unclustered Factor
-   is its own group; each official Factor is its own group with similarity unknown.
+   is its own group; each official Factor starts as its own group until step 3 measures it.
 3. Call `compare_factor_runs` on the selected owned runs, covering every pair, and verify each
-   is below the distinct-signal cut. Replace a redundant selection from the returned candidates,
-   or record a justified threshold exception. Missing pairs remain unknown; do not claim distinct
-   signals without the comparison. Never send official runs to this owner-only tool.
+   is below the distinct-signal cut. Never send official Factors to this owner-only tool. For
+   selected official Factors, call `compare_with_official_factors` once per selected owned run
+   (`factor_run_id`) with the selected `official_factor_ids`, and once per selected official
+   Factor (`official_factor_id`) with the other selected official Factors, so every
+   owned-to-official and official-to-official pair is measured against the same cut. Replace a
+   redundant selection from the returned candidates, or record a justified threshold exception.
+   A missing pair or a statistic whose status is not `ok` remains unknown; do not claim distinct
+   signals without the comparison.
 4. Call `create_strategy_family`, or `create_strategy` for an existing Family, through
-   `$strategy-building`. The note lists groups, pairwise values and any unknown official
-   comparisons; its `references` list the exact compared runs and selection evidence.
+   `$strategy-building`. The note lists groups, pairwise values including the official ones, and
+   any comparison that stayed unknown; its `references` list the exact compared runs and
+   selection evidence, and the note text names each compared official Factor.
 5. Call `submit_strategy_backtest`, then `wait_for_runs`; read `get_strategy_backtest` and analyze
    through `$strategy-analysis`. Call `record_research_conclusion` with the Strategy run and
    relied-on Factor runs in `references`.
