@@ -28,7 +28,7 @@ Use this skill for deep diagnosis of an existing factor result, including:
 - mechanism hypotheses and plausible alternative explanations;
 - prioritized, controlled factor improvement experiments;
 - readiness assessment for handing a factor to Strategy Building;
-- similarity to the caller's other Factors, and grouping them into factor LibraryFolders.
+- similarity to the caller's other Factors and the active official Factors, and LibraryFolder grouping.
 
 Use `$factor-mining` for factor ideation, plugin construction, submission, resume, history browsing,
 Result Bundle export, or a short ordinary result summary. Use `$strategy-analysis` for a
@@ -92,8 +92,8 @@ For an explicit user-requested export only, use `create_factor_chart_download`,
 require downloads for analysis, or treat a ticket as mutation authority.
 
 For similarity, follow [Factor similarity](references/factor-similarity.md). `rank_similar_factors` finds the most similar owned Factors to one FactorRun,
-`compare_factor_runs` compares chosen runs (one target adds a monthly breakdown), and
-`cluster_owned_factors` groups every owned Factor at a cut you choose and explain. Filing groups
+`compare_factor_runs` compares chosen runs (one target adds a monthly breakdown), `cluster_owned_factors` groups every owned Factor at a cut you choose and explain, and
+`rank_similar_official_factors` and `compare_with_official_factors` measure a FactorRun or an official Factor against the active official Factors. Filing groups
 into factor LibraryFolders reads `list_library_corrections` first and writes only through
 `replace_factor_library_classification`.
 

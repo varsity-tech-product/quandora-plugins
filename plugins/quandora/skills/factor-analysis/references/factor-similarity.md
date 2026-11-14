@@ -1,6 +1,7 @@
 # Factor Similarity and LibraryFolder Filing
 
-Three read-only tools compare the caller's own Factors using correlations the server computes.
+Three read-only tools compare the caller's own Factors using correlations the server computes,
+and two more measure a candidate against the active official Factors.
 The server sorts and groups, but it never sets a threshold or delivers a verdict. A label such as
 "duplicate", "redundant" or "hedge" is your inference: state the statistic, its value and its
 `status` next to it.
@@ -14,8 +15,8 @@ reference thresholds and the consecutive-repeat stop rule.
   `factor_run_id`. Take it from `get_factor_family_history` with `view: "runs"` (the row's
   `factor_run_id`, which equals its `job_id`) or from a returned backtest `run.run_id`.
 - A retest run, another owner's run, a shared run or an official Factor makes the whole call fail
-  with `not_found`. A candidate that is not done fails with `conflict`. Official Factors cannot be
-  compared.
+  with `not_found`. A candidate that is not done fails with `conflict`. These three tools never
+  take an official Factor; use the two tools under [Official Factors](#official-factors).
 - Rows identify Factors as `{factor_family_id, factor_id, factor_run_id, primary_horizon}`.
   `factor_id` is the immutable Factor.
 
@@ -50,6 +51,33 @@ reference thresholds and the consecutive-repeat stop rule.
   has |value correlation| ≥ 0.7. Report `coverage.pairs_present` against `pairs_needed`, because a
   missing pair keeps two Factors apart. Also report `truncated` and `unclustered`. The `medoid` is
   the most central member by distance, not the best performer.
+
+## Official Factors
+
+An official Factor is available to every user, so an owned Factor that repeats one adds nothing.
+Two tools measure against the active official Factors with the same statistics, statuses and IS
+window as above.
+
+- The candidate is exactly one of `factor_run_id` (a completed attempt-1 FactorRun of a
+  caller-owned Factor) or `official_factor_id` (an official row's selector from
+  `list_eligible_strategy_factors`). Sending both or neither is rejected.
+- Rows identify an official Factor as `official_factor`: `{official_factor_id, name,
+  primary_horizon}`. There is no run ID, `same_factor_family` or `direct_lineage`. `candidate` is
+  `{factor_run, official_factor}`; the one you did not send is `null`.
+- An unknown, unowned or no longer active selector makes the whole call fail with `not_found`.
+  Official Plugin source stays restricted; similarity does not reveal a formula.
+- `rank_similar_official_factors`: "which official Factors is this most like?" It takes the
+  candidate, `order_by` and `limit`, and ranks every active official Factor (an official
+  candidate is not ranked against itself). Choose `order_by` as for `rank_similar_factors`. While
+  `complete` is false, call again with the same candidate and the returned `next_page_token` until
+  `complete` is true before naming the nearest official Factor. `excluded` counts official
+  Factors left out by status; `coverage.eligible` is the number of active official Factors.
+- `compare_with_official_factors`: compares the candidate with chosen `official_factor_ids`
+  (1–50), in that order. With exactly one, `monthly` adds the 24-month IS breakdown. An official
+  candidate compares two official Factors with each other. While `next_page_token` is non-empty,
+  call again with it and the same candidate and list.
+- A research note's `references` take runs and versions only. Reference your own compared run
+  there, and name the official Factor by `official_factor_id` and `name` in the note text.
 
 ## Reading a pair
 

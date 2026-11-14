@@ -98,7 +98,10 @@ Fill the fields from the decision itself:
 Every `research_note` and every `record_research_conclusion` must include `references`. Use the
 subject type names: `factor_version`, `factor_run`, `strategy_version`, `strategy_run`,
 `portfolio_version`, `portfolio_run`, `simulation_run`. Include every run or version used as
-evidence, including those compared through `compare_factor_runs` or `rank_similar_factors`. When
+evidence, including those compared through `compare_factor_runs` or `rank_similar_factors`. An
+official Factor compared through `rank_similar_official_factors` or
+`compare_with_official_factors` has no run or version to reference: name its
+`official_factor_id` in the note text. When
 you used a card's results, reference the run in its `shown_run`, not only the version.
 An empty list is allowed only when the decision used no Quandora evidence; never omit the field.
 

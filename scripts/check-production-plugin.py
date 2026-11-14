@@ -206,6 +206,8 @@ CANONICAL_TOOL_OWNERS = {
         "compare_factor_runs",
         "rank_similar_factors",
         "cluster_owned_factors",
+        "rank_similar_official_factors",
+        "compare_with_official_factors",
         "list_library_corrections",
         "replace_factor_library_classification",
     },
