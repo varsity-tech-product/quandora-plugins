@@ -6,6 +6,20 @@ Read this document completely, then install and authenticate Quandora for the us
 
 This procedure supports a local Agent task in the macOS WorkBuddy application, either the China edition (`WorkBuddy`) or the international edition (`WorkBuddy AI`). It uses the Mac's system shell and WorkBuddy's own bundled runtime; it does not require or install Node.js, Python, Git, Homebrew, a standalone CodeBuddy CLI, or a local MCP server. Do not adapt it to CodeBuddy IDE, Windows, web, cloud, mobile, or a remote Agent.
 
+## What this installs and who publishes it
+
+This guide is published by Quandora, a quantitative research product at https://www.quandora.ai. Signed-in users copy the request that links here from Quandora's Agent Center. `varsity-tech-product/quandora-plugins` is Quandora's public plugin repository, and the plugin connects only to Quandora's own MCP endpoint `https://mcp.quandora.ai/quant`.
+
+The installation is one shell command, shown under **Run the reviewed bootstrap once**:
+
+1. It downloads [`workbuddy-cn-bootstrap-macos.sh`](https://github.com/varsity-tech-product/quandora-plugins/blob/main/plugins/quandora/scripts/workbuddy-cn-bootstrap-macos.sh) from this repository and runs it only if its SHA-256 matches the value in the command.
+2. The bootstrap finds the signed WorkBuddy application, downloads [`workbuddy-cn-install-macos.js`](https://github.com/varsity-tech-product/quandora-plugins/blob/main/plugins/quandora/scripts/workbuddy-cn-install-macos.js) from the same repository, checks it against the SHA-256 pinned in the bootstrap, and runs it with WorkBuddy's own runtime.
+3. The installer uses WorkBuddy's own plugin manager to add the `quandora` marketplace and install the `quandora` plugin for this user.
+
+The SHA-256 checks make sure the files that run are exactly the reviewed versions in this repository. The command does not use `sudo`, install system software, or change other plugins, and it never reads, copies or sends credentials. It does not authorize anything; the user does that later in WorkBuddy's own interface. Both scripts are public, and the user or you may read them before running them.
+
+Before running the command, tell the user in one or two sentences what it will do and ask them to approve it through WorkBuddy's approval prompt. Run it only after they approve. If the user prefers not to run a script, or you cannot run it, use **Install from WorkBuddy plugin settings** below; it reaches the same result through WorkBuddy's interface without any script.
+
 ## Handoff from an unsupported conversation
 
 If the user is in a web/mobile chat rather than the supported local app, ask their
@@ -13,13 +27,13 @@ operating system if unknown. For macOS, direct them to install WorkBuddy (China 
 https://www.codebuddy.cn/work/) or WorkBuddy AI from its official download page, sign in and
 open a new local Agent task. Provide:
 
-> Read https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/workbuddy-cn.md and install and connect Quandora. Check existing progress first. I will complete required approvals, sign-in and consent.
+> Read https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/workbuddy-cn.md completely, then install and authenticate Quandora for me. I use Quandora and approve running the guide's hash-checked install command; I will complete browser sign-in and consent myself.
 
 For Windows or other hosts, explain that this reviewed installer is macOS-only and offer
 **Install from WorkBuddy plugin settings** below; do not adapt the bootstrap or install
 substitute runtimes. Do not claim local checks ran from a web session.
 
-The user's installation request authorizes one foreground invocation of the reviewed bootstrap below. Request WorkBuddy's normal approval for that invocation once, then continue. The only other user actions are clicking **Connect** for Quandora in WorkBuddy's MCP settings, browser sign-in, MFA, or the final Quandora authorization action when required, and starting one new local Agent task when asked.
+The user's installation request and their approval of that one command cover the whole bootstrap; do not ask again for each step inside it. The only other user actions are clicking **Connect** for Quandora in WorkBuddy's MCP settings, browser sign-in, MFA, or the final Quandora authorization action when required, and starting one new local Agent task when asked.
 
 The production trust anchors are:
 
@@ -29,7 +43,7 @@ The production trust anchors are:
 - OAuth authorization server: `https://mcp.quandora.ai`
 - Protected verification tool: `get_factor_mining_status`
 
-Never request, read, print, copy, or relay an OAuth token, authorization code, client secret, authorization URL, password, passkey, MFA code, or cookie. Do not create a separate MCP entry, replace a conflicting marketplace, edit a plugin cache, or change another plugin.
+To protect the user's accounts, never request, read, print, copy, or relay an OAuth token, authorization code, client secret, authorization URL, password, passkey, MFA code, or cookie. Do not create a separate MCP entry, replace a conflicting marketplace, edit a plugin cache, or change another plugin.
 
 Do not run an OAuth flow yourself, read or write WorkBuddy's credential or connector stores, or load WorkBuddy application modules. WorkBuddy registers its own OAuth client, opens the browser, receives the `workbuddy://` (China edition) or `workbuddy-ai://` (WorkBuddy AI) callback and stores the grant for its `quandora` MCP server.
 
@@ -78,7 +92,7 @@ On any other failed result, report only its safe `message` and `remediation`, th
 
 ## Install from WorkBuddy plugin settings
 
-This path depends on nothing inside the WorkBuddy application, so it still works when an update changes WorkBuddy's internal layout. Ask the user to open WorkBuddy's plugin settings, add the GitHub marketplace `varsity-tech-product/quandora-plugins`, and install `quandora` for their user. Do not write plugin files or WorkBuddy configuration yourself. Then continue at **Authorize in WorkBuddy and verify**.
+This path runs no script and depends on nothing inside the WorkBuddy application, so it still works when an update changes WorkBuddy's internal layout. Ask the user to open WorkBuddy's plugin page, choose **Add Marketplace** (添加市场), enter `varsity-tech-product/quandora-plugins` as the marketplace source (市场源), and install the `quandora` plugin for their user. Do not write plugin files or WorkBuddy configuration yourself. Then continue at **Authorize in WorkBuddy and verify**.
 
 ## Authorize in WorkBuddy and verify
 

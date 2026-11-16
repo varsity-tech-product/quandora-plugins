@@ -8,7 +8,8 @@ never expands WorkBuddy beyond its supported local macOS Agent workflow and plug
 
 The user's installation request authorizes ordinary environment checks and the
 requested plugin installation within existing permissions. Explain the scope
-briefly, then perform the work; do not ask for confirmation before every step.
+briefly, then perform the work, grouping related steps under one approval instead
+of asking before each step.
 Use the client's approval mechanism when required. Additional system-component
 or standalone CLI installation/update requires a concise explanation and approval
 unless that exact change was already authorized. Never require global Auto accept.
@@ -108,7 +109,8 @@ installation failure a server outage.
 ## Authorization and completion
 
 Use the platform's native OAuth mechanism and its exit result/status file.
-Do not inspect credentials or automate consent. The client chooses the browser;
+Leave credentials and consent to the user and the client: do not read stored
+credentials or approve consent on the user's behalf. The client chooses the browser;
 embedded browsing is not promised. Do not ask the user to paste callback URLs or
 codes, or routinely to say "done" when a machine-readable outcome is available.
 Keep the agent turn/process available until success, bounded timeout, cancellation,
