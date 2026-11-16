@@ -7,8 +7,7 @@ readonly BUNDLE_ID='com.tencent.workbuddy.mac'
 readonly TEAM_ID='FN2V63AD2J'
 readonly URL_SCHEME='workbuddy'
 readonly SCRIPT_BASE_DEFAULT='https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/plugins/quandora/scripts'
-readonly INSTALLER_SHA256='b0b50488ed11f224d620bb3af3ccc23c745300b4d6121676ecc2a570adcf70a2'
-readonly OAUTH_SHA256='65db30362772d399a95bd278810c027a39efddf6e70f80bea475d851d4b8c51b'
+readonly INSTALLER_SHA256='e4612d302bc881497b8df5534db20eaad2d36678b599dac6a984cd2a920d5f6f'
 readonly MAX_SCRIPT_BYTES=1048576
 
 fail() {
@@ -184,7 +183,6 @@ if [ -z "$script_directory" ]; then
     'Download the bootstrap again through the canonical installation guide.'
 fi
 installer="$script_directory/workbuddy-cn-install-macos.js"
-oauth="$script_directory/workbuddy-cn-oauth-macos.js"
 script_base=${QUANDORA_WORKBUDDY_SCRIPT_BASE_URL:-$SCRIPT_BASE_DEFAULT}
 case "$script_base" in
   https://*) ;;
@@ -201,9 +199,5 @@ download_reviewed_script \
   "$script_base/workbuddy-cn-install-macos.js" \
   "$installer" \
   "$INSTALLER_SHA256"
-download_reviewed_script \
-  "$script_base/workbuddy-cn-oauth-macos.js" \
-  "$oauth" \
-  "$OAUTH_SHA256"
 
 ELECTRON_RUN_AS_NODE=1 "$electron" "$installer" "$app_root" "$config_root"

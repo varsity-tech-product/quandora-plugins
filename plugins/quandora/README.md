@@ -136,7 +136,6 @@ Production also retains the reviewed WorkBuddy support scripts:
 
 - `scripts/workbuddy-cn-bootstrap-macos.sh`
 - `scripts/workbuddy-cn-install-macos.js`
-- `scripts/workbuddy-cn-oauth-macos.js`
 - `scripts/workbuddy-mcp-login-macos.sh`
 - `scripts/workbuddy-mcp-login-windows.ps1`
 
