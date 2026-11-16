@@ -1231,6 +1231,18 @@ def _check_production_delivery(errors: list[str]) -> None:
     declared = re.search(r"const EXPECTED_SKILLS = (\[.*?\]);", installer, re.DOTALL)
     if not declared or set(re.findall(r'"([^"\n]+)"', declared.group(1))) != REQUIRED_SKILLS:
         errors.append("WorkBuddy expected Skill set differs from package")
+    listed = re.search(r"^readonly SUPPORTED_BUNDLE_IDS='([^']*)'$", source, re.MULTILINE)
+    cased = re.search(r"^\s*([a-z0-9.|-]+)\) return 0 ;;$", source, re.MULTILINE)
+    editions = re.search(r"const SUPPORTED_EDITIONS = new Map\(\[(.*?)\]\);", installer, re.DOTALL)
+    bootstrap_ids = set(listed.group(1).split()) if listed else set()
+    if (
+        not bootstrap_ids
+        or not cased
+        or set(cased.group(1).split("|")) != bootstrap_ids
+        or not editions
+        or set(re.findall(r'\["([^"]+)",', editions.group(1))) != bootstrap_ids
+    ):
+        errors.append("WorkBuddy supported editions differ between bootstrap and installer")
     for text in (installer, guide):
         if "get_factor_mining_status" not in text:
             errors.append("WorkBuddy protected probe must use canonical status tool")

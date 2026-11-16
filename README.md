@@ -167,15 +167,15 @@ codebuddy plugin list --json
 
 CodeBuddy uses the plugin-managed remote HTTP MCP server and opens its native browser authorization flow when the server connects. No Python, Node.js, local MCP server, or Quandora API key is required.
 
-#### WorkBuddy China edition
+#### WorkBuddy (China edition and WorkBuddy AI)
 
-On macOS, give a local WorkBuddy China Agent this one-sentence prompt:
+On macOS, give a local WorkBuddy or WorkBuddy AI Agent this one-sentence prompt:
 
 ```text
 Read https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/workbuddy-cn.md completely, then install and authenticate Quandora for me.
 ```
 
-The guide downloads one hash-pinned, repo-owned macOS bootstrap. That bootstrap discovers the signed local WorkBuddy China application and active config, downloads and verifies the reviewed installer from this public repository, and runs it with WorkBuddy's bundled runtime. The installer closes CLI stdin, bounds every plugin-manager call, and installs and verifies the managed package. Authorization stays with WorkBuddy: the user approves Quandora in WorkBuddy's own authorization prompt, and the Agent then verifies the protected `get_factor_mining_status` tool through WorkBuddy's `quandora` server. The installer loads no WorkBuddy application module and never touches its credential store. It does not require a fixed application path, config path, WorkBuddy/CLI/plugin version, standalone runtime, custom MCP server, or pasted credential.
+The guide downloads one hash-pinned, repo-owned macOS bootstrap. That bootstrap discovers the signed local WorkBuddy application (China edition or WorkBuddy AI), preferring the one that launched the Agent task, and its config directory, downloads and verifies the reviewed installer from this public repository, and runs it with WorkBuddy's bundled runtime. The installer closes CLI stdin, bounds every plugin-manager call, and installs and verifies the managed package. Authorization stays with WorkBuddy: the user approves Quandora in WorkBuddy's own authorization prompt, and the Agent then verifies the protected `get_factor_mining_status` tool through WorkBuddy's `quandora` server. The installer loads no WorkBuddy application module and never touches its credential store. It does not require a fixed application path, config path, WorkBuddy/CLI/plugin version, standalone runtime, custom MCP server, or pasted credential. When the scripted path cannot run, the guide falls back to installing `quandora` from WorkBuddy's plugin settings.
 
 #### Kimi Code CLI
 

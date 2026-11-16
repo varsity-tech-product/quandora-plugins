@@ -2,7 +2,7 @@
 
 * [README](README.md)
 * [Grok Bot / Cursor install guide](agent-install-guide/grok-bot.md)
-* [WorkBuddy China install guide](agent-install-guide/workbuddy-cn.md)
+* [WorkBuddy install guide](agent-install-guide/workbuddy-cn.md)
 * [Quandora](plugins/quandora/README.md)
   * [Quandora Factor Analysis](plugins/quandora/skills/factor-analysis/SKILL.md)
   * [Quandora Factor Mining](plugins/quandora/skills/factor-mining/SKILL.md)

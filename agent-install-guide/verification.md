@@ -18,7 +18,7 @@ Run on disposable user profiles with permission to install and authenticate.
 Record host/OS version, CLI version, guide commit, stage outcomes, and redacted
 failure category. Never record tokens, authorization URLs, or callback codes.
 
-| Scenario | ChatGPT/Codex macOS + Windows | Claude Desktop/CLI macOS + Windows | WorkBuddy China macOS | Expected outcome |
+| Scenario | ChatGPT/Codex macOS + Windows | Claude Desktop/CLI macOS + Windows | WorkBuddy / WorkBuddy AI macOS | Expected outcome |
 | --- | --- | --- | --- | --- |
 | Start in web/mobile | Required | Required | Required | Official host download, correct local entry, continuation prompt; no pretend local checks |
 | Clean install | Required | Required | Required | Minimum dependencies, official source, single OAuth, discovery and protected probe |

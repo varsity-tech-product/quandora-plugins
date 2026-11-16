@@ -6,7 +6,7 @@
 
 - [Claude install guide](https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/claude.md): Install and authenticate the Quandora plugin from a Claude Desktop Code session
 - [ChatGPT install guide](https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/chatgpt.md): Install and authenticate Quandora for ChatGPT
-- [WorkBuddy China install guide](https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/workbuddy-cn.md): Install and authenticate Quandora in the macOS China edition of WorkBuddy
+- [WorkBuddy install guide](https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/workbuddy-cn.md): Install and authenticate Quandora in macOS WorkBuddy (China edition and WorkBuddy AI)
 
 ## Plugin
 
