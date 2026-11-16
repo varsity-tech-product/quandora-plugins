@@ -33,7 +33,7 @@ For Windows or other hosts, explain that this reviewed installer is macOS-only a
 **Install from WorkBuddy plugin settings** below; do not adapt the bootstrap or install
 substitute runtimes. Do not claim local checks ran from a web session.
 
-The user's installation request and their approval of that one command cover the whole bootstrap; do not ask again for each step inside it. The only other user actions are clicking **Connect** for Quandora in WorkBuddy's MCP settings, browser sign-in, MFA, or the final Quandora authorization action when required, and starting one new local Agent task when asked.
+The user's installation request and their approval of that one command cover the whole bootstrap; do not ask again for each step inside it. The only other user actions are clicking **Connect** for Quandora in WorkBuddy's MCP settings and completing browser sign-in, MFA, or the final Quandora authorization action when required.
 
 The production trust anchors are:
 
@@ -104,6 +104,6 @@ WorkBuddy starts Quandora's authorization only when the user clicks **Connect** 
 
 The chat input's **+ → Connectors** menu lists only WorkBuddy marketplace connectors; Quandora does not appear there. Do not operate the browser page, open an authorization URL yourself, add a custom MCP server, reinstall the plugin, or start a second attempt while one is open.
 
-After the user finishes, ask them to start one new local Agent task and paste the same one-sentence request. That task resumes at **Check existing progress first**, where Quandora's tools are listed and `get_factor_mining_status` verifies the grant.
+After the user finishes, call `get_factor_mining_status` in this task; WorkBuddy makes Quandora's tools available once the server is connected.
 
 Success is a successful `get_factor_mining_status` call through WorkBuddy's own `quandora` server. Then tell the user that production Quandora is installed and authorized. If the call still fails with an authentication error after the user completed the browser step, report that WorkBuddy did not adopt the authorization and stop; do not reinstall, add a custom MCP server, or loop.
