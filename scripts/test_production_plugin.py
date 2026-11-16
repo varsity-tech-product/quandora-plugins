@@ -387,6 +387,35 @@ class ConnectionPolicyTests(unittest.TestCase):
         path.write_text(json.dumps(data))
         self.rejected("unsupported Antigravity MCP server keys")
 
+    def test_root_manifest_needs_agent_plugins_schema(self):
+        path = self.plugin / "plugin.json"
+        data = json.loads(path.read_text()); del data["$schema"]
+        path.write_text(json.dumps(data))
+        self.rejected("plugin-root manifest must declare the Agent Plugins $schema")
+
+    def test_agent_plugins_mcp_rejects_legacy_transport(self):
+        path = self.plugin / "mcp.json"
+        data = json.loads(path.read_text())
+        data["mcpServers"]["quandora"]["type"] = "http"
+        path.write_text(json.dumps(data))
+        self.rejected("must be a streamable-http server")
+
+    def test_agent_plugins_mcp_requires_schema(self):
+        path = self.plugin / "mcp.json"
+        data = json.loads(path.read_text()); del data["$schema"]
+        path.write_text(json.dumps(data))
+        self.rejected("must be an Agent Plugins mcp.json")
+
+    def test_cursor_and_codebuddy_declare_mcp_inline(self):
+        for name in (".cursor-plugin", ".codebuddy-plugin"):
+            with self.subTest(manifest=name):
+                path = self.plugin / name / "plugin.json"
+                original = path.read_text()
+                data = json.loads(original); data["mcpServers"] = "./mcp.json"
+                path.write_text(json.dumps(data))
+                self.rejected("declare the quandora MCP server inline")
+                path.write_text(original)
+
     def test_future_version_needs_no_instruction_change(self):
         paths = [self.root / "kimi.plugin.json", *self.root.glob(".*-plugin/marketplace.json"),
                  *self.plugin.glob(".*-plugin/plugin.json"), self.plugin / "plugin.json"]

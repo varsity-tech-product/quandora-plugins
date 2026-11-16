@@ -46,7 +46,8 @@ Real Live uses separate account-oriented read tools; its writes remain frontend-
 ## Connection
 
 Supported hosts load the plugin's `quandora` remote HTTP MCP declaration. Antigravity reads
-it from `mcp_config.json` with `plugin.json` as its manifest. Complete the
+it from `mcp_config.json` with `plugin.json` as its manifest; WorkBuddy reads the same
+`plugin.json` as an Agent Plugins manifest and takes the server from the Agent Plugins `mcp.json`. Complete the
 host-native browser authorization flow for initial setup; reload tools only when the host requires it.
 Do not create a local MCP server or paste credentials.
 

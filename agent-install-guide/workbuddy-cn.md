@@ -2,7 +2,7 @@
 
 Also read the [shared installation and recovery policy](https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/install-recovery.md). Apply it within this platform's supported scope; preserve the native authorization flow below.
 
-Read this document completely, then install and authenticate Quandora for the user. Perform the installation yourself instead of displaying instructions. WorkBuddy itself owns Quandora's authorization: the user approves it in WorkBuddy's own authorization prompt and the browser page WorkBuddy opens.
+Read this document completely, then install and authenticate Quandora for the user. Perform the installation yourself instead of displaying instructions. WorkBuddy itself owns Quandora's authorization: the user starts it with WorkBuddy's **Connect** button for the `quandora` MCP server and approves it on the browser page WorkBuddy opens. WorkBuddy does not open that page on its own.
 
 This procedure supports a local Agent task in the macOS WorkBuddy application, either the China edition (`WorkBuddy`) or the international edition (`WorkBuddy AI`). It uses the Mac's system shell and WorkBuddy's own bundled runtime; it does not require or install Node.js, Python, Git, Homebrew, a standalone CodeBuddy CLI, or a local MCP server. Do not adapt it to CodeBuddy IDE, Windows, web, cloud, mobile, or a remote Agent.
 
@@ -19,7 +19,7 @@ For Windows or other hosts, explain that this reviewed installer is macOS-only a
 **Install from WorkBuddy plugin settings** below; do not adapt the bootstrap or install
 substitute runtimes. Do not claim local checks ran from a web session.
 
-The user's installation request authorizes one foreground invocation of the reviewed bootstrap below. Request WorkBuddy's normal approval for that invocation once, then continue. The only other user actions are starting one new local Agent task when asked, accepting WorkBuddy's own Quandora authorization, and browser sign-in, MFA, or the final Quandora authorization action when required.
+The user's installation request authorizes one foreground invocation of the reviewed bootstrap below. Request WorkBuddy's normal approval for that invocation once, then continue. The only other user actions are clicking **Connect** for Quandora in WorkBuddy's MCP settings, browser sign-in, MFA, or the final Quandora authorization action when required, and starting one new local Agent task when asked.
 
 The production trust anchors are:
 
@@ -38,8 +38,8 @@ Do not run an OAuth flow yourself, read or write WorkBuddy's credential or conne
 If this task already lists Quandora's MCP tools, call `get_factor_mining_status` once without arguments.
 
 - It succeeds: Quandora is installed and authorized. Tell the user and stop; do not run the bootstrap.
-- WorkBuddy reports that the `quandora` server needs authorization, or the call fails with an authentication error: continue at **Authorize in WorkBuddy and verify**.
-- Quandora's tools are not listed, or the call fails for another reason: run the bootstrap below.
+- The call fails with an authentication error: continue at **Authorize in WorkBuddy and verify**.
+- Quandora's tools are not listed, or the call fails for another reason: run the bootstrap below. An installed Quandora that is not yet authorized may not list its tools; the bootstrap then reports `installed` without reinstalling.
 
 ## Run the reviewed bootstrap once
 
@@ -56,7 +56,7 @@ trap quandora_cleanup EXIT
   --output "$quandora_bootstrap" \
   'https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/plugins/quandora/scripts/workbuddy-cn-bootstrap-macos.sh' || exit 1
 quandora_bootstrap_sha=$(/usr/bin/shasum -a 256 "$quandora_bootstrap" | /usr/bin/awk '{print $1}')
-[ "$quandora_bootstrap_sha" = '8a2bb69c924b549592b7a46a4051c0bc62c9864ef01a51f3277aeeca5f93f274' ] || { echo 'Quandora bootstrap integrity check failed.' >&2; exit 1; }
+[ "$quandora_bootstrap_sha" = '2b18e91e7a2306246b2fd1564ead4e7433866f96101c739a2eb21a055297d241' ] || { echo 'Quandora bootstrap integrity check failed.' >&2; exit 1; }
 /bin/sh "$quandora_bootstrap"
 ```
 
@@ -66,7 +66,7 @@ Plugin state changes go only through WorkBuddy's bundled public plugin manager w
 
 ## Installer result
 
-Success is one final JSON object whose `status` is `installed`, `installed` and `enabled` are `true`, `plugin` is `quandora@quandora`, `scope` is `user`, `version` matches the validated marketplace and installed manifests, `edition` is `china` or `international`, `mcpServer` is `quandora`, `authorization` is `workbuddy_native`, and `protectedProbe` is `get_factor_mining_status`. It means the package is installed; it does not mean Quandora is authorized.
+Success is one final JSON object whose `status` is `installed`, `installed` and `enabled` are `true`, `plugin` is `quandora@quandora`, `scope` is `user`, `version` matches the validated marketplace and installed manifests, `edition` is `china` or `international`, `mcpServer` is `quandora`, `authorization` is `workbuddy_native`, and `protectedProbe` is `get_factor_mining_status`. It means the package is installed and WorkBuddy will list the `quandora` server in its MCP settings; it does not mean Quandora is authorized.
 
 On `host_login_required`, ask the user to sign in to WorkBuddy, start a new local Agent task, and paste the same one-sentence request again. On `host_update_required`, direct the user to WorkBuddy's update action (China edition: **Personal Center → Check for Updates**), then restart WorkBuddy and retry in a new task; if the application is missing, install it from its official download page (China edition: `https://www.codebuddy.cn/work/`). If WorkBuddy is already up to date, use **Install from WorkBuddy plugin settings** instead of retrying. Do not install a standalone CLI or another runtime as a substitute.
 
@@ -82,10 +82,14 @@ This path depends on nothing inside the WorkBuddy application, so it still works
 
 ## Authorize in WorkBuddy and verify
 
-WorkBuddy connects a newly installed plugin's MCP server in new tasks. If this task does not list Quandora's tools after `installed`, tell the user that Quandora is installed and ask them to start one new local Agent task and paste the same one-sentence request. That task resumes at **Check existing progress first**; do not reinstall the plugin or add an MCP server manually.
+WorkBuddy starts Quandora's authorization only when the user clicks **Connect** for the server; its background connection checks never open the browser. Do not wait for a prompt. After `installed`, tell the user that Quandora is installed and ask them to:
 
-When Quandora's tools are listed but WorkBuddy reports that the `quandora` server needs authorization, ask the user to complete WorkBuddy's own authorization for it: accept WorkBuddy's prompt, or, if no prompt appears, use the authorize or connect action for the Quandora server in WorkBuddy's plugin or MCP settings. WorkBuddy opens the Quandora page in the browser, where the user completes sign-in, MFA, and the final authorization action. Do not operate that page, open an authorization URL yourself, or start a second attempt while one is open.
+1. Open **Experts · Skills · Connectors → Connectors → Custom MCP** (China edition: **连接器 → 自定义 MCP**). This opens WorkBuddy's MCP server management panel, which also lists MCP servers that come from plugins.
+2. Find `quandora`, shown as coming from the plugin `quandora`, marked as needing authentication (需要认证). If it is not listed yet, quit and reopen WorkBuddy; WorkBuddy picks up a newly installed plugin's server when it refreshes plugins and at startup.
+3. Click **Connect** (连接) next to it. WorkBuddy opens the Quandora page in the browser, where the user completes sign-in, MFA, and the final authorization action. The server is marked connected afterwards.
 
-After the user finishes, call `get_factor_mining_status` again. If WorkBuddy only adopts the new authorization in a new task, ask the user to start one and paste the same request.
+The chat input's **+ → Connectors** menu lists only WorkBuddy marketplace connectors; Quandora does not appear there. Do not operate the browser page, open an authorization URL yourself, add a custom MCP server, reinstall the plugin, or start a second attempt while one is open.
+
+After the user finishes, ask them to start one new local Agent task and paste the same one-sentence request. That task resumes at **Check existing progress first**, where Quandora's tools are listed and `get_factor_mining_status` verifies the grant.
 
 Success is a successful `get_factor_mining_status` call through WorkBuddy's own `quandora` server. Then tell the user that production Quandora is installed and authorized. If the call still fails with an authentication error after the user completed the browser step, report that WorkBuddy did not adopt the authorization and stop; do not reinstall, add a custom MCP server, or loop.

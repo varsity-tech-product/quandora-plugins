@@ -371,12 +371,24 @@ PORTFOLIO_METADATA_MANIFESTS = (
 PRODUCTION_MCP_SERVER = "quandora"
 PRODUCTION_MCP_URL = "https://mcp.quandora.ai/quant"
 ANTIGRAVITY_MANIFEST_KEYS = {
-    "name", "displayName", "description", "logo", "suggestedPrompts", "version",
+    "$schema", "name", "displayName", "description", "logo", "suggestedPrompts", "version",
     "author", "homepage", "repository", "disabled",
 }
 ANTIGRAVITY_MCP_SERVER_KEYS = {
     "command", "args", "env", "cwd", "url", "headers", "disabled", "variables",
 }
+# WorkBuddy (and other Agent Plugins hosts) read the same plugin-root plugin.json as an
+# Agent Plugins manifest. Without this $schema WorkBuddy rejects the package and silently
+# drops its MCP server; with it, MCP servers come only from the Agent Plugins mcp.json.
+AGENT_PLUGIN_SCHEMA = "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
+AGENT_MCP_SCHEMA = "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json"
+AGENT_MCP_REMOTE_SERVER_KEYS = {"type", "url", "headers"}
+# These host manifests used to point at mcp.json; they now declare the server inline so
+# they never read the Agent Plugins format.
+INLINE_MCP_MANIFESTS = (
+    PLUGIN_ROOT / ".codebuddy-plugin" / "plugin.json",
+    PLUGIN_ROOT / ".cursor-plugin" / "plugin.json",
+)
 FORBIDDEN_RUNTIME_MARKDOWN = {
     "/Users/": "workstation-specific POSIX path",
     "C:\\Users\\": "workstation-specific Windows path",
@@ -557,6 +569,54 @@ def _check_antigravity_manifest(errors: list[str]) -> None:
     unknown = sorted(set(server) - ANTIGRAVITY_MCP_SERVER_KEYS)
     if unknown:
         errors.append(f"{label}: unsupported Antigravity MCP server keys {unknown}")
+
+
+def _check_agent_plugins_package(errors: list[str]) -> None:
+    label = "plugins/quandora/plugin.json"
+    manifest = _load_json(PLUGIN_ROOT / "plugin.json")
+    if not isinstance(manifest, dict) or manifest.get("$schema") != AGENT_PLUGIN_SCHEMA:
+        errors.append(f"{label}: plugin-root manifest must declare the Agent Plugins $schema")
+
+    label = "plugins/quandora/mcp.json"
+    config = _load_json(PLUGIN_ROOT / "mcp.json")
+    servers = config.get("mcpServers") if isinstance(config, dict) else None
+    if (
+        not isinstance(config, dict)
+        or set(config) != {"$schema", "mcpServers"}
+        or config.get("$schema") != AGENT_MCP_SCHEMA
+        or not isinstance(servers, dict)
+        or set(servers) != {PRODUCTION_MCP_SERVER}
+    ):
+        errors.append(
+            f"{label}: must be an Agent Plugins mcp.json declaring only "
+            f"the {PRODUCTION_MCP_SERVER} MCP server"
+        )
+    else:
+        server = servers[PRODUCTION_MCP_SERVER]
+        if (
+            not isinstance(server, dict)
+            or server.get("type") != "streamable-http"
+            or server.get("url") != PRODUCTION_MCP_URL
+            or set(server) - AGENT_MCP_REMOTE_SERVER_KEYS
+        ):
+            errors.append(
+                f"{label}: {PRODUCTION_MCP_SERVER} must be a streamable-http server at "
+                f"{PRODUCTION_MCP_URL} using only type, url and headers"
+            )
+
+    for path in INLINE_MCP_MANIFESTS:
+        data = _load_json(path)
+        inline = data.get("mcpServers") if isinstance(data, dict) else None
+        server = inline.get(PRODUCTION_MCP_SERVER) if isinstance(inline, dict) else None
+        if (
+            set(inline or {}) != {PRODUCTION_MCP_SERVER}
+            or not isinstance(server, dict)
+            or server.get("url") != PRODUCTION_MCP_URL
+        ):
+            errors.append(
+                f"{path.relative_to(REPOSITORY_ROOT)}: declare the {PRODUCTION_MCP_SERVER} "
+                "MCP server inline; mcp.json uses the Agent Plugins format"
+            )
 
 
 def _check_package_shape(errors: list[str]) -> None:
@@ -1267,6 +1327,7 @@ def main() -> int:
         _check_production_delivery(errors)
         _check_package_shape(errors)
         _check_antigravity_manifest(errors)
+        _check_agent_plugins_package(errors)
         skills = _skill_files(errors)
         _check_skills(errors, skills)
         _check_runtime_markdown(errors, skills)
