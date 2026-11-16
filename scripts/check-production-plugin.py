@@ -62,7 +62,7 @@ CLAUDE_PLUGIN_SUPPORT_SCRIPTS = {
     "claude-mcp-login-macos.sh",
     "claude-mcp-login-windows.ps1",
 }
-PRODUCTION_SUPPORT_SCRIPTS = CLAUDE_PLUGIN_SUPPORT_SCRIPTS | {'workbuddy-cn-install-macos.js', 'workbuddy-cn-bootstrap-macos.sh', 'workbuddy-mcp-login-macos.sh', 'workbuddy-cn-oauth-macos.js', 'workbuddy-mcp-login-windows.ps1'}
+PRODUCTION_SUPPORT_SCRIPTS = CLAUDE_PLUGIN_SUPPORT_SCRIPTS | {'workbuddy-cn-install-macos.js', 'workbuddy-cn-bootstrap-macos.sh', 'workbuddy-mcp-login-macos.sh', 'workbuddy-mcp-login-windows.ps1'}
 PUBLIC_PROSE_CJK = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
 MAX_MAIN_SKILL_LINES = 220
 MAX_CODEX_DEFAULT_PROMPT_CHARS = 128
@@ -1221,10 +1221,9 @@ def _check_production_delivery(errors: list[str]) -> None:
     scripts = PLUGIN_ROOT / "scripts"
     bootstrap = scripts / "workbuddy-cn-bootstrap-macos.sh"
     source = bootstrap.read_text(encoding="utf-8")
-    for variable, filename in (("INSTALLER_SHA256", "workbuddy-cn-install-macos.js"), ("OAUTH_SHA256", "workbuddy-cn-oauth-macos.js")):
-        digest = hashlib.sha256((scripts / filename).read_bytes()).hexdigest()
-        if f"{variable}='{digest}'" not in source:
-            errors.append(f"WorkBuddy component integrity mismatch: {filename}")
+    digest = hashlib.sha256((scripts / "workbuddy-cn-install-macos.js").read_bytes()).hexdigest()
+    if f"INSTALLER_SHA256='{digest}'" not in source:
+        errors.append("WorkBuddy component integrity mismatch: workbuddy-cn-install-macos.js")
     guide = (REPOSITORY_ROOT / "agent-install-guide/workbuddy-cn.md").read_text(encoding="utf-8")
     if hashlib.sha256(bootstrap.read_bytes()).hexdigest() not in guide:
         errors.append("WorkBuddy bootstrap guide integrity mismatch")
@@ -1232,9 +1231,15 @@ def _check_production_delivery(errors: list[str]) -> None:
     declared = re.search(r"const EXPECTED_SKILLS = (\[.*?\]);", installer, re.DOTALL)
     if not declared or set(re.findall(r'"([^"\n]+)"', declared.group(1))) != REQUIRED_SKILLS:
         errors.append("WorkBuddy expected Skill set differs from package")
-    for filename in ("workbuddy-cn-install-macos.js", "workbuddy-cn-oauth-macos.js"):
-        if "get_factor_mining_status" not in (scripts / filename).read_text(encoding="utf-8"):
+    for text in (installer, guide):
+        if "get_factor_mining_status" not in text:
             errors.append("WorkBuddy protected probe must use canonical status tool")
+    # WorkBuddy owns authorization; its application modules are private and change between
+    # releases (5.11.3 removed the ones an earlier OAuth helper loaded).
+    for path in sorted(scripts.glob("workbuddy-*.js")):
+        modules = re.findall(r"\b(?:require|import)\(\s*([^)]*?)\s*\)", path.read_text(encoding="utf-8"))
+        if any(not re.fullmatch(r'"node:[a-z_/]+"', module) for module in modules):
+            errors.append(f"{path.name}: WorkBuddy installer may load only Node built-in modules")
     for path in RUN_FACTOR_VERSION_ACTION_PATHS:
         if RUN_FACTOR_VERSION_FALLBACK not in " ".join(path.read_text(encoding="utf-8").split()):
             errors.append(

@@ -14,7 +14,7 @@ search/pagination guidance. It also rejects orphaned Skill scripts, release-proc
 runtime documentation, per-Skill bundled-version copy, retired tool names, and repeated blocking version
 probes in normal entry paths.
 
-The public package retains the two fixed-purpose Claude authorization launchers and the five
+The public package retains the two fixed-purpose Claude authorization launchers and the four
 reviewed production WorkBuddy installation/authorization scripts. These are explicitly allowlisted;
 other plugin-root scripts remain rejected. WorkBuddy component hashes and the bootstrap hash in
 the installation guide must be updated together when their contents change.

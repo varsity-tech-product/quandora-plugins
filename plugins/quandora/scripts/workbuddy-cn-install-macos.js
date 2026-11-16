@@ -14,7 +14,6 @@ const PLUGIN_NAME = "quandora";
 const MCP_URL = "https://mcp.quandora.ai/quant";
 const CLI_HEALTH_TIMEOUT_MS = 45 * 1000;
 const CLI_TIMEOUT_MS = 2 * 60 * 1000;
-const OAUTH_TIMEOUT_MS = 7 * 60 * 1000;
 const INSTALL_TIMEOUT_MS = 9 * 60 * 1000 + 30 * 1000;
 const OUTPUT_LIMIT_BYTES = 1024 * 1024;
 const DEFAULT_REMEDIATION = "Stop without retrying and report this safe failure.";
@@ -43,20 +42,11 @@ const EXPECTED_SKILLS = [
   "portfolio-analysis",
   "portfolio-trading-analysis",
 ];
-const OAUTH_PROGRESS_STEPS = new Set([
-  "oauth_runtime_ready",
-  "protected_probe_started",
-  "protected_probe_completed",
-  "oauth_discovery_started",
-  "oauth_discovery_completed",
-  "callback_listener_ready",
-  "browser_opened",
-  "callback_received",
-  "token_exchange_started",
-  "token_exchange_completed",
-  "authorization_saved",
-  "workbuddy_notified",
-]);
+// WorkBuddy owns Quandora authorization: it registers its own OAuth client,
+// receives the workbuddy:// callback and stores the grant. The installer never
+// loads WorkBuddy application modules or touches its credential store.
+const MCP_SERVER_NAME = "quandora";
+const PROTECTED_PROBE = "get_factor_mining_status";
 
 class SafeError extends Error {
   constructor(message, code = "installation_failed", remediation = DEFAULT_REMEDIATION) {
@@ -102,17 +92,6 @@ function emit(payload) {
   process.stdout.write(`${JSON.stringify(payload)}\n`);
 }
 
-function resolveBootstrapOAuthHelper(helperPath, installerPath) {
-  const reviewedHelperPath = realpath(helperPath, "Reviewed Quandora OAuth helper");
-  if (
-    path.basename(reviewedHelperPath) !== "workbuddy-cn-oauth-macos.js" ||
-    path.dirname(reviewedHelperPath) !== path.dirname(installerPath)
-  ) {
-    fail("The reviewed Quandora OAuth helper is missing or invalid.");
-  }
-  return reviewedHelperPath;
-}
-
 function createCliEnv(configRoot) {
   const env = { ...process.env };
   for (const key of AGENT_ROUTING_ENV_KEYS) delete env[key];
@@ -143,8 +122,6 @@ function cleanupTemporaryBootstrap() {
     ) {
       return;
     }
-    const oauthHelperPath = path.join(installerDirectory, "workbuddy-cn-oauth-macos.js");
-    if (fs.existsSync(oauthHelperPath)) fs.unlinkSync(oauthHelperPath);
     fs.unlinkSync(installerPath);
     fs.rmdirSync(installerDirectory);
   } catch {
@@ -157,7 +134,6 @@ async function runProcess(command, args, options) {
     label,
     timeoutMs,
     env = process.env,
-    onStderrLine,
     failureCode = "process_failed",
     remediation = DEFAULT_REMEDIATION,
   } = options;
@@ -167,7 +143,6 @@ async function runProcess(command, args, options) {
     let oversized = false;
     let stdout = Buffer.alloc(0);
     let stderr = Buffer.alloc(0);
-    let pendingStderr = "";
     let killTimer;
     let timeout;
 
@@ -207,21 +182,11 @@ async function runProcess(command, args, options) {
     });
     child.stderr.on("data", (chunk) => {
       stderr = append(stderr, chunk);
-      if (onStderrLine) {
-        pendingStderr += chunk.toString("utf8");
-        let newline = pendingStderr.indexOf("\n");
-        while (newline !== -1) {
-          onStderrLine(pendingStderr.slice(0, newline));
-          pendingStderr = pendingStderr.slice(newline + 1);
-          newline = pendingStderr.indexOf("\n");
-        }
-      }
     });
     child.on("error", () => {
       finish(new SafeError(`${label} could not be started.`, failureCode, remediation));
     });
     child.on("close", (code, signal) => {
-      if (onStderrLine && pendingStderr) onStderrLine(pendingStderr);
       if (timedOut) {
         const outputState = stdout.length === 0 && stderr.length === 0
           ? " without producing output"
@@ -246,36 +211,6 @@ async function runProcess(command, args, options) {
       terminate();
     }, timeoutMs);
   });
-}
-
-function relayOAuthProgress(line) {
-  let payload;
-  try {
-    payload = JSON.parse(line);
-  } catch {
-    return;
-  }
-  if (
-    payload?.status === "progress" &&
-    typeof payload.step === "string" &&
-    OAUTH_PROGRESS_STEPS.has(payload.step)
-  ) {
-    emit({ status: "progress", step: payload.step });
-  }
-}
-
-function oauthFailureRequiresHostUpdate(stderr) {
-  for (const line of stderr.split(/\r?\n/).reverse()) {
-    try {
-      const payload = JSON.parse(line);
-      if (payload?.status === "failed" && payload?.code === "host_update_required") {
-        return true;
-      }
-    } catch {
-      // Ignore non-JSON runtime diagnostics.
-    }
-  }
-  return false;
 }
 
 async function requireSuccess(command, args, options) {
@@ -433,27 +368,6 @@ function validateInstalledPlugin(entry, configRoot, marketplaceVersion) {
   return pluginRoot;
 }
 
-function parseOAuthResult(stdout) {
-  const lines = stdout.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
-  if (lines.length !== 1) fail("Quandora authorization returned an invalid result.");
-  let payload;
-  try {
-    payload = JSON.parse(lines[0]);
-  } catch {
-    fail("Quandora authorization returned an invalid result.");
-  }
-  if (
-    payload?.status !== "completed" ||
-    payload?.authenticated !== true ||
-    payload?.protectedProbe !== "get_factor_mining_status" ||
-    !Number.isInteger(payload?.toolCount) ||
-    payload.toolCount <= 0
-  ) {
-    fail("Quandora authorization or protected verification failed.");
-  }
-  return payload;
-}
-
 async function main() {
   const startedAt = Date.now();
   if (process.platform !== "darwin") fail("This installer supports macOS only.");
@@ -476,11 +390,6 @@ async function main() {
     fail("The application identity is not WorkBuddy China.");
   }
   validateAccount(configRoot);
-  const installerPath = realpath(__filename, "Reviewed Quandora installer");
-  const oauthHelper = resolveBootstrapOAuthHelper(
-    path.join(path.dirname(installerPath), "workbuddy-cn-oauth-macos.js"),
-    installerPath,
-  );
 
   const electron = realpath(
     path.join(appRoot, "Contents", "MacOS", "Electron"),
@@ -549,7 +458,7 @@ async function main() {
       timeoutMs: remainingTimeout(startedAt, CLI_TIMEOUT_MS, "Quandora plugin installation"),
       env: cliEnv,
     });
-  } else if (!hasRequiredPackageFiles(plugin, configRoot)) {
+  } else if (plugin.version !== marketplaceVersion || !hasRequiredPackageFiles(plugin, configRoot)) {
     await requireCliSuccess(cli, pluginArgs("update", PLUGIN_ID, "--scope", "user"), {
       label: "Quandora plugin update",
       timeoutMs: remainingTimeout(startedAt, CLI_TIMEOUT_MS, "Quandora plugin update"),
@@ -571,46 +480,21 @@ async function main() {
     plugin = selectUserPlugin(await listPlugins());
   }
 
-  const pluginRoot = validateInstalledPlugin(plugin, configRoot, marketplaceVersion);
+  validateInstalledPlugin(plugin, configRoot, marketplaceVersion);
   emit({ status: "progress", step: "plugin_ready" });
 
-  const oauth = await runProcess(
-    electron,
-    [
-      oauthHelper,
-      pluginRoot,
-      configRoot,
-      appRoot,
-    ],
-    {
-      label: "Quandora authorization",
-      timeoutMs: remainingTimeout(startedAt, OAUTH_TIMEOUT_MS, "Quandora authorization"),
-      env: { ...cliEnv, ELECTRON_RUN_AS_NODE: "1" },
-      onStderrLine: relayOAuthProgress,
-    },
-  );
-  if (oauth.code !== 0) {
-    if (oauthFailureRequiresHostUpdate(oauth.stderr)) {
-      fail(
-        "This WorkBuddy build does not expose the required native OAuth runtime.",
-        "host_update_required",
-        "Update WorkBuddy from Personal Center, restart it, and retry in a new local Agent task.",
-      );
-    }
-    fail("Quandora authorization failed.");
-  }
-  const result = parseOAuthResult(oauth.stdout);
+  // Authorization and the protected probe happen afterwards through WorkBuddy's
+  // own Quandora MCP connection; see agent-install-guide/workbuddy-cn.md.
   emit({
-    status: "completed",
+    status: "installed",
     installed: true,
     enabled: true,
-    authenticated: true,
     plugin: PLUGIN_ID,
     scope: "user",
     version: plugin.version,
-    protectedProbe: result.protectedProbe,
-    toolCount: result.toolCount,
-    browserAuthorizationOpened: result.browserAuthorizationOpened === true,
+    mcpServer: MCP_SERVER_NAME,
+    authorization: "workbuddy_native",
+    protectedProbe: PROTECTED_PROBE,
   });
 }
 

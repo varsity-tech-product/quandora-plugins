@@ -427,6 +427,24 @@ class ConnectionPolicyTests(unittest.TestCase):
                 self.rejected("missing production fallback for an unlisted run_factor_version")
                 path.write_text(original)
 
+    def test_workbuddy_installer_cannot_load_application_modules(self):
+        installer = self.plugin / "scripts/workbuddy-cn-install-macos.js"
+        original = installer.read_text()
+        for statement in (
+            'const auth = require(path.join(resources, "app.asar", "main", "auth.js"));',
+            'const auth = require("/Applications/WorkBuddy.app/Contents/Resources/app.asar/main/auth.js");',
+            'const tar = await import("./tar.js");',
+        ):
+            with self.subTest(statement=statement):
+                installer.write_text(original.replace('"use strict";\n', f'"use strict";\n{statement}\n', 1))
+                self.rejected("WorkBuddy installer may load only Node built-in modules")
+        installer.write_text(original)
+
+    def test_workbuddy_guide_keeps_the_protected_probe(self):
+        guide = self.root / "agent-install-guide/workbuddy-cn.md"
+        guide.write_text(guide.read_text().replace("get_factor_mining_status", "get_quandora_account"))
+        self.rejected("WorkBuddy protected probe must use canonical status tool")
+
     def test_stale_bootstrap_guide_hash_is_rejected(self):
         self.append(self.plugin / "scripts/workbuddy-cn-bootstrap-macos.sh", "# changed bootstrap")
         self.rejected("WorkBuddy bootstrap guide integrity mismatch")
