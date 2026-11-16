@@ -1,22 +1,23 @@
-# Install and authenticate Quandora in WorkBuddy 中国版
+# Install and authenticate Quandora in WorkBuddy (中国版 and WorkBuddy AI)
 
 Also read the [shared installation and recovery policy](https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/install-recovery.md). Apply it within this platform's supported scope; preserve the native authorization flow below.
 
 Read this document completely, then install and authenticate Quandora for the user. Perform the installation yourself instead of displaying instructions. WorkBuddy itself owns Quandora's authorization: the user approves it in WorkBuddy's own authorization prompt and the browser page WorkBuddy opens.
 
-This procedure supports a local Agent task in the macOS WorkBuddy China application. It uses the Mac's system shell and WorkBuddy's own bundled runtime; it does not require or install Node.js, Python, Git, Homebrew, a standalone CodeBuddy CLI, or a local MCP server. Do not adapt it to WorkBuddy AI international, CodeBuddy IDE, Windows, web, cloud, mobile, or a remote Agent.
+This procedure supports a local Agent task in the macOS WorkBuddy application, either the China edition (`WorkBuddy`) or the international edition (`WorkBuddy AI`). It uses the Mac's system shell and WorkBuddy's own bundled runtime; it does not require or install Node.js, Python, Git, Homebrew, a standalone CodeBuddy CLI, or a local MCP server. Do not adapt it to CodeBuddy IDE, Windows, web, cloud, mobile, or a remote Agent.
 
 ## Handoff from an unsupported conversation
 
 If the user is in a web/mobile chat rather than the supported local app, ask their
-operating system if unknown. For macOS, direct them to https://www.codebuddy.cn/work/
-to install WorkBuddy China, sign in and open a new local Agent task. Provide:
+operating system if unknown. For macOS, direct them to install WorkBuddy (China edition:
+https://www.codebuddy.cn/work/) or WorkBuddy AI from its official download page, sign in and
+open a new local Agent task. Provide:
 
 > Read https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/agent-install-guide/workbuddy-cn.md and install and connect Quandora. Check existing progress first. I will complete required approvals, sign-in and consent.
 
-For Windows or other unsupported hosts, explain that this reviewed installer is
-macOS-only; do not adapt the bootstrap or install substitute runtimes. Do not
-claim local checks ran from a web session.
+For Windows or other hosts, explain that this reviewed installer is macOS-only and offer
+**Install from WorkBuddy plugin settings** below; do not adapt the bootstrap or install
+substitute runtimes. Do not claim local checks ran from a web session.
 
 The user's installation request authorizes one foreground invocation of the reviewed bootstrap below. Request WorkBuddy's normal approval for that invocation once, then continue. The only other user actions are starting one new local Agent task when asked, accepting WorkBuddy's own Quandora authorization, and browser sign-in, MFA, or the final Quandora authorization action when required.
 
@@ -30,7 +31,7 @@ The production trust anchors are:
 
 Never request, read, print, copy, or relay an OAuth token, authorization code, client secret, authorization URL, password, passkey, MFA code, or cookie. Do not create a separate MCP entry, replace a conflicting marketplace, edit a plugin cache, or change another plugin.
 
-Do not run an OAuth flow yourself, read or write WorkBuddy's credential or connector stores, or load WorkBuddy application modules. WorkBuddy registers its own OAuth client, opens the browser, receives the `workbuddy://` callback and stores the grant for its `quandora` MCP server.
+Do not run an OAuth flow yourself, read or write WorkBuddy's credential or connector stores, or load WorkBuddy application modules. WorkBuddy registers its own OAuth client, opens the browser, receives the `workbuddy://` (China edition) or `workbuddy-ai://` (WorkBuddy AI) callback and stores the grant for its `quandora` MCP server.
 
 ## Check existing progress first
 
@@ -55,23 +56,29 @@ trap quandora_cleanup EXIT
   --output "$quandora_bootstrap" \
   'https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/plugins/quandora/scripts/workbuddy-cn-bootstrap-macos.sh' || exit 1
 quandora_bootstrap_sha=$(/usr/bin/shasum -a 256 "$quandora_bootstrap" | /usr/bin/awk '{print $1}')
-[ "$quandora_bootstrap_sha" = '52ae3babb7a8b6ad917dc7f33febd2830680e39a1c13fb926542f7e5ae51a961' ] || { echo 'Quandora bootstrap integrity check failed.' >&2; exit 1; }
+[ "$quandora_bootstrap_sha" = '8a2bb69c924b549592b7a46a4051c0bc62c9864ef01a51f3277aeeca5f93f274' ] || { echo 'Quandora bootstrap integrity check failed.' >&2; exit 1; }
 /bin/sh "$quandora_bootstrap"
 ```
 
-The guide contains only this download-and-verify boundary. The hash-pinned repository bootstrap discovers and validates the signed WorkBuddy China application and active account configuration without assuming a username, application location, config location, application version, CLI version, plugin version, processor architecture, port, session, or cache version. It then downloads the separately reviewed installer from the same public production repository, verifies its embedded SHA-256 value, and runs it with the selected WorkBuddy application's bundled runtime.
+The guide contains only this download-and-verify boundary. The hash-pinned repository bootstrap discovers and validates the signed WorkBuddy application, preferring the one that launched this Agent task, and its configuration directory without assuming a username, application location, config location, application version, CLI version, plugin version, processor architecture, port, session, or cache version. It then downloads the separately reviewed installer from the same public production repository, verifies its embedded SHA-256 value, and runs it with the selected WorkBuddy application's bundled runtime.
 
 Plugin state changes go only through WorkBuddy's bundled public plugin manager with closed stdin, argument arrays, headless mode, and bounded processes. The installer does not authorize Quandora and loads no WorkBuddy application module. No credential file, connector store, standalone CLI state, or in-use plugin cache is read or modified.
 
 ## Installer result
 
-Success is one final JSON object whose `status` is `installed`, `installed` and `enabled` are `true`, `plugin` is `quandora@quandora`, `scope` is `user`, `version` matches the validated marketplace and installed manifests, `mcpServer` is `quandora`, `authorization` is `workbuddy_native`, and `protectedProbe` is `get_factor_mining_status`. It means the package is installed; it does not mean Quandora is authorized.
+Success is one final JSON object whose `status` is `installed`, `installed` and `enabled` are `true`, `plugin` is `quandora@quandora`, `scope` is `user`, `version` matches the validated marketplace and installed manifests, `edition` is `china` or `international`, `mcpServer` is `quandora`, `authorization` is `workbuddy_native`, and `protectedProbe` is `get_factor_mining_status`. It means the package is installed; it does not mean Quandora is authorized.
 
-On `host_login_required`, ask the user to sign in to WorkBuddy, start a new local Agent task, and paste the same one-sentence request again. On `host_update_required`, direct the user to WorkBuddy **Personal Center → Check for Updates**, then restart WorkBuddy and retry in a new task; if the application is missing, use `https://www.codebuddy.cn/work/`. These are the official recovery paths—do not install a standalone CLI or another runtime as a substitute.
+On `host_login_required`, ask the user to sign in to WorkBuddy, start a new local Agent task, and paste the same one-sentence request again. On `host_update_required`, direct the user to WorkBuddy's update action (China edition: **Personal Center → Check for Updates**), then restart WorkBuddy and retry in a new task; if the application is missing, install it from its official download page (China edition: `https://www.codebuddy.cn/work/`). If WorkBuddy is already up to date, use **Install from WorkBuddy plugin settings** instead of retrying. Do not install a standalone CLI or another runtime as a substitute.
 
-On `cli_unhealthy`, ask the user to close the failed task, restart WorkBuddy, and paste the same one-sentence request once in a new local Agent task. If it repeats, direct them to **Personal Center → Check for Updates** before retrying. Do not run a bare CLI, use Terminal as a fallback, or retry inside the failed task.
+On `host_layout_unsupported` or `unsupported_host`, use **Install from WorkBuddy plugin settings**; do not retry the bootstrap.
 
-On any other failed result, report only its safe `message` and `remediation`, then stop. Do not expose subprocess output or retry source conflicts, integrity failures, or unsupported hosts.
+On `cli_unhealthy`, ask the user to close the failed task, restart WorkBuddy, and paste the same one-sentence request once in a new local Agent task. If it repeats, use **Install from WorkBuddy plugin settings**. Do not run a bare CLI, use Terminal as a fallback, or retry inside the failed task.
+
+On any other failed result, report only its safe `message` and `remediation`, then stop. Do not expose subprocess output or retry source conflicts or integrity failures.
+
+## Install from WorkBuddy plugin settings
+
+This path depends on nothing inside the WorkBuddy application, so it still works when an update changes WorkBuddy's internal layout. Ask the user to open WorkBuddy's plugin settings, add the GitHub marketplace `varsity-tech-product/quandora-plugins`, and install `quandora` for their user. Do not write plugin files or WorkBuddy configuration yourself. Then continue at **Authorize in WorkBuddy and verify**.
 
 ## Authorize in WorkBuddy and verify
 

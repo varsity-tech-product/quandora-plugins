@@ -440,6 +440,12 @@ class ConnectionPolicyTests(unittest.TestCase):
                 self.rejected("WorkBuddy installer may load only Node built-in modules")
         installer.write_text(original)
 
+    def test_workbuddy_editions_must_match(self):
+        installer = self.plugin / "scripts/workbuddy-cn-install-macos.js"
+        installer.write_text(installer.read_text().replace(
+            '  ["com.workbuddy.workbuddy-ai", "international"],\n', "", 1))
+        self.rejected("WorkBuddy supported editions differ between bootstrap and installer")
+
     def test_workbuddy_guide_keeps_the_protected_probe(self):
         guide = self.root / "agent-install-guide/workbuddy-cn.md"
         guide.write_text(guide.read_text().replace("get_factor_mining_status", "get_quandora_account"))

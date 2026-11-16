@@ -2,7 +2,7 @@
 
 Read this policy together with the selected platform guide. That guide owns the
 supported host, commands, minimum capabilities, and OAuth mechanism. This policy
-never expands WorkBuddy China beyond its supported local macOS Agent workflow.
+never expands WorkBuddy beyond its supported local macOS Agent workflow and plugin-settings fallback.
 
 ## Act, verify, and resume
 

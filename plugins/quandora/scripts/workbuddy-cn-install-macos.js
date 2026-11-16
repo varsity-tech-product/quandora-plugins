@@ -5,8 +5,12 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { spawn } = require("node:child_process");
 
-const BUNDLE_ID = "com.tencent.workbuddy.mac";
-const URL_SCHEME = "workbuddy";
+// WorkBuddy China and WorkBuddy AI (international); the bootstrap verifies their
+// shared Developer ID signature before this installer runs.
+const SUPPORTED_EDITIONS = new Map([
+  ["com.tencent.workbuddy.mac", "china"],
+  ["com.workbuddy.workbuddy-ai", "international"],
+]);
 const MARKETPLACE_REPOSITORY = "varsity-tech-product/quandora-plugins";
 const MARKETPLACE_NAME = "quandora";
 const PLUGIN_ID = "quandora@quandora";
@@ -243,17 +247,6 @@ async function plutilValue(infoPlist, key) {
   return stdout.trim();
 }
 
-function validateAccount(configRoot) {
-  const snapshot = readJson(
-    path.join(configRoot, "storage", "skeleton", "account-snapshot.json"),
-    "WorkBuddy account snapshot",
-  );
-  const userId = requireString(snapshot?.primary?.uid, "WorkBuddy user identity");
-  if (!/^[A-Za-z0-9_-]{8,160}$/.test(userId)) {
-    fail("The active WorkBuddy user identity has an unsupported format.");
-  }
-}
-
 function validateMarketplace(marketplace, configRoot) {
   if (
     marketplace?.type !== "github" ||
@@ -382,17 +375,16 @@ async function main() {
   );
 
   const infoPlist = path.join(appRoot, "Contents", "Info.plist");
-  const [bundleId, urlScheme] = await Promise.all([
+  const [bundleId, executableName] = await Promise.all([
     plutilValue(infoPlist, "CFBundleIdentifier"),
-    plutilValue(infoPlist, "CFBundleURLTypes.0.CFBundleURLSchemes.0"),
+    plutilValue(infoPlist, "CFBundleExecutable"),
   ]);
-  if (bundleId !== BUNDLE_ID || urlScheme !== URL_SCHEME) {
-    fail("The application identity is not WorkBuddy China.");
-  }
-  validateAccount(configRoot);
+  const edition = SUPPORTED_EDITIONS.get(bundleId);
+  if (!edition) fail("The application identity is not a supported WorkBuddy edition.");
+  if (!/^[^/\0]+$/.test(executableName)) fail("The WorkBuddy application executable is invalid.");
 
   const electron = realpath(
-    path.join(appRoot, "Contents", "MacOS", "Electron"),
+    path.join(appRoot, "Contents", "MacOS", executableName),
     "WorkBuddy bundled runtime",
   );
   if (realpath(process.execPath, "Active runtime") !== electron) {
@@ -492,6 +484,7 @@ async function main() {
     plugin: PLUGIN_ID,
     scope: "user",
     version: plugin.version,
+    edition,
     mcpServer: MCP_SERVER_NAME,
     authorization: "workbuddy_native",
     protectedProbe: PROTECTED_PROBE,
@@ -501,7 +494,7 @@ async function main() {
 main().catch((error) => {
   const failure = error instanceof SafeError
     ? error
-    : new SafeError("The WorkBuddy China installation failed safely.");
+    : new SafeError("The WorkBuddy installation failed safely.");
   process.stderr.write(
     `${JSON.stringify({
       status: "failed",
