@@ -48,6 +48,13 @@ Antigravity reads the plugin-root `plugin.json` manifest and `mcp_config.json`. 
 their version in step with the other manifests, pin the production MCP URL, and reject keys
 Antigravity would silently drop.
 
+WorkBuddy (and other Agent Plugins hosts) read the same plugin-root `plugin.json` as an
+[Agent Plugins](https://agent-plugins.org/specification) manifest. Without its `$schema`,
+WorkBuddy rejects the package and silently drops the `quandora` MCP server while still loading
+the Skills. With it, MCP servers come only from the Agent Plugins `mcp.json` (`$schema`,
+`streamable-http`). The CodeBuddy and Cursor manifests therefore declare the server inline,
+and the checks enforce all three.
+
 Production publication promotes the reviewed eight-Skill payload from the staging repository while
 preserving the production package identity, MCP/OAuth endpoint, and supported host installation
 guides. Update every manifest version together. Publish and verify the package before advancing

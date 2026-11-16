@@ -7,7 +7,7 @@ umask 077
 readonly SUPPORTED_BUNDLE_IDS='com.tencent.workbuddy.mac com.workbuddy.workbuddy-ai'
 readonly TEAM_ID='FN2V63AD2J'
 readonly SCRIPT_BASE_DEFAULT='https://raw.githubusercontent.com/varsity-tech-product/quandora-plugins/main/plugins/quandora/scripts'
-readonly INSTALLER_SHA256='62e04791e84320398aba2d4e754e59c4b9b4d9fee0c87aeec133d9265c3a0e6f'
+readonly INSTALLER_SHA256='612d918e948539240c60b288097de76ea553df484742bc0c6fbbace1828b79e6'
 readonly MAX_SCRIPT_BYTES=1048576
 
 fail() {

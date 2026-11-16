@@ -16,6 +16,11 @@ const MARKETPLACE_NAME = "quandora";
 const PLUGIN_ID = "quandora@quandora";
 const PLUGIN_NAME = "quandora";
 const MCP_URL = "https://mcp.quandora.ai/quant";
+// WorkBuddy reads a plugin-root plugin.json as an Agent Plugins manifest and then
+// takes MCP servers only from the Agent Plugins mcp.json. A root manifest without
+// this $schema makes WorkBuddy drop the plugin's MCP server.
+const AGENT_PLUGIN_SCHEMA = "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json";
+const AGENT_MCP_SCHEMA = "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json";
 const CLI_HEALTH_TIMEOUT_MS = 45 * 1000;
 const CLI_TIMEOUT_MS = 2 * 60 * 1000;
 const INSTALL_TIMEOUT_MS = 9 * 60 * 1000 + 30 * 1000;
@@ -306,6 +311,7 @@ function selectUserPlugin(entries) {
 
 function requiredRuntimeFiles(pluginRoot) {
   return [
+    path.join(pluginRoot, "plugin.json"),
     path.join(pluginRoot, ".codebuddy-plugin", "plugin.json"),
     path.join(pluginRoot, "mcp.json"),
     ...EXPECTED_SKILLS.map((skill) => path.join(pluginRoot, "skills", skill, "SKILL.md")),
@@ -351,9 +357,21 @@ function validateInstalledPlugin(entry, configRoot, marketplaceVersion) {
   if (manifest.name !== PLUGIN_NAME || manifest.version !== marketplaceVersion) {
     fail("The installed Quandora plugin identity is invalid.");
   }
+  const agentManifest = readJson(
+    path.join(pluginRoot, "plugin.json"),
+    "Installed Quandora Agent Plugins manifest",
+  );
+  if (
+    agentManifest.$schema !== AGENT_PLUGIN_SCHEMA ||
+    agentManifest.name !== PLUGIN_NAME ||
+    agentManifest.version !== marketplaceVersion
+  ) {
+    fail("The installed Quandora plugin identity is invalid.");
+  }
   const mcp = readJson(path.join(pluginRoot, "mcp.json"), "Installed Quandora MCP manifest");
   if (
-    mcp?.mcpServers?.quandora?.type !== "http" ||
+    mcp?.$schema !== AGENT_MCP_SCHEMA ||
+    mcp?.mcpServers?.quandora?.type !== "streamable-http" ||
     mcp?.mcpServers?.quandora?.url !== MCP_URL
   ) {
     fail("The installed Quandora MCP declaration is invalid.");

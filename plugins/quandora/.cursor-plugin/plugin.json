@@ -1,7 +1,7 @@
 {
   "name": "quandora",
   "displayName": "Quandora",
-  "version": "4.3.7-preview",
+  "version": "4.3.8-preview",
   "description": "Quandora provides Account Connection, Factor Mining, Factor Analysis, Strategy Building, Strategy Analysis, Portfolio Building, Portfolio Analysis, and Portfolio Trading Analysis for backtest research and forward-test management.",
   "author": {
     "name": "Varsity Tech Product"
@@ -32,5 +32,10 @@
     "quant"
   ],
   "skills": "./skills/",
-  "mcpServers": "./mcp.json"
+  "mcpServers": {
+    "quandora": {
+      "type": "http",
+      "url": "https://mcp.quandora.ai/quant"
+    }
+  }
 }
