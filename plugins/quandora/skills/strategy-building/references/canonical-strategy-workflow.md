@@ -13,6 +13,11 @@ For a changed specification, call `create_strategy` with the exact `strategy_fam
 `research_note` explaining the change. Each base reference keeps its `factor_family_id`, `factor_id`
 (the immutable Factor) and `factor_run_id`; copy those three, never a display name.
 This creates a new immutable Strategy in that Family. It never edits the base or previous Runs.
+These changes always need a new Strategy: adding, removing or replacing a Factor or changing its
+Factor run; changing Factor order or signal weights; changing ranking, direction, strategy type,
+rebalance or another frozen field. Copy the complete base and change only the authorized part. A
+new Factor run must pass current Strategy admission again. After a removal the remaining Factors
+stay equally weighted unless the user supplied weights.
 A plain rerun uses `submit_strategy_backtest` on the existing Strategy with a fresh
 `client_request_id` and any explicitly requested dates allowed by the live schema. Omitted dates
 use the server's standard defaults. Dates are Run parameters, never Strategy definition fields.

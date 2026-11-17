@@ -113,6 +113,23 @@ STRATEGY_SERVER_VALUE_GUIDANCE_MARKERS = (
     "`maker_fee_rate=0.0002`",
     "`attribution=true`",
 )
+# Agents recommend only equal weights; non-equal weights come from the user and stay labeled.
+STRATEGY_EQUAL_WEIGHT_MARKERS = (
+    "Every Strategy you design or recommend uses equal Factor weights",
+    "user-specified, never an AI recommendation",
+    "Never search for, recommend or pick in-sample best weights",
+)
+PORTFOLIO_EQUAL_WEIGHT_MARKERS = (
+    "Every Portfolio you design or recommend uses equal initial capital",
+    "Never recommend maximum-Sharpe, minimum-variance, inverse-volatility, risk-parity, "
+    "target-volatility or other in-sample-optimized weights",
+    "user-specified, not an AI recommendation",
+)
+RETIRED_WEIGHT_RECOMMENDATIONS = (
+    "explained risk budget",
+    "are research candidates to compare with equal capital",
+    "factor removal or reweighting",
+)
 ROUTING_MARKERS = {
     "account-connection": (
         "Do not use for Factor",
@@ -885,6 +902,12 @@ def _check_skills(
                     "portfolio-building/SKILL.md: missing fixed-window boundary "
                     f"{marker!r}"
                 )
+        for marker in PORTFOLIO_EQUAL_WEIGHT_MARKERS:
+            if marker not in normalized_portfolio_text:
+                errors.append(
+                    "portfolio-building/SKILL.md: missing equal-capital recommendation rule "
+                    f"{marker!r}"
+                )
         if "resolves the actual latest data endpoint" in normalized_portfolio_text:
             errors.append(
                 "portfolio-building/SKILL.md: retired provider-watermark guidance remains"
@@ -892,6 +915,13 @@ def _check_skills(
 
     strategy_path = skill_files.get("strategy-building")
     if strategy_path is not None:
+        normalized_strategy_text = " ".join(strategy_path.read_text(encoding="utf-8").split())
+        for marker in STRATEGY_EQUAL_WEIGHT_MARKERS:
+            if marker not in normalized_strategy_text:
+                errors.append(
+                    "strategy-building/SKILL.md: missing equal-weight recommendation rule "
+                    f"{marker!r}"
+                )
         ordinary_workflow = strategy_path.parent / "references" / "ordinary-strategy-workflow.md"
         ordinary_text = " ".join(
             ordinary_workflow.read_text(encoding="utf-8").split()
@@ -1226,6 +1256,12 @@ def _check_connection_policy(errors: list[str], skill_files: dict[str, Path]) ->
     paths = [REPOSITORY_ROOT / "README.md", *PLUGIN_ROOT.rglob("*.md")]
     for path in paths:
         text = " ".join(path.read_text(encoding="utf-8").split())
+        for phrase in RETIRED_WEIGHT_RECOMMENDATIONS:
+            if phrase in text:
+                errors.append(
+                    f"{path.relative_to(REPOSITORY_ROOT)}: optimized-weight recommendation "
+                    f"remains: {phrase!r}"
+                )
         if re.search(r"(?:create_\w+_result_bundle_download|read_\w+_result_bundle_chunk)", text):
             errors.append(f"{path.relative_to(REPOSITORY_ROOT)}: use the unified Result Bundle export tool")
         for pattern, reason in (

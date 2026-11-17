@@ -59,6 +59,28 @@ class ConnectionPolicyTests(unittest.TestCase):
                 self.rejected("missing optional-window boundary")
                 workflow.write_text(original)
 
+    def test_equal_weight_recommendation_rules_are_required(self):
+        for relative, expected in (
+            ("skills/strategy-building/SKILL.md", "missing equal-weight recommendation rule"),
+            ("skills/portfolio-building/SKILL.md", "missing equal-capital recommendation rule"),
+        ):
+            with self.subTest(skill=relative):
+                skill = self.plugin / relative
+                original = skill.read_text()
+                marker = "Every Strategy you" if "strategy" in relative else "Every Portfolio you"
+                self.assertIn(marker, original)
+                skill.write_text(original.replace(marker, "Each design you"))
+                self.rejected(expected)
+                skill.write_text(original)
+
+    def test_optimized_weight_recommendation_is_rejected(self):
+        reference = self.plugin / "skills/portfolio-building/references/selection-and-weighting.md"
+        self.append(
+            reference,
+            "Inverse volatility or risk balance are research candidates to compare with equal capital.",
+        )
+        self.rejected("optimized-weight recommendation remains")
+
     def test_strategy_fixed_only_date_guidance_is_rejected(self):
         workflow = self.plugin / "skills/strategy-building/references/ordinary-strategy-workflow.md"
         self.append(workflow, "Omit both `start_date` and `end_date`, including when an older tool schema still exposes them.")
