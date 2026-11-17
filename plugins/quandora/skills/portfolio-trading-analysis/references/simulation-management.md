@@ -36,7 +36,8 @@ of hiding it or creating a replacement automatically.
 Use `rename_simulation_account`, `archive_simulation_account`, and
 `restore_simulation_account` on exact visible account IDs. PB enforces archive eligibility and
 restore quota. Archive does not stop, delete, reset or rewrite account history. Pause and resume
-are available through the simulated run tools; resume rechecks plan and sharing eligibility.
+are available through the simulated run tools; resume rechecks that the Portfolio is still
+listed in Mine or its Share is still valid.
 Account reset, history deletion and active capital edits are not exposed.
 
 For existing accounts, `start_simulation_account_run` accepts `account_id`, exactly one of the
