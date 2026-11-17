@@ -75,8 +75,8 @@ chosen in advance.
    Rank two Portfolio versions only on Runs with the same exchange and window; otherwise state the
    difference instead of ranking them.
 2. Reuse actual source Strategy Cards through `$strategy-analysis`; avoid duplicate diagnosis.
-3. Compare with the core Strategy, each actual member and an available same-member equal-capital
-   baseline. A retrospective best member is additional context with its criterion stated.
+3. Compare with the core Strategy, each actual member and the best single member with its metric
+   stated; compare user-specified weights with an available same-member equal-capital result.
 4. Evaluate canonical return/risk, drawdown/recovery, concentration, supported complementary
    evidence and available costs. Neutrality and residual claims require their own evidence.
 5. Explain unsupported cross-member prediction correlation, historical overlap, covariance or
@@ -89,8 +89,9 @@ comparison. A missing advanced metric does not invalidate independent ready evid
 prevent a claim of independent Alpha or confirmed diversification.
 
 An equal-weight control or leave-one-out experiment requires an existing result or authorized
-execution by `$portfolio-building`. Specify the removed member, remaining weight/capital rule,
-window and comparison metric. Historical attribution alone is not causal marginal value.
+execution by `$portfolio-building`. Specify the removed member, window and comparison metric; the
+remaining members get equal capital again. Historical attribution alone is not causal marginal value.
+Never propose optimized non-equal capital weights as a next experiment.
 
 ## Output
 

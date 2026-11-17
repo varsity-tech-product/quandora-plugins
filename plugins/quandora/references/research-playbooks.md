@@ -92,6 +92,9 @@ establish novelty; resolve it or report the unresolved comparison and stop the b
 2. Call `list_eligible_strategy_factors` and, when needed, `get_eligible_strategy_factor`. Select
    at most one eligible Factor per cluster using its IS card evidence. Each unclustered Factor
    is its own group; each official Factor starts as its own group until step 3 measures it.
+   Screen standalone validity and marginal contribution with
+   [Factor selection and signal weighting](../skills/strategy-building/references/factor-selection-and-weighting.md):
+   a value below the distinct-signal cut is necessary, not sufficient, for complementarity.
 3. Call `compare_factor_runs` on the selected owned runs, covering every pair, and verify each
    is below the distinct-signal cut. Never send official Factors to this owner-only tool. For
    selected official Factors, call `compare_with_official_factors` once per selected owned run
@@ -102,16 +105,20 @@ establish novelty; resolve it or report the unresolved comparison and stop the b
    A missing pair or a statistic whose status is not `ok` remains unknown; do not claim distinct
    signals without the comparison.
 4. Call `create_strategy_family`, or `create_strategy` for an existing Family, through
-   `$strategy-building`. The note lists groups, pairwise values including the official ones, and
-   any comparison that stayed unknown; its `references` list the exact compared runs and
+   `$strategy-building` with equal Factor weights (omit `weighting`). The note lists groups,
+   pairwise values including the official ones, any comparison that stayed unknown, and the
+   controls preregistered for step 6; its `references` list the exact compared runs and
    selection evidence, and the note text names each compared official Factor.
 5. Call `submit_strategy_backtest`, then `wait_for_runs`; read `get_strategy_backtest` and analyze
    through `$strategy-analysis`. Call `record_research_conclusion` with the Strategy run and
    relied-on Factor runs in `references`.
-6. Run one control per member, each removing that member with `create_strategy` and
-   `relation: "control"`, then `submit_strategy_backtest` and `wait_for_runs`. Keep other rules
-   and the window fixed; record any required weight renormalization. Read and compare results
-   through `$strategy-analysis`; each note/conclusion references the baseline and compared runs.
+6. Run the controls preregistered in step 4, normally one per member, each removing that member
+   with the remaining Factors equally weighted, plus the core Factor alone when the note names one.
+   Use `create_strategy` with `relation: "control"`, then `submit_strategy_backtest` and
+   `wait_for_runs`. Keep other rules and the window fixed. A control chosen after seeing results
+   is a new experiment with its own hypothesis, not part of this validation. Read and compare
+   results through `$strategy-analysis`; each note/conclusion references the baseline and
+   compared runs.
 
 ## File the Factor library
 

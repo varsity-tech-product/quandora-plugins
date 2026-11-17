@@ -1,6 +1,6 @@
 ---
 name: strategy-building
-description: Builds one non-optimizer Quandora Strategy and lists available, eligible, or selectable factors. Use when the user asks to create, revise, backtest, rerun, retrieve, or export that Strategy. Do not use for multi-Strategy Portfolio composition, Paper execution, or deep diagnosis.
+description: Builds one non-optimizer Quandora Strategy from admitted Factor evidence, recommending only equal Factor weights, and lists available, eligible, or selectable factors. Use when the user asks to design, create, revise, backtest, rerun, retrieve, or export that Strategy. Do not use for multi-Strategy Portfolio composition, Paper execution, or deep diagnosis.
 ---
 
 # Quandora Strategy Building
@@ -26,6 +26,11 @@ For named objects, follow [Name discovery](../../references/object-discovery.md)
 
 Use [Research playbooks](../../references/research-playbooks.md) for goal-based call orders and similarity decisions.
 
+A Strategy turns existing Factor evidence into one traceable definition: exact FactorRun →
+Factor Card → Strategy admission → ordered `factor_references` → immutable Strategy →
+StrategyRun. The Factor Card says why Factors belong together; the server's admission record says
+whether they may be combined. Neither overrides the other.
+
 ## Tools
 
 - Factor selection: `get_strategy_capabilities`, `list_eligible_strategy_factors`,
@@ -49,6 +54,13 @@ page token byte-for-byte. Do not start research or auto-page from an inventory r
 Preserve returned `strategy_use` and `unresolved_eligible_factor_ids`; an explicitly included Factor can
 appear with `strategy_use.status=needs_optimization` and is not selectable merely because it is
 listed. Report that state without adding local grade thresholds or silently substituting Factors.
+
+For a design request or delegated Factor choice, follow
+[Factor selection and signal weighting](references/factor-selection-and-weighting.md); a
+design-only request stops at the proposal without creating a definition or submitting a Run.
+Judge cross-Factor redundancy and complementarity from Factor value correlation, reported with its
+direction, window, valid days, common symbols and status; missing or insufficient overlap is not
+low correlation.
 
 For a Strategy request, follow [Canonical Strategy Workflow](references/ordinary-strategy-workflow.md).
 Read `get_research_context` with `stage: "strategy"` first. Resolve exact admitted Factors, prepare
@@ -79,6 +91,17 @@ additional date shift. Route a request to author or change an input-level thesis
 
 For a changed definition or another Run of an existing Strategy, follow
 [Immutable Definition Changes](references/canonical-strategy-workflow.md).
+
+## Factor Weights
+
+Every Strategy you design or recommend uses equal Factor weights: omit `weighting` and the server
+derives them. Use non-equal weights only when the user supplies them; label that definition
+user-specified, never an AI recommendation, and show the equal-weight version of the same Factors
+beside it. User weights are finite and positive, sum exactly to 1 and align with the ordered
+`factor_references`. Never search for, recommend or pick in-sample best weights. If equal weights
+leave an unacceptable concentration, change the Factor set or report that the candidates do not
+make a Strategy; do not reweight to hide it. Factor signal weights, Strategy asset weights and
+Portfolio capital weights are different quantities.
 
 ## Observe and Deliver
 

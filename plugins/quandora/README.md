@@ -19,8 +19,11 @@ Use it for production research and Simulation workflows. Real Live evidence is r
 Alongside account management, six Skills cover backtests and one covers forward tests. The
 [research intent and evidence contract](references/research-workflows.md) defines request modes,
 capability-aware analysis and handoffs. Design-only requests do not create resources. Exact supplied
-members/weights are not silently optimized. Analysis suggestions do not authorize experiments;
-already-authorized work continues through the owning builder without repeated confirmation.
+members/weights are not silently optimized. Every Strategy or Portfolio the agent designs or
+recommends uses equal Factor weights or equal initial capital; non-equal weights come only from
+the user and are compared with the equal-weight version. Analysis suggestions do not authorize
+experiments; already-authorized work continues through the owning builder without repeated
+confirmation.
 
 The [research notebook](references/research-notebook.md) carries research across conversations:
 each research task reads `get_research_context` first, each decision carries a `research_note`

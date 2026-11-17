@@ -1,6 +1,6 @@
 ---
 name: portfolio-building
-description: Selects complementary Strategies and builds, revises or backtests an immutable Quandora Portfolio, including one-member Portfolios. Use when the user asks for a composition plan, capital weights, creation, Community discovery, favorites, publication or sharing. Do not use for single-Strategy authoring, deep diagnosis of an existing Portfolio result or Trading account management.
+description: Selects complementary Strategies at equal initial capital and builds, revises or backtests an immutable Quandora Portfolio, including one-member Portfolios. Use when the user asks for a composition plan, capital weights, creation, Community discovery, favorites, publication or sharing. Do not use for single-Strategy authoring, deep diagnosis of an existing Portfolio result or Trading account management.
 ---
 
 # Portfolio Building
@@ -48,17 +48,30 @@ Never request credentials; recover connection failures through the shared policy
 
 ## Route Selection, Design and Execution
 
+Aim for independently valid return sources with an explainable risk structure that measurably
+improve on the single Strategies, not a basket of high-Sharpe members.
 Use [Selection and weighting](references/selection-and-weighting.md) when the user delegates
 member choice or asks for a design. Reuse `$strategy-analysis` Strategy Cards and the shared
-[neutrality framework](../../references/portfolio-neutrality.md), with missing evidence explicit.
+[neutrality framework](../../references/portfolio-neutrality.md), required when a member is
+cross-sectional long/short or market neutral; keep missing evidence explicit.
 For design-only requests, return the proposed members and weights without creating or submitting.
 For exact supplied members and weights, validate and execute that intent without forcing a full
 selection study. Research uncertainty is not an additional product eligibility gate.
 
-Freeze the goal, actual candidate scope, selection reasons, initial weights and intended baseline.
-Do not default to in-sample maximum-Sharpe weights or claim global optimality. A same-member equal-
-capital or leave-one-out control is a separate experiment requiring existing authorization.
-After a requested backtest, use `$portfolio-analysis` for an evidence-based historical verdict.
+Every Portfolio you design or recommend uses equal initial capital: omit every `target_weight`.
+Never recommend maximum-Sharpe, minimum-variance, inverse-volatility, risk-parity,
+target-volatility or other in-sample-optimized weights. Custom weights come only from the user:
+label them user-specified, not an AI recommendation, and compare them with the same members at
+equal weight. If equal capital concentrates risk unacceptably, remove or replace the member
+causing it and weight the rest equally, or report that the candidates do not make a Portfolio.
+
+Freeze the goal, actual candidate scope, each candidate's evaluated StrategyRun, selection reasons,
+weights and intended baseline before reading any Portfolio result. Do not create, change, rerun or
+swap a member's Strategy or Run here to improve a curve, or pick the best of several versions; a
+needed change is a separate `$strategy-building` experiment. Do not claim global optimality.
+A leave-one-out control is a separate experiment requiring existing authorization. After a
+requested backtest, use `$portfolio-analysis` and its
+[incremental value test](../portfolio-analysis/references/incremental-value.md) for the verdict.
 
 ## Discover and Compose
 
@@ -69,9 +82,9 @@ Use `list_portfolios(portfolio_family_id=...)` for immutable definitions in an e
 
 Resolve one to five distinct exact immutable `strategy_id` values. If a needed Strategy does not
 exist, continue its authorized preparation through `$strategy-building`.
-For equal initial capital weights, omit every `target_weight`. For custom weights, supply a
-positive decimal string for every component with an exact sum of 1, for example `"0.7"` and
-`"0.3"`. Never mix supplied and omitted weights, use exponent notation, or round automatically.
+For equal initial capital weights, omit every `target_weight`. For user-supplied custom
+weights, supply a positive decimal string for every component with an exact sum of 1, for example
+`"0.7"` and `"0.3"`. Never mix supplied and omitted weights, use exponent notation, or round automatically.
 These allocate initial capital between Strategies; they are not Factor signal weights, leverage,
 or daily rebalancing instructions. Changing weights creates a new immutable Portfolio and does
 not alter historical backtests or running accounts. Research normalizes capital to 100000;

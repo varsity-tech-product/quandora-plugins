@@ -7,8 +7,9 @@ Use `query` and `filters` only as accepted by this eligible-factor tool. Preserv
 constraint and copy `next_page_token` byte-for-byte on requested continuation.
 
 Before selecting members for a multi-factor Strategy, follow the grouping and pairwise-comparison
-order in [Research playbooks](../../../references/research-playbooks.md). Preserve exact supplied
-Factors; report their redundancy instead of silently substituting members.
+order in [Research playbooks](../../../references/research-playbooks.md) and the evidence and
+decision rules in [Factor selection and signal weighting](factor-selection-and-weighting.md).
+Preserve exact supplied Factors; report their redundancy instead of silently substituting members.
 
 For composition, read `get_strategy_capabilities` when needed to establish supported choices.
 The current tool input schema is the sole request boundary; `caller_supplied_fields` describes
@@ -41,10 +42,13 @@ Never reconstruct a retired import action or treat a local plugin as an eligible
 ## Create the Definition
 
 Choose a nonblank user-facing name from the user's name or the selected Factor theme and task.
-Build one `specification` with `strategy_kind: "cs"`, required `ranking`, and only requested
-optional `weighting`, `strategy_type`, and `rebalance_bars`. Equal weighting is server-derived;
-for custom weighting use `weighting.mode: "custom"` and finite positive `weighting.weights`
-totaling 1, aligned in order with the exact selected `factor_references`.
+Build one `specification` with `strategy_kind: "cs"`, required `ranking`, and optional
+`strategy_type` and `rebalance_bars` chosen from the selected Factor Cards or the user's request.
+Omit `weighting` for every AI-designed or recommended Strategy; the server derives equal Factor
+weights. Send `weighting.mode: "custom"` only with weights the user explicitly supplied: finite
+positive `weighting.weights` totaling exactly 1, aligned in order with the exact selected
+`factor_references`. Label that definition user-specified and report the equal-weight version of
+the same Factors beside it.
 Never send `portfolio_optimizer`, including null.
 
 For a new Family, call `create_strategy_family` with `name`, `specification`, `factor_references`,

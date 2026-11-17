@@ -181,8 +181,8 @@ as the actual portfolio selection unless the immutable Strategy specification co
 
 Prioritize a small number of changes. Each proposal must state the changed variable, motivating
 evidence, expected effect, confirmation metric, and tradeoff. Favor one-variable changes when
-possible. Examples include factor removal or reweighting, ranking breadth, rebalance cadence, cost
-exposure, and one suspected style control.
+possible. Examples: removing one Factor with the rest equally weighted, ranking breadth, rebalance
+cadence, cost exposure, one suspected style control. Never propose non-equal Factor weights.
 
 Do not claim an automatic ablation or correlation matrix: retained evidence does not guarantee
 per-factor correlations or precomputed ablations. Hand the chosen test to `$strategy-building`.
