@@ -8,7 +8,7 @@
       "name": "quandora",
       "source": {
         "source": "local",
-        "path": "./plugins/quandora"
+        "path": "./plugins/quandora-codex"
       },
       "policy": {
         "installation": "AVAILABLE",

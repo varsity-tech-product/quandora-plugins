@@ -1,0 +1,121 @@
+# Canonical Strategy Workflow
+
+## Select Factors
+
+A bare available-factor request calls only `list_eligible_strategy_factors` with a bounded page.
+Use `query` and `filters` only as accepted by this eligible-factor tool. Preserve every selection
+constraint and copy `next_page_token` byte-for-byte on requested continuation.
+
+Before selecting members for a multi-factor Strategy, follow the grouping and pairwise-comparison
+order in [Research playbooks](../../../references/research-playbooks.md) and the evidence and
+decision rules in [Factor selection and signal weighting](factor-selection-and-weighting.md).
+Preserve exact supplied Factors; report their redundancy instead of silently substituting members.
+
+For composition, read `get_strategy_capabilities` when needed to establish supported choices.
+The current tool input schema is the sole request boundary; `caller_supplied_fields` describes
+caller choices when returned. Do not copy server-managed values into proposed inputs, and do not
+add any field absent from the live submit schema. Do not ask for confirmation of server-managed
+fields; explain the effective research period from server evidence when relevant.
+
+Resolve exact Factors through `list_eligible_strategy_factors`; use `get_eligible_strategy_factor`
+for eligible detail with the row's `eligible_factor_id`. Use `include_eligible_factor_ids` for
+supplied exact selectors and preserve `unresolved_eligible_factor_ids` as unresolved; do not replace
+them with similarly named Factors.
+Included rows can carry `strategy_use.status=needs_optimization`. Report the exact Factor and
+returned `reasonCode`, `phase`, `runtimeError`, and `observedAt`; preserve nullable support and
+admission evidence, and do not select that row or retry detail to override its state. Continue
+Factor repair only within the user's authorized scope through `$factor-mining`.
+Source and eligibility come from returned data. Grade F or a negative grade score remains
+selectable when returned as eligible; do not derive another eligibility rule from metrics.
+Copy each selected row's exact `admission.factor_family_id`, `admission.factor_id` (the immutable
+Factor) and `admission.factor_run_id` into `factor_references`. These are the current Factor input
+field names; do not infer them from a display name or the row's `eligible_factor_id`.
+
+Sharing or Publication visibility does not establish Strategy eligibility. Resolve a requested
+shared Factor through the eligible-factor tools above and select it only when the server returns
+an eligible admission record. If it is absent or ineligible, report that limitation; do not copy
+source, infer eligibility from a Publication child ID, or switch to an internal endpoint.
+
+A newly authored Factor must go through `$factor-mining` validation, backtest, and admission.
+Never reconstruct a retired import action or treat a local plugin as an eligible Factor.
+
+## Create the Definition
+
+Choose a nonblank user-facing name from the user's name or the selected Factor theme and task.
+Build one `specification` with `strategy_kind: "cs"`, required `ranking`, and optional
+`strategy_type` and `rebalance_bars` chosen from the selected Factor Cards or the user's request.
+Omit `weighting` for every AI-designed or recommended Strategy; the server derives equal Factor
+weights. Send `weighting.mode: "custom"` only with weights the user explicitly supplied: finite
+positive `weighting.weights` totaling exactly 1, aligned in order with the exact selected
+`factor_references`. Label that definition user-specified and report the equal-weight version of
+the same Factors beside it.
+Never send `portfolio_optimizer`, including null.
+
+For a new Family, call `create_strategy_family` with `name`, `specification`, `factor_references`,
+and a `new_direction` `research_note`. The response contains `strategy_family.strategy_family_id`
+and the first immutable `strategy.strategy_id`. They are different resources; creation does not
+itself imply a Run exists. Preserve the complete returned Strategy definition.
+Minimal arguments; omit unrequested optional fields and never send null:
+
+```json
+{"name":"…","specification":{"strategy_kind":"cs","ranking":{"mode":"percent","value":20}},"factor_references":[{"factor_family_id":"…","factor_id":"…","factor_run_id":"…"}],"research_note":{"relation":"new_direction","hypothesis":"…","references":[{"type":"factor_run","id":"…"}]}}
+```
+
+For an existing Family and a changed definition, read the exact base with `get_strategy`, then
+call `create_strategy` with `strategy_family_id`, `base_strategy_id`, the complete new
+`specification`, `factor_references`, and an `improvement` or `control` `research_note`. The base
+remains unchanged.
+
+## Submit and Observe
+
+Call `submit_strategy_backtest` with the exact immutable `strategy_id` and a fresh
+`client_request_id` UUID generated before the first submission. Optional `start_date` and
+`end_date` select an ordinary StrategyRun's research period when the live submit schema and
+capabilities allow them. Preserve explicit dates unchanged; dates belong to the Run, not the
+Strategy definition. Omitted dates default to `2022-01-01` through the last complete UTC month end,
+frozen by FM at first acceptance. Do not calculate a replacement cutoff on retry. Cash, fees,
+attribution, universe, provider settings, and execution controls are not caller inputs.
+
+If the connected schema or capabilities still exclude a requested date, report that limitation;
+do not silently submit a different period or invent unsupported fields. Gateway date-validation
+rejection creates no Run. Do not remove rejected dates and resubmit unless the user accepts the
+changed research intent. Preserve historical Run dates as returned; do not rewrite them to today's
+interval. A changed period requires a new request identity; the same ID and original parameters
+recover the accepted Run even across UTC month boundaries.
+
+A request to build and backtest authorizes both definition creation and Run submission. Present
+consequential choices, but do not require fresh approval merely because another tool is needed.
+
+Use the response as the first snapshot. Copy `run.strategy_run_id` to
+`get_strategy_backtest(strategy_run_id=...)`. Read that persisted Run with bounded observation;
+no continue command or internal command receipt belongs to this lifecycle. For history call
+`list_strategy_backtests(strategy_id=..., page_size=...)`; it accepts no search query or filters.
+
+When the submission fails or its response is lost, follow
+[Failed mutations](../../../references/failed-mutations.md); the backend may already have created
+and started the Run. Reconcile any exact returned identity. If none was returned, inspect
+`list_strategy_backtests(strategy_id=...)` for the original immutable Strategy and read an exact
+candidate with `get_strategy_backtest`. Compare retained creation time and execution choices with
+the original request. Use bounded repeated reads when the first page has not yet exposed the Run.
+If the reads show no Run and the original call carried `client_request_id`, one repeat with the
+exact same ID and parameters recovers the original operation. Never use a fresh ID or change
+parameters to recover an uncertain submission. If the original call omitted the ID, the shared
+ten-minute rule applies; do not pick a merely similar Run as proof.
+
+Preserve safe failure details and retryability. A rejected request is not a completed backtest.
+A requested rerun uses a fresh `client_request_id`, even for the same requested interval and a completed
+or still-running previous Run (normal quota/concurrency limits still apply). The same ID is
+reserved for retries, including after reconnection or more than ten minutes. A response with
+`idempotency_key_reused` means that ID was used with different parameters; report the conflict
+and reconcile the original operation, rather than silently generating another ID.
+The field is an operation identifier, not part of the Strategy definition or Run parameters.
+Its omission exists only for old-client compatibility and cannot reliably express an identical
+intentional rerun on modern MCP. If the live schema lacks the field, report the connection's
+schema limitation rather than inventing it or forcing another request.
+
+An authorized rerun submits a new Run of the same Strategy; changing a frozen definition requires
+an authorized new Strategy first. Do not repeat failed execution merely to manufacture evidence.
+
+Read `get_strategy` for immutable composition/specification and the Run for execution state.
+Use available server artifacts for effective execution parameters; preserve missing fields as
+unknown. A terminal zero-order/no-result outcome is not a reason to keep polling missing charts.

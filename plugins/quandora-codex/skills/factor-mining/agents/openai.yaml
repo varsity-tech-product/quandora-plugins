@@ -1,0 +1,16 @@
+interface:
+  display_name: "Factor Mining"
+  short_description: "Write and backtest Quandora factor plugins"
+  icon_small: "./assets/factor-mining.png"
+  icon_large: "./assets/factor-mining.png"
+  brand_color: "#F28C00"
+  default_prompt: "Use $factor-mining to list public tasks or run a custom factor idea."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "quandora"
+      description: "Quandora Factor Mining connection"
+      transport: "streamable_http"
+      url: "https://mcp.quandora.ai/quant"
+      oauth_resource: "https://mcp.quandora.ai/quant"
