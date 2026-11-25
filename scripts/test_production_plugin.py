@@ -27,6 +27,10 @@ class ConnectionPolicyTests(unittest.TestCase):
         )
         return result.returncode, result.stdout + result.stderr
 
+    def sync_codex_package(self):
+        subprocess.run([sys.executable, str(self.root / "scripts/sync-codex-package.py")],
+                       check=True, capture_output=True)
+
     def append(self, path, text):
         path.write_text(path.read_text() + "\n" + text + "\n")
 
@@ -263,6 +267,20 @@ class ConnectionPolicyTests(unittest.TestCase):
         path.write_text(path.read_text().replace("Portfolio Analysis", "Portfolio Review"))
         self.rejected("metadata omits Portfolio Analysis")
 
+    def test_codex_package_mirrors_the_shared_package(self):
+        codex = self.root / "plugins/quandora-codex"
+        self.append(self.policy, "An edit that was not synced.")
+        self.rejected("differs from plugins/quandora")
+        self.sync_codex_package()
+        self.assertEqual(self.check()[0], 0)
+        (codex / "plugin.json").write_text((self.plugin / "plugin.json").read_text())
+        self.rejected("Codex package must not carry Agent Plugins or Antigravity root files")
+
+    def test_codex_marketplace_installs_the_mirror(self):
+        path = self.root / ".agents/plugins/marketplace.json"
+        path.write_text(path.read_text().replace("./plugins/quandora-codex", "./plugins/quandora"))
+        self.rejected("Codex must install ./plugins/quandora-codex")
+
     def test_missing_shared_policy(self):
         self.policy.unlink()
         self.rejected("missing shared connection recovery policy")
@@ -449,6 +467,7 @@ class ConnectionPolicyTests(unittest.TestCase):
                 if "version" in plugin:
                     plugin["version"] = "future-release+canary"
             path.write_text(json.dumps(data))
+        self.sync_codex_package()
         code, output = self.check()
         self.assertEqual(code, 0, output)
 

@@ -1,0 +1,16 @@
+interface:
+  display_name: "Portfolio Building"
+  short_description: "Select Strategies, build and share Portfolios"
+  icon_small: "./assets/portfolio-building.png"
+  icon_large: "./assets/portfolio-building.png"
+  brand_color: "#F28C00"
+  default_prompt: "Use $portfolio-building to select complementary Strategies, create and backtest a Portfolio, or share an existing one."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "quandora"
+      description: "Quandora research and forward-test connection"
+      transport: "streamable_http"
+      url: "https://mcp.quandora.ai/quant"
+      oauth_resource: "https://mcp.quandora.ai/quant"

@@ -1,0 +1,16 @@
+interface:
+  display_name: "Strategy Building"
+  short_description: "Create and backtest one strategy"
+  icon_small: "./assets/strategy-building.png"
+  icon_large: "./assets/strategy-building.png"
+  brand_color: "#F28C00"
+  default_prompt: "Use $strategy-building to choose eligible Factors, create one immutable Strategy, and backtest it within my request."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "quandora"
+      description: "Quandora Strategy Building connection"
+      transport: "streamable_http"
+      url: "https://mcp.quandora.ai/quant"
+      oauth_resource: "https://mcp.quandora.ai/quant"

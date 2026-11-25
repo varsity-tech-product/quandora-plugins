@@ -1,0 +1,157 @@
+# Connection recovery and version diagnostics
+
+Use this shared policy for every Quandora Skill when a real connection failure occurs,
+for explicit account requests and for the first-use release check. A release check never blocks ordinary business work.
+
+Explicit requests to connect, open authorization, reauthorize or switch accounts route
+to [Quandora Account](../skills/account-connection/SKILL.md). They independently
+authorize initiating one supported native OAuth flow, even with a valid grant.
+Do not wait for a business call to fail. A status-only request stays read-only.
+
+## Recover automatically
+
+Use only the configured `quandora` MCP connection. OAuth and credentials remain
+host-managed. Let the host complete automatic token refresh first, then use its supported
+reconnect or tool-discovery recovery within existing permissions. The Agent handles routine
+recovery and resumes the original task without asking the user to interpret tokens or run commands.
+Do not start concurrent authorization flows or repeat failed recovery indefinitely.
+
+After successful recovery, retry an affected read once. When a mutating call fails or its response
+is lost, follow [Failed mutations](failed-mutations.md). Never create a replacement backtest or
+Trading run, or change the arguments, merely because a response was lost.
+
+For incidental failures, when the host reports terminal authorization failure or authenticated diagnostics
+require fresh consent, the Agent initiates the supported host-native OAuth flow. Explicit account
+requests are the independent trigger described above. Ask the user only to complete
+unavoidable browser sign-in, MFA, consent, or host approval. Respect cancellation and security
+denials. Resume and verify the original workflow afterward. If the host provides no supported
+recovery capability, explain the concrete connection blocker without inventing commands or
+claiming success. Do not reinstall a working plugin for authentication or discovery failures.
+
+Do not display token lifetimes, expiry explanations, or copyable connection-refresh prompts.
+Never inspect, print, copy, store, or request credential values, token stores, authorization codes,
+PKCE verifiers, or pasted secrets. Never bypass MCP with private service APIs, raw internal HTTP,
+or an improvised credential-refresh script.
+
+## Rejected arguments
+
+`backend_validation_error` naming `details.path` or `details.field` means nothing was written.
+Fix only that argument against the current tool schema and retry; if the schema lacks the named
+field, refresh tool discovery first. After two rejections at the same path, stop and report the
+returned error. It is never an account or permission block.
+
+## Connected, but workflow tools are missing
+
+A successful version check or `get_factor_mining_status` proves only that particular
+read works. It does not prove that the connection exposes the tools needed for the
+user's workflow. A current plugin package cannot add permissions to an existing OAuth grant.
+
+Before declaring a workflow unavailable, use the host's supported tool search/discovery
+and complete any discovery pagination. Compare the resulting catalog with the relevant
+Skill's required tools. For Portfolio creation this includes `list_strategy_families`,
+`list_strategies`, `create_portfolio` and `submit_portfolio_backtest`. Do not call a mutation
+merely to check availability.
+
+If only a subset is missing, distinguish three cases: incomplete host discovery,
+an older authorization missing workflow scopes, or a server-side surface restriction.
+Use explicit host authorization diagnostics when available; missing tool names alone
+do not establish which case applies. An update notice saying the package is current
+does not resolve any of these cases.
+
+When available, call `get_factor_mining_status` once for this diagnosis. Its
+`connection.scope` is the current authenticated grant and its `tools` array is the
+server's scope- and deployment-filtered catalog. A successful probe with these fields
+is stronger evidence than a cached host catalog. Older servers may omit them; absence
+is unknown, not an empty grant. Do not expose connection IDs or raw scope lists as
+user-facing troubleshooting instructions.
+
+For the requested Strategy/Portfolio workflow, compare only the permissions it needs:
+
+| Required tool | Required scope |
+| --- | --- |
+| `list_strategy_families`, `list_strategies` | `strategy:definitions.read` |
+| `create_strategy_family`, `create_strategy` | `strategy:definitions.write` |
+| `list_strategy_backtests`, `get_strategy_backtest` | `strategy:backtests.read` |
+| `submit_strategy_backtest` | `strategy:backtests.create` |
+| `list_portfolios`, `get_portfolio` | `strategy:portfolios.read` |
+| `create_portfolio` | `strategy:portfolios.write` |
+| `list_portfolio_backtests`, `get_portfolio_backtest` | `strategy:portfolio_evaluations.read` |
+| `submit_portfolio_backtest` | `strategy:portfolio_evaluations.create` |
+
+If a required scope is missing, explain that this workflow needs additional permission
+and initiate one supported host-native reauthorization of the existing connector.
+Token refresh or a plugin update cannot add that permission. The host must request
+the needed current scopes explicitly or omit `scope` so the updated Auth server can
+prepare its current default consent set. Never send an empty scope. If the host keeps
+explicitly sending the old scope set, another identical login will not repair it;
+report that concrete host limitation instead of repeating sign-in or reinstalling.
+The authorization page shows the requested permissions and can reuse an existing
+browser login. Only the user may approve the additional access; preserve explicit
+restricted grants and do not demand unrelated permissions for an authorized read.
+
+If the needed tools are in the status catalog but absent from host discovery, refresh
+the host catalog within the current grant; do not request broader permissions. If the
+scope is already granted but the tool is absent from the server catalog, report a
+server exposure problem instead of asking for consent again.
+
+When diagnostics are inconclusive, try supported discovery/reconnect recovery once
+within the existing grant. If the host reports missing scopes or requires new consent, use the existing connector's native
+authorization flow below and let the user approve any additional permissions. Never
+silently broaden a grant. If this host exposes no recovery action, state which workflow
+tools remain absent and that the existing Quandora connector needs authorization/discovery
+recovery; do not stop at a generic "tools unavailable" message or recommend reinstalling.
+
+After recovery, rediscover the required tools and verify a relevant authorized read
+before resuming the user's task. Do not report Portfolio creation as ready solely because
+the version check or Factor status succeeds. Keep unavailable client checks explicit.
+For Portfolio recovery, verify `list_strategy_families` before resuming creation, and
+confirm that `create_portfolio` and `submit_portfolio_backtest` are discoverable without
+invoking them as probes. If status still reports the old grant after the OAuth callback,
+stop the recovery loop and report that the host has not adopted the new authorization.
+
+## Host-native authorization fallback
+
+These paths are for the Agent only after automatic recovery cannot restore authorization; they
+are not boilerplate instructions to display to the user. Use only capabilities actually available
+in the current host, and involve the user only for unavoidable interaction:
+
+- Codex Desktop and local CLI/TUI: follow [Codex native authorization recovery](codex-authorization-recovery.md).
+  A plugin-management `plugin_not_found` does not end recovery: check the permitted same-host
+  official CLI route before declaring it unavailable. The Agent starts the supported flow;
+  the user completes required sign-in/consent. Respect explicit security denials.
+- Kimi Code: `/mcp-config login plugin-quandora:quandora`.
+- Claude Code: authenticate `quandora` through `/mcp`.
+- Claude Desktop: authorize the existing `quandora` connector at
+  `https://mcp.quandora.ai/quant`; do not create a duplicate connector.
+- CodeBuddy/WorkBuddy: reconnect the existing plugin-managed Remote MCP server and finish
+  host-native browser authorization if required.
+- Antigravity: ask the user to sign in to the `quandora` plugin from its sign-in card or
+  plugin page. If the callback page shows an authorization code, the user enters it only in
+  Antigravity's own authorization field; never accept or relay it in chat.
+
+Use a new chat or host restart only if the host requires it to reload authorized tools; do not
+claim a reload is necessary for every failure. The package's two documented Claude Desktop Code
+launchers are authorization-only, not business-workflow tools.
+
+The sole direct HTTP exception is consumption of an unmodified, opaque, short-lived
+Result Bundle URL returned by `download_result_bundle`. It may be retried or resumed until
+expiry using the same URL. Never construct, alter, persist, log, or summarize that URL.
+Follow [Unified Result Bundle Download](result-bundle-download.md). This is not permission
+to call internal APIs or obtain credentials outside the host-managed connection.
+
+## Check releases once per session
+
+On first Quandora use in each session, read actual installed metadata from the **same installed package**
+that supplied this Skill. Call `check_quandora_plugin_version` once; reuse the result across all Skill
+handoffs. If installed metadata is unavailable, report unknown without guessing. Follow the reviewed
+[host update guide](plugin-update.md) for the legacy query fallback, explicit
+pins, update authority, marketplace refresh and host-specific installation/reload steps.
+
+A failed check is nonblocking. Do not repeat notices for the same recommended release in the session.
+Respect existing update authorization; a research request alone does not authorize installation.
+Never automatically downgrade or switch release channels. Preserve explicit version pins.
+
+The actual installed version comes from host metadata or this package's host manifest, never from
+memory, the cache folder name, a remote manifest or the server recommendation. Do not hardcode labels.
+Version advice never establishes business compatibility or expired OAuth. Do not reinstall for an
+OAuth failure. Installation is not proof that the current session loaded the updated Skills.

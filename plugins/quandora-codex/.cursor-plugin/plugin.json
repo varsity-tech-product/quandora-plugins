@@ -1,0 +1,41 @@
+{
+  "name": "quandora",
+  "displayName": "Quandora",
+  "version": "4.3.11-preview",
+  "description": "Quandora provides Account Connection, Factor Mining, Factor Analysis, Strategy Building, Strategy Analysis, Portfolio Building, Portfolio Analysis, and Portfolio Trading Analysis for backtest research and forward-test management.",
+  "author": {
+    "name": "Varsity Tech Product"
+  },
+  "homepage": "https://github.com/varsity-tech-product/quandora-plugins",
+  "repository": "https://github.com/varsity-tech-product/quandora-plugins",
+  "license": "Apache-2.0",
+  "keywords": [
+    "quandora",
+    "factor-mining",
+    "factor-analysis",
+    "backtesting",
+    "strategy-building",
+    "portfolio-building",
+    "portfolio-analysis",
+    "strategy-analysis",
+    "portfolio-trading-analysis",
+    "quant"
+  ],
+  "category": "productivity",
+  "tags": [
+    "quandora",
+    "factor-mining",
+    "strategy-building",
+    "portfolio-building",
+    "portfolio-analysis",
+    "backtesting",
+    "quant"
+  ],
+  "skills": "./skills/",
+  "mcpServers": {
+    "quandora": {
+      "type": "http",
+      "url": "https://mcp.quandora.ai/quant"
+    }
+  }
+}

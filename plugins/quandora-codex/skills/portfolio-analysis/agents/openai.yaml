@@ -1,0 +1,16 @@
+interface:
+  display_name: "Portfolio Analysis"
+  short_description: "Evaluate backtest diversification and tradeoffs"
+  icon_small: "./assets/portfolio-analysis.png"
+  icon_large: "./assets/portfolio-analysis.png"
+  brand_color: "#F28C00"
+  default_prompt: "Use $portfolio-analysis to evaluate my Portfolio backtest against its actual Strategy members and an equal-weight baseline."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "quandora"
+      description: "Quandora research and forward-test connection"
+      transport: "streamable_http"
+      url: "https://mcp.quandora.ai/quant"
+      oauth_resource: "https://mcp.quandora.ai/quant"

@@ -44,6 +44,15 @@ The Factor Skills name `run_factor_version`, which production Auth lists only wh
 `REMOTE_MCP_RUN_FACTOR_VERSION_ENABLED` is on. When it is not listed, the Skills tell the user
 that testing an existing version at another horizon is unavailable and never upload source instead.
 
+Codex installs `plugins/quandora-codex/`, a mirror of the shared package without its plugin-root
+`plugin.json`, `mcp.json` and `mcp_config.json`. When the root `plugin.json` declares the Agent
+Plugins `$schema`, Codex loads the package through that format and binds only a name-order prefix
+of the MCP tools (22 or 44 of 137 measured on staging on 2026-11-25); the same package without
+those files binds every tool. WorkBuddy and Antigravity still read them from the shared package.
+Edit only `plugins/quandora/`, then run `python3 scripts/sync-codex-package.py`; the check rejects
+any drift, those root files or symbolic links in the mirror, and a Codex marketplace path other
+than the mirror.
+
 Antigravity reads the plugin-root `plugin.json` manifest and `mcp_config.json`. The checks keep
 their version in step with the other manifests, pin the production MCP URL, and reject keys
 Antigravity would silently drop.

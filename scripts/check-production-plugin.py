@@ -406,6 +406,15 @@ INLINE_MCP_MANIFESTS = (
     PLUGIN_ROOT / ".codebuddy-plugin" / "plugin.json",
     PLUGIN_ROOT / ".cursor-plugin" / "plugin.json",
 )
+# Codex reads a plugin whose root plugin.json declares the Agent Plugins $schema through that format
+# and then binds only a name-order prefix of its MCP tools (22 or 44 of 137 measured on staging,
+# 2026-11-25); the same package without those root files binds every tool. WorkBuddy and Antigravity
+# need them, so Codex installs a mirror of the shared package without them
+# (scripts/sync-codex-package.py).
+CODEX_PACKAGE_ROOT = REPOSITORY_ROOT / "plugins" / "quandora-codex"
+CODEX_PACKAGE_PATH = "./plugins/quandora-codex"
+CODEX_EXCLUDED_ROOT_FILES = frozenset({"plugin.json", "mcp.json", "mcp_config.json"})
+CODEX_MARKETPLACE = REPOSITORY_ROOT / ".agents" / "plugins" / "marketplace.json"
 FORBIDDEN_RUNTIME_MARKDOWN = {
     "/Users/": "workstation-specific POSIX path",
     "C:\\Users\\": "workstation-specific Windows path",
@@ -1179,6 +1188,50 @@ def _check_research_workflows(errors: list[str], skill_files: dict[str, Path]) -
                     errors.append(f"{path.relative_to(REPOSITORY_ROOT)}: broken supporting reference {target!r}")
 
 
+def _package_files(root: Path, excluded: frozenset[str] = frozenset()) -> dict[str, bytes]:
+    return {
+        path.relative_to(root).as_posix(): path.read_bytes()
+        for path in sorted(root.rglob("*"))
+        if path.is_file() and path.relative_to(root).parts[0] not in excluded
+    }
+
+
+def _check_codex_package(errors: list[str]) -> None:
+    label = "plugins/quandora-codex"
+    if not CODEX_PACKAGE_ROOT.is_dir():
+        errors.append(f"{label}: missing Codex package; run scripts/sync-codex-package.py")
+        return
+    for name in sorted(CODEX_EXCLUDED_ROOT_FILES):
+        if (CODEX_PACKAGE_ROOT / name).exists():
+            errors.append(
+                f"{label}/{name}: Codex package must not carry Agent Plugins or Antigravity root "
+                "files; Codex then binds only part of the MCP tools"
+            )
+    if any(path.is_symlink() for path in CODEX_PACKAGE_ROOT.rglob("*")):
+        errors.append(f"{label}: symbolic links are not allowed")
+    shared = _package_files(PLUGIN_ROOT, CODEX_EXCLUDED_ROOT_FILES)
+    codex = _package_files(CODEX_PACKAGE_ROOT)
+    drift = sorted(
+        name for name in shared.keys() | codex.keys()
+        if name not in CODEX_EXCLUDED_ROOT_FILES and shared.get(name) != codex.get(name)
+    )
+    if drift:
+        errors.append(
+            f"{label}: differs from plugins/quandora ({', '.join(drift[:5])}"
+            f"{', ...' if len(drift) > 5 else ''}); run scripts/sync-codex-package.py"
+        )
+    marketplace = _load_json(CODEX_MARKETPLACE)
+    paths = [
+        plugin.get("source", {}).get("path")
+        for plugin in marketplace.get("plugins", [])
+        if plugin.get("name") == PRODUCTION_MCP_SERVER
+    ]
+    if paths != [CODEX_PACKAGE_PATH]:
+        errors.append(
+            f".agents/plugins/marketplace.json: Codex must install {CODEX_PACKAGE_PATH}, got {paths}"
+        )
+
+
 def _check_connection_policy(errors: list[str], skill_files: dict[str, Path]) -> None:
     policy = PLUGIN_ROOT / "references/connection-and-security.md"
     if not policy.is_file():
@@ -1370,6 +1423,7 @@ def main() -> int:
         _check_connection_policy(errors, skills)
         _check_research_workflows(errors, skills)
         _check_research_notebook(errors, skills)
+        _check_codex_package(errors)
     except ValueError as exc:
         errors.append(str(exc))
 

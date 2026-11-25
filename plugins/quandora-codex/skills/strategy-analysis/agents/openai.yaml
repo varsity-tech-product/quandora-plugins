@@ -1,0 +1,16 @@
+interface:
+  display_name: "Strategy Analysis"
+  short_description: "Diagnose Quandora strategy results safely"
+  icon_small: "./assets/strategy-analysis.png"
+  icon_large: "./assets/strategy-analysis.png"
+  brand_color: "#F28C00"
+  default_prompt: "Use $strategy-analysis to diagnose this strategy result and propose controlled improvements."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "quandora"
+      description: "Quandora Strategy Analysis connection"
+      transport: "streamable_http"
+      url: "https://mcp.quandora.ai/quant"
+      oauth_resource: "https://mcp.quandora.ai/quant"
