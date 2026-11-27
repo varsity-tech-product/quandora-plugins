@@ -11,9 +11,10 @@ Treat style explanations as hypotheses unless server evidence directly measures 
 - **Volatility:** a signal may primarily select high- or low-volatility instruments.
 - **Coverage:** missing data can change the effective universe and create selection effects.
 
-When discussing the six-chart Strategy Size style later in the workflow, use the returned style
-metadata. If it declares trailing 90-natural-day median-positive-quote-volume, Size is its
-logarithm rather than open-interest notional.
+For a Strategy's measured Size exposure, use the run's retained chart or attribution artifact
+and the method documented in [Six-chart diagnostics](../../strategy-analysis/references/six-chart-diagnostics.md).
+The observation applies to the selected Strategy basket. Attributing it to one Factor requires
+Factor-level evidence.
 
 ## Readiness For Strategy Building
 
