@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "quandora",
   "displayName": "Quandora",
-  "version": "4.3.11-preview",
+  "version": "4.3.12-preview",
   "description": "Quandora provides Account Connection, Factor Mining, Factor Analysis, Strategy Building, Strategy Analysis, Portfolio Building, Portfolio Analysis, and Portfolio Trading Analysis for backtest research and forward-test management.",
   "logo": "assets/quandora.png",
   "author": {

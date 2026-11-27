@@ -155,8 +155,8 @@ Read [artifacts-and-metrics.md](references/artifacts-and-metrics.md) and
 - daily turnover using the Strategy single-sided `/2` convention;
 - gross and net exposure and whether nominal neutrality held in practice;
 - factor composition and whether explicit weights created concentration;
-- all available chart families, including quantile ordering, long/short style, exposure, decay,
-  prediction-style correlation, and turnover;
+- all available chart families: quantile ordering, style long/short returns, basket or
+  prediction-bucket exposure per the chart title, return autocorrelation, style correlation, turnover;
 - evidence gaps and plausible market, liquidity, size, or implementation alternatives.
 
 If retained lineage suggests a `binance_intraday` availability, normalization, or comparability
