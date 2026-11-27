@@ -44,6 +44,8 @@ Never reconstruct a retired import action or treat a local plugin as an eligible
 Choose a nonblank user-facing name from the user's name or the selected Factor theme and task.
 Build one `specification` with `strategy_kind: "cs"`, required `ranking`, and optional
 `strategy_type` and `rebalance_bars` chosen from the selected Factor Cards or the user's request.
+Send `liquidity` only when the user asks for a tier; omission means `low`. Tiers by 30-day average
+daily volume (excluding today), in USD: `low` > 10M, `medium` > 50M, `high` > 100M; updated daily.
 Omit `weighting` for every AI-designed or recommended Strategy; the server derives equal Factor
 weights. Send `weighting.mode: "custom"` only with weights the user explicitly supplied: finite
 positive `weighting.weights` totaling exactly 1, aligned in order with the exact selected
